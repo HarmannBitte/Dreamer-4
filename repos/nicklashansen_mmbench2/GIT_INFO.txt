@@ -1,0 +1,6 @@
+remote: https://github.com/nicklashansen/mmbench2.git
+branch: main
+commit: 3dda6ea5bc60382ad9e1dcd1c6c3af67d69326a9
+date:   2026-07-09 13:36:03 -0700
+subject: update README
+fetched: 2026-09-20T13:35:05Z (shallow clone, depth 1; .git removed to save space)

@@ -1,0 +1,54 @@
+[project]
+name = "dreamer4-pytorch"
+version = "0.1.0"
+description = "Dreamer 4 — PyTorch implementation of a scalable world model agent"
+requires-python = ">=3.10"
+
+dependencies = [
+    # Core
+    "torch>=2.2",
+    # Config
+    "pyyaml",
+    # Utilities
+    "numpy",
+    # Perceptual loss (torchvision carries the LPIPS trunks)
+    "torchvision",
+    "lpips",
+    # TensorBoard logging
+    "tensorboard",
+    # Artifacts: the tokenizer's reconstruction strip (imageio) and the
+    # world model's open-loop rollout GIF (pillow)
+    "imageio",
+    "pillow",
+    # Real-environment evaluation in phases 2-3 (gymnasium.make)
+    "gymnasium",
+]
+
+[project.scripts]
+dreamer4-train-tokenizer = "dreamer4.train.train_tokenizer:main"
+dreamer4-train-dynamics = "dreamer4.train.train_dynamics:main"
+dreamer4-train-heads = "dreamer4.train.train_heads:main"
+dreamer4-train-pmpo = "dreamer4.train.train_pmpo:main"
+
+[project.optional-dependencies]
+dino = [
+    # DINOv3 perceptual-loss backbone (dreamer4.train.perceptual.DinoV3Perceptual)
+    "transformers",
+]
+lerobot = [
+    # parquet reading for LeRobot state/actions, and the ffmpeg plugin that
+    # decodes its per-episode videos (dreamer4.data.lerobot)
+    "pyarrow",
+    "imageio-ffmpeg",
+]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["dreamer4*"]

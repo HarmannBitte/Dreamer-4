@@ -1,0 +1,2346 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+  
+    
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-site-verification" content="5fPGCLllnWrvFxH9QWI0l1TadV7byeEvfPcyK2VkS_s"/>
+    <meta name="google-site-verification" content="Rp5zp04IKW-s1IbpTOGB7Z6XY60oloZD5C3kTM-AiY4"/>
+
+    
+    
+    <meta name="generator" content="InvenioRDM 15.0"/>
+
+    
+    
+    
+  
+    <meta name="description" content="" />
+    <meta name="citation_title" content="How to train a frontier-level world model" />
+    <meta name="citation_author" content="Diego, Martì Monsò" />
+    <meta name="citation_author" content="Sacco, Francesco" />
+    <meta name="citation_author" content="Hu, Edward" />
+    <meta name="citation_doi" content="10.5281/zenodo.21475232" />
+    <meta name="citation_abstract_html_url" content="https://zenodo.org/records/21475232" />
+    <meta property="og:title" content="How to train a frontier-level world model" />
+    <meta property="og:description" content="" />
+    <meta property="og:url" content="https://zenodo.org/records/21475232" />
+    <meta property="og:site_name" content="Zenodo" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@zenodo_org" />
+    <meta name="twitter:title" content="How to train a frontier-level world model" />
+    <meta name="twitter:description" content="" />
+    
+    <link rel="alternate" type="application/octet-stream" href="https://zenodo.org/records/21475232/files/bibliography.bib">
+    <link rel="item" type="application/octet-stream" href="https://zenodo.org/records/21475232/files/bibliography.bib">
+    
+    <link rel="alternate" type="text/html" href="https://zenodo.org/records/21475232/files/space-layer-mask.html">
+    <link rel="item" type="text/html" href="https://zenodo.org/records/21475232/files/space-layer-mask.html">
+    
+    <link rel="alternate" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/causal-space-time.svg">
+    <link rel="item" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/causal-space-time.svg">
+    
+    <link rel="alternate" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/xpred-vpred-noise-comparison.svg">
+    <link rel="item" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/xpred-vpred-noise-comparison.svg">
+    
+    <link rel="alternate" type="text/css" href="https://zenodo.org/records/21475232/files/style.css">
+    <link rel="item" type="text/css" href="https://zenodo.org/records/21475232/files/style.css">
+    
+    <link rel="alternate" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/causal-sequence.svg">
+    <link rel="item" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/causal-sequence.svg">
+    
+    <link rel="alternate" type="video/mp4" href="https://zenodo.org/records/21475232/files/comparison.mp4">
+    <link rel="item" type="video/mp4" href="https://zenodo.org/records/21475232/files/comparison.mp4">
+    
+    <link rel="alternate" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/compute_scaling_reconstructed.svg">
+    <link rel="item" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/compute_scaling_reconstructed.svg">
+    
+    <link rel="alternate" type="image/gif" href="https://zenodo.org/records/21475232/files/behaviour-cloning.gif">
+    <link rel="item" type="image/gif" href="https://zenodo.org/records/21475232/files/behaviour-cloning.gif">
+    
+    <link rel="alternate" type="video/mp4" href="https://zenodo.org/records/21475232/files/coinrun-wm.mp4">
+    <link rel="item" type="video/mp4" href="https://zenodo.org/records/21475232/files/coinrun-wm.mp4">
+    
+    <link rel="alternate" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/maetok-autoencoder-platformer.svg">
+    <link rel="item" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/maetok-autoencoder-platformer.svg">
+    
+    <link rel="alternate" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/search-space.svg">
+    <link rel="item" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/search-space.svg">
+    
+    <link rel="alternate" type="text/html" href="https://zenodo.org/records/21475232/files/index.html">
+    <link rel="item" type="text/html" href="https://zenodo.org/records/21475232/files/index.html">
+    
+    <link rel="alternate" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/optimizer-comparison.svg">
+    <link rel="item" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/optimizer-comparison.svg">
+    
+    <link rel="alternate" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/diffusion-forcing.svg">
+    <link rel="item" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/diffusion-forcing.svg">
+    
+    <link rel="alternate" type="image/gif" href="https://zenodo.org/records/21475232/files/coinrun.gif">
+    <link rel="item" type="image/gif" href="https://zenodo.org/records/21475232/files/coinrun.gif">
+    
+    <link rel="alternate" type="image/jpeg" href="https://zenodo.org/records/21475232/files/hollow-inside.jpg">
+    <link rel="item" type="image/jpeg" href="https://zenodo.org/records/21475232/files/hollow-inside.jpg">
+    
+    <link rel="alternate" type="text/javascript" href="https://zenodo.org/records/21475232/files/distill.pub_template.v2.js">
+    <link rel="item" type="text/javascript" href="https://zenodo.org/records/21475232/files/distill.pub_template.v2.js">
+    
+    <link rel="alternate" type="image/jpeg" href="https://zenodo.org/records/21475232/files/coinrun-tokenizer.jpg">
+    <link rel="item" type="image/jpeg" href="https://zenodo.org/records/21475232/files/coinrun-tokenizer.jpg">
+    
+    <link rel="alternate" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/roofline-analysis.svg">
+    <link rel="item" type="image/svg+xml" href="https://zenodo.org/records/21475232/files/roofline-analysis.svg">
+
+
+<link rel="canonical" href="https://zenodo.org/records/21475232">
+      
+      
+      <title>How to train a frontier-level world model | Zenodo</title>
+      <link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico"/>
+          <link rel="apple-touch-icon" sizes="120x120" href="/static/apple-touch-icon-120.png"/>
+          <link rel="apple-touch-icon" sizes="152x152" href="/static/apple-touch-icon-152.png"/>
+          <link rel="apple-touch-icon" sizes="167x167" href="/static/apple-touch-icon-167.png"/>
+          <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon-180.png"/>
+    
+      <link rel="stylesheet" href="/static/dist/css/6874.66341f2e5059614d.css" />
+      <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+      <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <![endif]-->
+    
+  </head>
+
+  <body data-invenio-config='{"isMathJaxEnabled": "//cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js?config=TeX-AMS-MML_HTMLorMML"}'  itemscope itemtype="http://schema.org/WebPage" data-spy="scroll" data-target=".scrollspy-target">
+      <a id="skip-to-main" class="ui button primary ml-5 mt-5 skip-link" href="#main">Skip to main</a>
+      <!--[if lt IE 8]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+      <![endif]-->
+    
+
+<div>
+  <header class="theme header">
+
+    <div class="outer-navbar">
+      <div class="ui container invenio-header-container">
+        <nav id="invenio-nav" class="ui inverted menu borderless p-0">
+          <div class="item logo p-0">
+                      <a class="logo-link" href="https://zenodo.org/">
+                      <img class="ui image rdm-logo"
+                            src="/static/images/invenio-rdm.svg"
+                            alt="Zenodo home"/>
+                    </a>
+          </div>
+
+          <div id="rdm-burger-toggle">
+            <button
+              id="rdm-burger-menu-icon"
+              class="ui button transparent"
+              aria-label="Menu"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              aria-controls="invenio-menu"
+            >
+              <span class="navicon" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <nav
+            id="invenio-menu"
+            aria-labelledby="rdm-burger-menu-icon"
+            class="ui fluid menu borderless mobile-hidden"
+          >
+            <button
+              id="rdm-close-burger-menu-icon"
+              class="ui button transparent"
+              aria-label="Close menu"
+            >
+              <span class="navicon" aria-hidden="true"></span>
+            </button>
+
+    
+    
+    
+      <div class="item p-0 search-bar">
+        <div id="header-search-bar" data-options='[{"key": "records", "text": "All Zenodo", "value": "/search"}]'>
+          <div class="ui fluid search">
+            <div class="ui icon input">
+              <input
+                autocomplete="off"
+                aria-label="Search records"
+                placeholder="Search records..."
+                type="text"
+                tabindex="0"
+                class="prompt"
+                value=""
+              >
+              <button class="ui icon button right-floated search" aria-label="Search">
+                <i aria-hidden="true" class="search icon"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+                  <div class="item">
+                    <a href="/communities">Communities</a>
+                  </div>
+
+              
+                <div class="item">
+                  <a href="/me/uploads">My dashboard</a>
+                </div>
+              
+              <div class="right menu item">
+    <form>
+      <a
+        href="/login/?next=/records/21475232"
+        class="ui button auth-button" aria-busy="false" aria-live="polite" aria-label="Log in"
+      >
+        <i class="sign-in icon auth-icon" aria-hidden="true"></i>
+        Log in
+      </a>
+      
+        <a href="/signup/" class="ui button signup">
+          <i class="edit outline icon"></i>
+          Sign up
+        </a>
+      
+    </form>
+              </div>
+          </nav>
+        </nav>
+      </div>
+    </div>
+      
+      
+    
+      
+    
+    
+      
+        <div class="ui warning message top attached m-0 inv-banner" id="banner-96">
+          <div class="ui container">
+              <p>Zenodo is currently experiencing slowness and intermittent outages due to heavy automated traffic from bots and AI crawlers. We are aware of the problem, and our team is focused on stabilizing the service. Thank you for your patience. <a href="https://blog.zenodo.org/">More info here</a>.&nbsp;</p>
+          </div>
+        </div>
+      
+    
+  </header>
+</div>
+
+  <main id="main">
+    <div class="invenio-page-body">
+<span id="detail-share-btn-require-link-expiration"
+        data-share-btn-require-link-expiration='false'>
+
+  <section id="banners" class="banners" aria-label="Information banner">
+    <!-- COMMUNITY HEADER: hide it when displaying the submission request -->
+    
+      
+    
+    <!-- /COMMUNITY HEADER -->
+
+    <!-- PREVIEW HEADER -->
+    
+    <!-- /PREVIEW HEADER -->
+
+    
+  </section>
+
+
+  <div class="ui container">
+    <div class="ui relaxed grid mt-5">
+      <div class="two column row top-padded">
+
+        
+        <article
+          class="sixteen wide tablet eleven wide computer column main-record-content">
+          
+
+              
+
+              
+
+              <section id="record-info"
+                       aria-label="Publication date and version number">
+                <div class="ui grid middle aligned">
+                  <div class="two column row">
+                    <div class="left floated left aligned column">
+                      <span class="ui" title="Publication date">
+                        Published July 21, 2026
+                      </span>
+                      <span
+                        class="label text-muted"> | Version v1</span>
+                    </div>
+                    <div class="right floated right aligned column">
+
+                      
+                      
+                        
+                          
+                        
+                        
+                          
+                        
+                        <a href="/search?q=&amp;f=resource_type%3Apublication%2Binner%3Apublication-report"
+                           role="note"
+                           class="ui label horizontal small neutral mb-5"
+                           aria-label="Resource type"
+                        >
+                          Report
+                        </a>
+                      
+
+                      <span role="note"
+                            class="ui label horizontal small access-status open mb-5"
+                            data-tooltip="The record and files are publicly accessible."
+                            data-inverted=""
+                            aria-label="Access status"
+                      >
+                        
+                          <i class="icon unlock"
+                             aria-hidden="true"></i>
+                        
+                        <span
+                          aria-label="The record and files are publicly accessible.">
+                          Open
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <div class="ui divider hidden"></div><section id="record-title-section"
+                       aria-label="Record title, authors and contributors">
+                <h1 id="record-title"
+                    class="wrap-overflowing-text">How to train a frontier-level world model</h1>
+
+                
+                  <section id="creatibutors"
+                           aria-label="Authors and contributors"><div class="ui grid">
+
+  
+    <div id="creators-section" class="row ui accordion affiliations">
+      <div class="sixteen wide mobile twelve wide tablet thirteen wide computer column">
+        <h3 class="sr-only">Authors/Creators</h3>
+        <ul class="creatibutors">
+          
+  
+  <li class="creatibutor-wrap separated">
+    <a class="ui creatibutor-link"
+      
+      href="/search?q=metadata.creators.person_or_org.name:%22Diego,+Mart%C3%AC+Mons%C3%B2%22"
+    >
+      <span class="creatibutor-name">Diego, Martì Monsò</span></a>
+  
+
+  
+    
+      
+        
+        <a href="https://orcid.org/0009-0006-7580-6035"
+           aria-label="Diego, Martì Monsò's ORCID profile"
+           title="Diego, Martì Monsò's ORCID profile">
+          <img class="ml-5 inline-id-icon"
+               src="/static/images/orcid.svg"
+               alt="ORCID icon"/>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+  
+  
+</li>
+  
+  <li class="creatibutor-wrap separated">
+    <a class="ui creatibutor-link"
+      
+      href="/search?q=metadata.creators.person_or_org.name:%22Sacco,+Francesco%22"
+    >
+      <span class="creatibutor-name">Sacco, Francesco</span></a>
+  
+
+  
+    
+      
+        
+        <a href="https://orcid.org/0000-0002-9565-4722"
+           aria-label="Sacco, Francesco's ORCID profile"
+           title="Sacco, Francesco's ORCID profile">
+          <img class="ml-5 inline-id-icon"
+               src="/static/images/orcid.svg"
+               alt="ORCID icon"/>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+  
+  
+</li>
+  
+  <li class="creatibutor-wrap separated"
+      data-affiliation-refs="1"
+      data-affiliations="University of Pennsylvania">
+    <a class="ui creatibutor-link"
+      
+        data-tooltip="University of Pennsylvania"
+        data-position="bottom center"
+      
+      href="/search?q=metadata.creators.person_or_org.name:%22Hu,+Edward%22"
+    >
+      <span class="creatibutor-name">Hu, Edward</span><sup class="font-tiny">1</sup></a>
+  
+
+  
+    
+      
+        
+        <a href="https://orcid.org/0009-0005-9339-5156"
+           aria-label="Hu, Edward's ORCID profile"
+           title="Hu, Edward's ORCID profile">
+          <img class="ml-5 inline-id-icon"
+               src="/static/images/orcid.svg"
+               alt="ORCID icon"/>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+  
+  
+</li>
+  
+        </ul>
+      </div>
+
+      
+        
+<div id="creators-affiliations-title"
+     class="ui sixteen wide tablet three wide computer column title right aligned bottom aligned">
+  <button class="ui affiliations-button trigger button mini mr-0"
+          aria-controls="creators-affiliations"
+          data-open-text="Show affiliations"
+          data-close-text="Hide affiliations"
+          aria-expanded="false"
+  >
+    Show affiliations
+  </button>
+</div>
+
+<section class="ui sixteen wide column content" id="creators-affiliations" aria-label="Affiliations for creators">
+  
+  <ul>
+    
+    <li data-affiliation-ref="1">
+      1.
+
+      
+        
+        
+
+        
+          <a class="no-text-decoration"
+             href="https://ror.org/00b30xv10"
+             aria-label="University of Pennsylvania's ROR profile"
+             title="University of Pennsylvania's ROR profile"
+          >
+            <img class="ml-5 inline-id-icon"
+                 src="/static/images/ror-icon.svg"
+                 alt="ROR icon"
+            />
+          </a>
+        
+      
+
+      University of Pennsylvania
+    </li>
+    
+  </ul>
+
+</section>
+
+      
+    </div>
+  
+
+  
+
+</div>
+                  </section>
+                
+              </section>
+
+
+
+
+<section
+      id="record-files" class="rel-mt-2 rel-mb-3"
+      aria-label="Files"
+    ><h2 id="files-heading">Files</h2>
+            
+  <div class="ui accordion panel mb-10 open" href="#files-preview-accordion-panel">
+    <h3 class="active title panel-heading open m-0">
+      <div
+        role="button"
+        id="files-preview-accordion-trigger"
+        aria-controls="files-preview-accordion-panel"
+        aria-expanded="true"
+        tabindex="0"
+        class="trigger"
+        aria-label="File preview"
+      >
+        <span id="preview-file-title">behaviour-cloning.gif</span>
+        <i class="angle right icon" aria-hidden="true"></i>
+      </div>
+    </h3>
+    <div
+      role="region"
+      id="files-preview-accordion-panel"
+      aria-labelledby="files-preview-accordion-trigger"
+      class="active content preview-container pt-0 open"
+    >
+      <div>
+        
+  
+  <iframe
+    title="Preview"
+    class="preview-iframe"
+    id="preview-iframe"
+    name="preview-iframe"
+    src="/records/21475232/preview/behaviour-cloning.gif?include_deleted=0"
+    tabindex="-1"
+  >
+  </iframe>
+      </div>
+    </div>
+  </div>
+  <div class="ui accordion panel mb-10 open" href="#files-list-accordion-panel">
+    <h3 class="active title panel-heading open m-0">
+      <div role="button" id="files-list-accordion-trigger" aria-controls="files-list-accordion-panel" aria-expanded="true" tabindex="0" class="trigger">
+        Files
+        <small class="text-muted"> (16.3 MB)</small>
+        <i class="angle right icon" aria-hidden="true"></i>
+      </div>
+    </h3>
+
+    <div role="region" id="files-list-accordion-panel" aria-labelledby="files-list-accordion-trigger" class="active content pt-0">
+      
+      <div>
+        
+  <table id="file-list-table" class="ui striped table files fluid open">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Size</th>
+        <th class>
+            
+              <a role="button" class="ui compact mini button right floated archive-link" href="https://zenodo.org/api/records/21475232/files-archive">
+                <i class="file archive icon button" aria-hidden="true"></i> Download all
+              </a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/behaviour-cloning.gif?download=1">behaviour-cloning.gif</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:5710e41ee6c2c10d9039c904cda131ba
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>82.2 kB</td>
+          <td class="right aligned">
+            <span>
+              
+                <a role="button" class="ui compact mini button preview-link" href="/records/21475232/preview/behaviour-cloning.gif?include_deleted=0" target="preview-iframe" data-file-key="behaviour-cloning.gif">
+                  <i class="eye icon" aria-hidden="true"></i>Preview
+                </a>
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/behaviour-cloning.gif?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/bibliography.bib?download=1">bibliography.bib</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:133e2ce8e8f644156e04c73e8e474702
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>1.7 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/bibliography.bib?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/causal-sequence.svg?download=1">causal-sequence.svg</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:ef14972bb1b0b0486c526456c49f065d
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>35.2 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/causal-sequence.svg?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/causal-space-time.svg?download=1">causal-space-time.svg</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:21dc5201599b44e6c99e3e564e4050d4
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>85.5 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/causal-space-time.svg?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/coinrun-tokenizer.jpg?download=1">coinrun-tokenizer.jpg</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:98089f1eebe71d38924aff5686d564c7
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>34.8 kB</td>
+          <td class="right aligned">
+            <span>
+              
+                <a role="button" class="ui compact mini button preview-link" href="/records/21475232/preview/coinrun-tokenizer.jpg?include_deleted=0" target="preview-iframe" data-file-key="coinrun-tokenizer.jpg">
+                  <i class="eye icon" aria-hidden="true"></i>Preview
+                </a>
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/coinrun-tokenizer.jpg?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/coinrun-wm.mp4?download=1">coinrun-wm.mp4</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:9613c95da97da863770416c17f104347
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>1.1 MB</td>
+          <td class="right aligned">
+            <span>
+              
+                <a role="button" class="ui compact mini button preview-link" href="/records/21475232/preview/coinrun-wm.mp4?include_deleted=0" target="preview-iframe" data-file-key="coinrun-wm.mp4">
+                  <i class="eye icon" aria-hidden="true"></i>Preview
+                </a>
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/coinrun-wm.mp4?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/coinrun.gif?download=1">coinrun.gif</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:ac8cd54ae4d3b0c697bd695ea8573589
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>2.6 MB</td>
+          <td class="right aligned">
+            <span>
+              
+                <a role="button" class="ui compact mini button preview-link" href="/records/21475232/preview/coinrun.gif?include_deleted=0" target="preview-iframe" data-file-key="coinrun.gif">
+                  <i class="eye icon" aria-hidden="true"></i>Preview
+                </a>
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/coinrun.gif?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/comparison.mp4?download=1">comparison.mp4</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:f2d22d0e3bbbad12b59bfd2145d81b67
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>3.2 MB</td>
+          <td class="right aligned">
+            <span>
+              
+                <a role="button" class="ui compact mini button preview-link" href="/records/21475232/preview/comparison.mp4?include_deleted=0" target="preview-iframe" data-file-key="comparison.mp4">
+                  <i class="eye icon" aria-hidden="true"></i>Preview
+                </a>
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/comparison.mp4?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/compute_scaling_reconstructed.svg?download=1">compute_scaling_reconstructed.svg</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:4ae145d87d9042607dab2ebaa1e3309f
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>16.9 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/compute_scaling_reconstructed.svg?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/diffusion-forcing.svg?download=1">diffusion-forcing.svg</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:97726a231f8e330adca28d27b86cd8a6
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>1.9 MB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/diffusion-forcing.svg?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/distill.pub_template.v2.js?download=1">distill.pub_template.v2.js</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:9055824229a78830a87c4ef5129516e1
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>292.6 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/distill.pub_template.v2.js?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/hollow-inside.jpg?download=1">hollow-inside.jpg</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:3fdc9a5c26459bcb4294b7acc3bccf19
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>15.8 kB</td>
+          <td class="right aligned">
+            <span>
+              
+                <a role="button" class="ui compact mini button preview-link" href="/records/21475232/preview/hollow-inside.jpg?include_deleted=0" target="preview-iframe" data-file-key="hollow-inside.jpg">
+                  <i class="eye icon" aria-hidden="true"></i>Preview
+                </a>
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/hollow-inside.jpg?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/index.html?download=1">index.html</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:a6290ee87371b65ef59aa032f1a4a203
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>36.7 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/index.html?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/maetok-autoencoder-platformer.svg?download=1">maetok-autoencoder-platformer.svg</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:bb4a70593f8e48512cc2ce06616234b1
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>459.2 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/maetok-autoencoder-platformer.svg?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/optimizer-comparison.svg?download=1">optimizer-comparison.svg</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:0e6265dc3344313e8702e2971fedf8ad
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>73.0 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/optimizer-comparison.svg?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/roofline-analysis.svg?download=1">roofline-analysis.svg</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:c678c7963929c5ddd732fc6cdca3108c
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>4.0 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/roofline-analysis.svg?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/search-space.svg?download=1">search-space.svg</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:bcdf523de2d92f494ffd69f5b765b117
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>1.8 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/search-space.svg?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/space-layer-mask.html?download=1">space-layer-mask.html</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:a7d1f76a22f11ae6d05b952dbf092850
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>28.9 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/space-layer-mask.html?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/style.css?download=1">style.css</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:16a595e20312a2c463b71b4bb26704da
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>10.6 kB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/style.css?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+      
+        
+        
+        <tr>
+          <td class="ten wide">
+            <div>
+              <a href="/records/21475232/files/xpred-vpred-noise-comparison.svg?download=1">xpred-vpred-noise-comparison.svg</a>
+            </div>
+            <small class="ui text-muted font-tiny">md5:abf8dad8cd497598c7755f5ce52382e6
+            <div class="ui icon inline-block" data-tooltip="This is the file fingerprint (checksum), which can be used to verify the file integrity.">
+              <i class="question circle checksum icon"></i>
+            </div>
+            </small>
+          </td>
+	  <td>6.2 MB</td>
+          <td class="right aligned">
+            <span>
+              
+              <a role="button" class="ui compact mini button" href="/records/21475232/files/xpred-vpred-noise-comparison.svg?download=1">
+                <i class="download icon" aria-hidden="true"></i>Download
+              </a>
+            </span>
+          </td>
+        </tr>
+      
+    
+    </tbody>
+  </table>
+      </div>
+    </div>
+  </div>
+
+    </section>
+              
+
+  <section id="additional-details" class="rel-mt-2" aria-label="Additional record details">
+
+
+
+
+
+
+  
+    
+      
+        
+      
+    
+      
+    
+      
+    
+  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+
+
+
+
+  <h2 id="record-details-heading">Additional details</h2>
+
+  <div class="ui divider"></div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+      
+      
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+
+      
+        <div class="ui fluid accordion padded grid rel-mb-1">
+          <div class="active title sixteen wide mobile four wide tablet three wide computer column">
+            <h3 class="ui header">
+              <div
+                id="custom-fields-accordion-trigger"
+                role="button"
+                tabindex="0"
+                aria-expanded="true"
+                aria-controls="custom-fields-panel"
+                class="trigger"
+              >
+                <i class="caret right icon" aria-hidden="true"></i>Software
+              </div>
+            </h3>
+          </div>
+          <div
+            id="custom-fields-panel"
+            role="region"
+            aria-labelledby="custom-fields-accordion-trigger"
+            class="active content sixteen wide mobile twelve wide tablet thirteen wide computer column"
+          >
+              
+              <dl class="details-list">
+                
+  
+
+  
+    
+    
+      
+        
+      
+    
+  
+    
+    
+  
+    
+    
+  
+
+  
+
+  
+    <dl class="details-list">
+      
+        
+  
+  
+    
+      <dt class="ui mini header">
+        Repository URL
+        
+        
+          <a href="https://codemeta.github.io/terms/#codeRepository" aria-label="https://codemeta.github.io/terms/#codeRepository">
+            <i class="icon external" aria-hidden="true"></i>
+          </a>
+        
+      </dt>
+
+      
+        <dd>
+          
+          
+            <a href="https://github.com/next-state/open-dreamer">https://github.com/next-state/open-dreamer</a>
+          
+        </dd>
+      
+    
+  
+
+      
+    </dl>
+  
+
+              </dl>
+          </div>
+        </div>
+        <div class="ui divider"></div>
+      
+      
+      
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+
+      
+      
+      
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+
+      
+  
+
+  
+
+
+
+  
+
+  </section>
+    
+    <section
+      id="citations-search"
+      data-record-pids='{"doi": {"client": "datacite", "identifier": "10.5281/zenodo.21475232", "provider": "datacite"}, "oai": {"identifier": "oai:zenodo.org:21475232", "provider": "oai"}}'
+      data-record-parent-pids='{"doi": {"client": "datacite", "identifier": "10.5281/zenodo.21475231", "provider": "datacite"}}'
+      data-citations-endpoint="https://zenodo-broker.web.cern.ch/api/relationships"
+      aria-label="Record citations"
+      class="rel-mb-1"
+    >
+    </section>
+  
+        </article>
+
+        
+        <aside class="sixteen wide tablet five wide computer column sidebar"
+               aria-label="Record details">
+          
+
+
+
+
+<section id="metrics" aria-label="Metrics" class="ui segment rdm-sidebar sidebar-container">
+
+
+<div class="ui tiny two statistics rel-mt-1">
+  
+  
+
+  <div class="ui statistic">
+    <div class="value">74</div>
+    <div class="label">
+      <i aria-hidden="true" class="eye icon"></i>
+      Views
+    </div>
+  </div>
+
+  <div class="ui statistic">
+    <div class="value">38</div>
+    <div class="label">
+      <i aria-hidden="true" class="download icon"></i>
+      Downloads
+    </div>
+  </div>
+</div>
+
+<div class="ui accordion rel-mt-1 centered">
+  <div class="title trigger" tabindex="0">
+    <i class="caret right icon" aria-hidden="true"></i>
+    <span
+      data-open-text="Show more details"
+      data-close-text="Show less details"
+    >
+      Show more details
+    </span>
+  </div>
+
+  <div class="content">
+    <table id="record-statistics" class="ui definition table fluid">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="right aligned">All versions</th>
+          <th class="right aligned">This version</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            Views
+            <i
+              tabindex="0"
+              role="button"
+              style="position:relative"
+              class="popup-trigger question circle small icon"
+              aria-expanded="false"
+              aria-label="More info"
+              data-variation="mini inverted"
+            >
+            </i>
+            <p role="tooltip" class="popup-content ui flowing popup transition hidden">
+              Total views
+            </p>
+          </td>
+          <td data-label="All versions" class="right aligned">
+  
+    74
+  
+</td>
+          <td data-label="This version" class="right aligned">
+  
+    74
+  
+</td>
+        </tr>
+        <tr>
+          <td>
+            Downloads
+            <i
+              tabindex="0"
+              role="button"
+              style="position:relative"
+              class="popup-trigger question circle small icon"
+              aria-expanded="false"
+              aria-label="More info"
+              data-variation="mini inverted"
+            >
+            </i>
+            <p role="tooltip" class="popup-content ui flowing popup transition hidden">
+              Total downloads
+            </p>
+          </td>
+          <td data-label="All versions" class="right aligned">
+  
+    38
+  
+</td>
+          <td data-label="This version" class="right aligned">
+  
+    38
+  
+</td>
+        </tr>
+        <tr>
+          <td>
+            Data volume
+            <i
+              tabindex="0"
+              role="button"
+              style="position:relative"
+              class="popup-trigger question circle small icon"
+              aria-expanded="false"
+              aria-label="More info"
+              data-variation="mini inverted"
+            >
+            </i>
+            <p role="tooltip" class="popup-content ui flowing popup transition hidden">
+              Total data volume
+            </p>
+          </td>
+
+          <td data-label="All versions" class="right aligned">33.4 MB</td>
+          <td data-label="This version" class="right aligned">33.4 MB</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="text-align-center rel-mt-1">
+      <small>
+        <a href="https://zenodo.org/help/statistics">More info on how stats are collected....</a>
+      </small>
+    </p>
+  </div>
+
+</div>
+
+</section>
+
+<div class="sidebar-container">
+  <h2 class="ui medium top attached header mt-0">Versions</h2>
+  <div id="record-versions" class="ui segment rdm-sidebar bottom attached pl-0 pr-0 pt-0">
+    <div class="versions">
+      <div id="recordVersions" data-record='{"access": {"embargo": {"active": false, "reason": null}, "files": "public", "record": "public", "status": "open"}, "created": "2026-07-21T14:29:44.967331+00:00", "custom_fields": {"code:codeRepository": "https://github.com/next-state/open-dreamer"}, "deletion_status": {"is_deleted": false, "status": "P"}, "expanded": {"parent": {"access": {"owned_by": {"active": null, "blocked_at": null, "confirmed_at": null, "email": "", "id": "613965", "is_current_user": false, "links": {"avatar": "https://zenodo.org/api/users/613965/avatar.svg", "records_html": "https://zenodo.org/search?q=parent.access.owned_by.user:613965", "self": "https://zenodo.org/api/users/613965"}, "profile": {"affiliations": "", "full_name": "Francesco Sacco"}, "username": "Francesco215", "verified_at": null}}}}, "files": {"count": 20, "enabled": true, "entries": {"behaviour-cloning.gif": {"access": {"hidden": false}, "checksum": "md5:5710e41ee6c2c10d9039c904cda131ba", "ext": "gif", "id": "5045fa24-79e3-45fd-9305-437d85aff0e0", "key": "behaviour-cloning.gif", "links": {"content": "https://zenodo.org/api/records/21475232/files/behaviour-cloning.gif/content", "iiif_api": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/full/0/default.png", "iiif_base": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif", "iiif_canvas": "https://zenodo.org/api/iiif/record:21475232/canvas/behaviour-cloning.gif", "iiif_info": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/info.json", "self": "https://zenodo.org/api/records/21475232/files/behaviour-cloning.gif"}, "metadata": {"height": 64, "width": 256}, "mimetype": "image/gif", "size": 82171, "storage_class": "L"}, "bibliography.bib": {"access": {"hidden": false}, "checksum": "md5:133e2ce8e8f644156e04c73e8e474702", "ext": "bib", "id": "3abb85d7-9cf9-4054-86c5-df166e79e57e", "key": "bibliography.bib", "links": {"content": "https://zenodo.org/api/records/21475232/files/bibliography.bib/content", "self": "https://zenodo.org/api/records/21475232/files/bibliography.bib"}, "metadata": {}, "mimetype": "application/octet-stream", "size": 1740, "storage_class": "L"}, "causal-sequence.svg": {"access": {"hidden": false}, "checksum": "md5:ef14972bb1b0b0486c526456c49f065d", "ext": "svg", "id": "20be3edf-9f60-40e4-9e1f-7e7ae896ad89", "key": "causal-sequence.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/causal-sequence.svg/content", "self": "https://zenodo.org/api/records/21475232/files/causal-sequence.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 35250, "storage_class": "L"}, "causal-space-time.svg": {"access": {"hidden": false}, "checksum": "md5:21dc5201599b44e6c99e3e564e4050d4", "ext": "svg", "id": "ea667a6e-3d69-421f-a474-287f7d3c304b", "key": "causal-space-time.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/causal-space-time.svg/content", "self": "https://zenodo.org/api/records/21475232/files/causal-space-time.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 85491, "storage_class": "L"}, "coinrun-tokenizer.jpg": {"access": {"hidden": false}, "checksum": "md5:98089f1eebe71d38924aff5686d564c7", "ext": "jpg", "id": "b9ad2b10-1c79-46f3-ab30-35a12a2b9490", "key": "coinrun-tokenizer.jpg", "links": {"content": "https://zenodo.org/api/records/21475232/files/coinrun-tokenizer.jpg/content", "iiif_api": "https://zenodo.org/api/iiif/record:21475232:coinrun-tokenizer.jpg/full/full/0/default.png", "iiif_base": "https://zenodo.org/api/iiif/record:21475232:coinrun-tokenizer.jpg", "iiif_canvas": "https://zenodo.org/api/iiif/record:21475232/canvas/coinrun-tokenizer.jpg", "iiif_info": "https://zenodo.org/api/iiif/record:21475232:coinrun-tokenizer.jpg/info.json", "self": "https://zenodo.org/api/records/21475232/files/coinrun-tokenizer.jpg"}, "metadata": {"height": 256, "width": 326}, "mimetype": "image/jpeg", "size": 34844, "storage_class": "L"}, "coinrun-wm.mp4": {"access": {"hidden": false}, "checksum": "md5:9613c95da97da863770416c17f104347", "ext": "mp4", "id": "f311a766-d459-42c6-bbbf-5741941f5b8f", "key": "coinrun-wm.mp4", "links": {"content": "https://zenodo.org/api/records/21475232/files/coinrun-wm.mp4/content", "self": "https://zenodo.org/api/records/21475232/files/coinrun-wm.mp4"}, "metadata": {}, "mimetype": "video/mp4", "size": 1096930, "storage_class": "L"}, "coinrun.gif": {"access": {"hidden": false}, "checksum": "md5:ac8cd54ae4d3b0c697bd695ea8573589", "ext": "gif", "id": "c8b07ce6-26a6-466d-9860-012af2f584ba", "key": "coinrun.gif", "links": {"content": "https://zenodo.org/api/records/21475232/files/coinrun.gif/content", "iiif_api": "https://zenodo.org/api/iiif/record:21475232:coinrun.gif/full/full/0/default.png", "iiif_base": "https://zenodo.org/api/iiif/record:21475232:coinrun.gif", "iiif_canvas": "https://zenodo.org/api/iiif/record:21475232/canvas/coinrun.gif", "iiif_info": "https://zenodo.org/api/iiif/record:21475232:coinrun.gif/info.json", "self": "https://zenodo.org/api/records/21475232/files/coinrun.gif"}, "metadata": {"height": 576, "width": 624}, "mimetype": "image/gif", "size": 2608735, "storage_class": "L"}, "comparison.mp4": {"access": {"hidden": false}, "checksum": "md5:f2d22d0e3bbbad12b59bfd2145d81b67", "ext": "mp4", "id": "bab23b34-479a-4197-bdbc-90eb198be844", "key": "comparison.mp4", "links": {"content": "https://zenodo.org/api/records/21475232/files/comparison.mp4/content", "self": "https://zenodo.org/api/records/21475232/files/comparison.mp4"}, "metadata": {}, "mimetype": "video/mp4", "size": 3223628, "storage_class": "L"}, "compute_scaling_reconstructed.svg": {"access": {"hidden": false}, "checksum": "md5:4ae145d87d9042607dab2ebaa1e3309f", "ext": "svg", "id": "dd2587bb-4e32-4433-a650-d89fcbafd6ec", "key": "compute_scaling_reconstructed.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/compute_scaling_reconstructed.svg/content", "self": "https://zenodo.org/api/records/21475232/files/compute_scaling_reconstructed.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 16924, "storage_class": "L"}, "diffusion-forcing.svg": {"access": {"hidden": false}, "checksum": "md5:97726a231f8e330adca28d27b86cd8a6", "ext": "svg", "id": "b2b86231-5d22-4946-aac8-38e3356dc6a9", "key": "diffusion-forcing.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/diffusion-forcing.svg/content", "self": "https://zenodo.org/api/records/21475232/files/diffusion-forcing.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 1947162, "storage_class": "L"}, "distill.pub_template.v2.js": {"access": {"hidden": false}, "checksum": "md5:9055824229a78830a87c4ef5129516e1", "ext": "js", "id": "2d38f3ee-7bc9-4ede-ab6a-92ad5b383aa2", "key": "distill.pub_template.v2.js", "links": {"content": "https://zenodo.org/api/records/21475232/files/distill.pub_template.v2.js/content", "self": "https://zenodo.org/api/records/21475232/files/distill.pub_template.v2.js"}, "metadata": {}, "mimetype": "text/javascript", "size": 292568, "storage_class": "L"}, "hollow-inside.jpg": {"access": {"hidden": false}, "checksum": "md5:3fdc9a5c26459bcb4294b7acc3bccf19", "ext": "jpg", "id": "0847dac4-a9dc-48a2-b1ee-775c2baaa310", "key": "hollow-inside.jpg", "links": {"content": "https://zenodo.org/api/records/21475232/files/hollow-inside.jpg/content", "iiif_api": "https://zenodo.org/api/iiif/record:21475232:hollow-inside.jpg/full/full/0/default.png", "iiif_base": "https://zenodo.org/api/iiif/record:21475232:hollow-inside.jpg", "iiif_canvas": "https://zenodo.org/api/iiif/record:21475232/canvas/hollow-inside.jpg", "iiif_info": "https://zenodo.org/api/iiif/record:21475232:hollow-inside.jpg/info.json", "self": "https://zenodo.org/api/records/21475232/files/hollow-inside.jpg"}, "metadata": {"height": 209, "width": 236}, "mimetype": "image/jpeg", "size": 15754, "storage_class": "L"}, "index.html": {"access": {"hidden": false}, "checksum": "md5:a6290ee87371b65ef59aa032f1a4a203", "ext": "html", "id": "8328dd27-c1f6-4bf2-98bf-98341e55b727", "key": "index.html", "links": {"content": "https://zenodo.org/api/records/21475232/files/index.html/content", "self": "https://zenodo.org/api/records/21475232/files/index.html"}, "metadata": {}, "mimetype": "text/html", "size": 36705, "storage_class": "L"}, "maetok-autoencoder-platformer.svg": {"access": {"hidden": false}, "checksum": "md5:bb4a70593f8e48512cc2ce06616234b1", "ext": "svg", "id": "8be0e917-4130-4b31-818a-81bf97df8261", "key": "maetok-autoencoder-platformer.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/maetok-autoencoder-platformer.svg/content", "self": "https://zenodo.org/api/records/21475232/files/maetok-autoencoder-platformer.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 459202, "storage_class": "L"}, "optimizer-comparison.svg": {"access": {"hidden": false}, "checksum": "md5:0e6265dc3344313e8702e2971fedf8ad", "ext": "svg", "id": "e93ed0b5-7979-47af-95ea-75b87bf7126d", "key": "optimizer-comparison.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/optimizer-comparison.svg/content", "self": "https://zenodo.org/api/records/21475232/files/optimizer-comparison.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 73012, "storage_class": "L"}, "roofline-analysis.svg": {"access": {"hidden": false}, "checksum": "md5:c678c7963929c5ddd732fc6cdca3108c", "ext": "svg", "id": "250ae8e9-038b-48c2-a5b2-a39bf68e7bc2", "key": "roofline-analysis.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/roofline-analysis.svg/content", "self": "https://zenodo.org/api/records/21475232/files/roofline-analysis.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 3982, "storage_class": "L"}, "search-space.svg": {"access": {"hidden": false}, "checksum": "md5:bcdf523de2d92f494ffd69f5b765b117", "ext": "svg", "id": "ffe84567-361c-406e-84a3-dfd4d21618da", "key": "search-space.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/search-space.svg/content", "self": "https://zenodo.org/api/records/21475232/files/search-space.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 1825, "storage_class": "L"}, "space-layer-mask.html": {"access": {"hidden": false}, "checksum": "md5:a7d1f76a22f11ae6d05b952dbf092850", "ext": "html", "id": "78af0892-99a3-48f7-9b61-47d15072668d", "key": "space-layer-mask.html", "links": {"content": "https://zenodo.org/api/records/21475232/files/space-layer-mask.html/content", "self": "https://zenodo.org/api/records/21475232/files/space-layer-mask.html"}, "metadata": {}, "mimetype": "text/html", "size": 28945, "storage_class": "L"}, "style.css": {"access": {"hidden": false}, "checksum": "md5:16a595e20312a2c463b71b4bb26704da", "ext": "css", "id": "9868229e-edec-4342-85cd-4a1b7d02bb2e", "key": "style.css", "links": {"content": "https://zenodo.org/api/records/21475232/files/style.css/content", "self": "https://zenodo.org/api/records/21475232/files/style.css"}, "metadata": {}, "mimetype": "text/css", "size": 10595, "storage_class": "L"}, "xpred-vpred-noise-comparison.svg": {"access": {"hidden": false}, "checksum": "md5:abf8dad8cd497598c7755f5ce52382e6", "ext": "svg", "id": "e930b0a1-f198-4f1b-8e8c-82ffd7560c88", "key": "xpred-vpred-noise-comparison.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/xpred-vpred-noise-comparison.svg/content", "self": "https://zenodo.org/api/records/21475232/files/xpred-vpred-noise-comparison.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 6230516, "storage_class": "L"}}, "order": [], "total_bytes": 16285979}, "id": "21475232", "is_draft": false, "is_published": true, "links": {"access": "https://zenodo.org/api/records/21475232/access", "access_grants": "https://zenodo.org/api/records/21475232/access/grants", "access_links": "https://zenodo.org/api/records/21475232/access/links", "access_request": "https://zenodo.org/api/records/21475232/access/request", "access_users": "https://zenodo.org/api/records/21475232/access/users", "archive": "https://zenodo.org/api/records/21475232/files-archive", "archive_media": "https://zenodo.org/api/records/21475232/media-files-archive", "communities": "https://zenodo.org/api/records/21475232/communities", "communities-suggestions": "https://zenodo.org/api/records/21475232/communities-suggestions", "doi": "https://doi.org/10.5281/zenodo.21475232", "draft": "https://zenodo.org/api/records/21475232/draft", "file_modification": "https://zenodo.org/api/records/21475232/file-modification", "files": "https://zenodo.org/api/records/21475232/files", "latest": "https://zenodo.org/api/records/21475232/versions/latest", "latest_html": "https://zenodo.org/records/21475232/latest", "media_files": "https://zenodo.org/api/records/21475232/media-files", "parent": "https://zenodo.org/api/records/21475231", "parent_doi": "https://doi.org/10.5281/zenodo.21475231", "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.21475231", "parent_html": "https://zenodo.org/records/21475231", "preview_html": "https://zenodo.org/records/21475232?preview=1", "quota_increase": "https://zenodo.org/api/records/21475232/quota-increase", "request_deletion": "https://zenodo.org/api/records/21475232/request-deletion", "requests": "https://zenodo.org/api/records/21475232/requests", "reserve_doi": "https://zenodo.org/api/records/21475232/draft/pids/doi", "self": "https://zenodo.org/api/records/21475232", "self_doi": "https://doi.org/10.5281/zenodo.21475232", "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.21475232", "self_html": "https://zenodo.org/records/21475232", "self_iiif_manifest": "https://zenodo.org/api/iiif/record:21475232/manifest", "self_iiif_sequence": "https://zenodo.org/api/iiif/record:21475232/sequence/default", "thumbnails": {"10": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E10,/0/default.jpg", "100": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E100,/0/default.jpg", "1200": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E1200,/0/default.jpg", "250": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E250,/0/default.jpg", "50": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E50,/0/default.jpg", "750": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E750,/0/default.jpg"}, "versions": "https://zenodo.org/api/records/21475232/versions"}, "media_files": {"count": 2, "enabled": true, "entries": {"coinrun-tokenizer.jpg.ptif": {"access": {"hidden": true}, "ext": "ptif", "id": "445c573b-9034-4bc2-a281-5aab000ddb48", "key": "coinrun-tokenizer.jpg.ptif", "links": {"content": "https://zenodo.org/api/records/21475232/files/coinrun-tokenizer.jpg.ptif/content", "self": "https://zenodo.org/api/records/21475232/files/coinrun-tokenizer.jpg.ptif"}, "metadata": null, "mimetype": "application/octet-stream", "processor": {"source_file_id": "b9ad2b10-1c79-46f3-ab30-35a12a2b9490", "status": "finished", "type": "image-tiles"}, "size": 0, "storage_class": "L"}, "hollow-inside.jpg.ptif": {"access": {"hidden": true}, "ext": "ptif", "id": "938dd8a1-3288-407f-a5a8-e4f956aa470b", "key": "hollow-inside.jpg.ptif", "links": {"content": "https://zenodo.org/api/records/21475232/files/hollow-inside.jpg.ptif/content", "self": "https://zenodo.org/api/records/21475232/files/hollow-inside.jpg.ptif"}, "metadata": null, "mimetype": "application/octet-stream", "processor": {"source_file_id": "0847dac4-a9dc-48a2-b1ee-775c2baaa310", "status": "finished", "type": "image-tiles"}, "size": 0, "storage_class": "L"}}, "order": [], "total_bytes": 0}, "metadata": {"creators": [{"person_or_org": {"family_name": "Diego", "given_name": "Mart\u00ec Mons\u00f2", "identifiers": [{"identifier": "0009-0006-7580-6035", "scheme": "orcid"}], "name": "Diego, Mart\u00ec Mons\u00f2", "type": "personal"}}, {"person_or_org": {"family_name": "Sacco", "given_name": "Francesco", "identifiers": [{"identifier": "0000-0002-9565-4722", "scheme": "orcid"}], "name": "Sacco, Francesco", "type": "personal"}}, {"affiliations": [{"id": "00b30xv10", "identifiers": [{"identifier": "00b30xv10", "scheme": "ror"}, {"identifier": "grid.25879.31", "scheme": "grid"}, {"identifier": "0000 0004 1936 8972", "scheme": "isni"}], "name": "University of Pennsylvania"}], "person_or_org": {"family_name": "Hu", "given_name": "Edward", "identifiers": [{"identifier": "0009-0005-9339-5156", "scheme": "orcid"}], "name": "Hu, Edward", "type": "personal"}}], "publication_date": "2026-07-21", "publisher": "Zenodo", "resource_type": {"id": "publication-report", "title": {"de": "Bericht", "en": "Report"}}, "rights": [{"description": {"en": "The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited."}, "icon": "cc-by-icon", "id": "cc-by-4.0", "props": {"scheme": "spdx", "url": "https://creativecommons.org/licenses/by/4.0/legalcode"}, "title": {"en": "Creative Commons Attribution 4.0 International"}}], "title": "How to train a frontier-level world model"}, "parent": {"access": {"owned_by": {"user": "613965"}, "settings": {"accept_conditions_text": null, "allow_guest_requests": false, "allow_user_requests": false, "secret_link_expiration": 0}}, "communities": {}, "id": "21475231", "pids": {"doi": {"client": "datacite", "identifier": "10.5281/zenodo.21475231", "provider": "datacite"}}}, "pids": {"doi": {"client": "datacite", "identifier": "10.5281/zenodo.21475232", "provider": "datacite"}, "oai": {"identifier": "oai:zenodo.org:21475232", "provider": "oai"}}, "revision_id": 4, "stats": {"all_versions": {"data_volume": 33371592.0, "downloads": 38, "unique_downloads": 38, "unique_views": 74, "views": 100}, "this_version": {"data_volume": 33371592.0, "downloads": 38, "unique_downloads": 38, "unique_views": 74, "views": 100}}, "status": "published", "swh": {}, "ui": {"access_status": {"description_l10n": "The record and files are publicly accessible.", "embargo_date_l10n": null, "icon": "unlock", "id": "open", "message_class": "", "title_l10n": "Open"}, "created_date_l10n_long": "July 21, 2026", "creators": {"affiliations": [[1, "University of Pennsylvania", "00b30xv10"]], "creators": [{"person_or_org": {"family_name": "Diego", "given_name": "Mart\u00ec Mons\u00f2", "identifiers": [{"identifier": "0009-0006-7580-6035", "scheme": "orcid"}], "name": "Diego, Mart\u00ec Mons\u00f2", "type": "personal"}}, {"person_or_org": {"family_name": "Sacco", "given_name": "Francesco", "identifiers": [{"identifier": "0000-0002-9565-4722", "scheme": "orcid"}], "name": "Sacco, Francesco", "type": "personal"}}, {"affiliations": [[1, "University of Pennsylvania"]], "person_or_org": {"family_name": "Hu", "given_name": "Edward", "identifiers": [{"identifier": "0009-0005-9339-5156", "scheme": "orcid"}], "name": "Hu, Edward", "type": "personal"}}]}, "custom_fields": {"code:codeRepository": "https://github.com/next-state/open-dreamer"}, "is_draft": false, "publication_date_l10n_long": "July 21, 2026", "publication_date_l10n_medium": "Jul 21, 2026", "resource_type": {"id": "publication-report", "title_l10n": "Report"}, "rights": [{"description_l10n": "The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.", "icon": "cc-by-icon", "id": "cc-by-4.0", "props": {"scheme": "spdx", "url": "https://creativecommons.org/licenses/by/4.0/legalcode"}, "title_l10n": "Creative Commons Attribution 4.0 International"}], "updated_date_l10n_long": "July 21, 2026", "version": "v1"}, "updated": "2026-07-21T14:29:47.411677+00:00", "versions": {"index": 1, "is_latest": true}}' data-preview='false'>
+        <div class="rel-p-1"></div>
+        <div class="ui fluid placeholder rel-mr-1 rel-ml-1"></div>
+        <div class="header">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><div class="sidebar-container">
+  <h2 class="ui small top attached header">External resources</h2>
+  <dl id="external-resource" aria-label="External resources" class="ui bottom attached segment rdm-sidebar external resource details-list">
+
+    <dt class="ui tiny header">Indexed in</dt>
+      <ul class="ui list no-bullet m-0">
+              <li class="item flex align-items-center">
+
+                
+                  <img class="ui image" src="/static/images/openaire.svg" alt="" width="32">
+                
+
+                <div class="content">
+                  <a
+                    class="header"
+                    href="https://explore.openaire.eu/search/result?pid=10.5281/zenodo.21475232"
+                    target="_blank"
+                    rel="noreferrer"
+                  >OpenAIRE
+                  </a>
+
+                  </div>
+              </li></ul></dl>
+</div>
+<div
+  id="sidebar-communities-manage"
+  data-user-communities-memberships='{}'
+  data-record-community-endpoint='https://zenodo.org/api/records/21475232/communities'
+  data-record-community-search-endpoint='https://zenodo.org/api/records/21475232/communities-suggestions'
+  data-record-community-search-config='{"aggs": [{"aggName": "type", "field": "type", "title": "Type"}, {"aggName": "funder", "field": "metadata.funding.funder", "title": "Funders"}, {"aggName": "organization", "field": "metadata.organizations", "title": "Organizations"}], "appId": "InvenioAppRdm.RecordCommunitiesSuggestions", "defaultSortingOnEmptyQueryString": [{"sortBy": "newest"}], "initialQueryState": {"filters": [], "hiddenParams": null, "layout": "list", "page": 1, "size": 10, "sortBy": "bestmatch"}, "layoutOptions": {"gridView": false, "listView": true}, "paginationOptions": {"defaultValue": 10, "maxTotalResults": 10000, "resultsPerPage": [{"text": "10", "value": 10}, {"text": "20", "value": 20}]}, "searchApi": {"axios": {"headers": {"Accept": "application/vnd.inveniordm.v1+json"}, "url": "https://zenodo.org/api/records/21475232/communities-suggestions", "withCredentials": true}, "invenio": {"requestSerializer": "InvenioRecordsResourcesRequestSerializer"}}, "sortOptions": [{"sortBy": "bestmatch", "text": "Best match"}, {"sortBy": "newest", "text": "Newest"}, {"sortBy": "oldest", "text": "Oldest"}], "sortOrderDisabled": true}'
+  data-record-user-community-search-endpoint=''
+  data-record-user-community-search-config='{"aggs": [{"aggName": "type", "field": "type", "title": "Type"}, {"aggName": "funder", "field": "metadata.funding.funder", "title": "Funders"}, {"aggName": "organization", "field": "metadata.organizations", "title": "Organizations"}], "appId": "InvenioAppRdm.RecordUserCommunitiesSuggestions", "defaultSortingOnEmptyQueryString": [{"sortBy": "newest"}], "initialQueryState": {"filters": [], "hiddenParams": [["membership", "true"]], "layout": "list", "page": 1, "size": 10, "sortBy": "bestmatch"}, "layoutOptions": {"gridView": false, "listView": true}, "paginationOptions": {"defaultValue": 10, "maxTotalResults": 10000, "resultsPerPage": [{"text": "10", "value": 10}, {"text": "20", "value": 20}]}, "searchApi": {"axios": {"headers": {"Accept": "application/vnd.inveniordm.v1+json"}, "url": "https://zenodo.org/api/records/21475232/communities-suggestions", "withCredentials": true}, "invenio": {"requestSerializer": "InvenioRecordsResourcesRequestSerializer"}}, "sortOptions": [{"sortBy": "bestmatch", "text": "Best match"}, {"sortBy": "newest", "text": "Newest"}, {"sortBy": "oldest", "text": "Oldest"}], "sortOrderDisabled": true}'
+  data-pending-communities-search-config='{"aggs": [{"aggName": "type", "field": "type", "title": "Type"}, {"aggName": "status", "field": "status", "title": "Status"}], "appId": "InvenioAppRdm.RecordRequests", "defaultSortingOnEmptyQueryString": [{"sortBy": "newest"}], "initialQueryState": {"filters": [], "hiddenParams": [["expand", "1"], ["is_open", "true"], ["type", "community-inclusion"], ["type", "community-submission"]], "layout": "list", "page": 1, "size": 10, "sortBy": "bestmatch"}, "layoutOptions": {"gridView": false, "listView": true}, "paginationOptions": {"defaultValue": 10, "maxTotalResults": 10000, "resultsPerPage": [{"text": "10", "value": 10}, {"text": "20", "value": 20}, {"text": "50", "value": 50}]}, "searchApi": {"axios": {"headers": {"Accept": "application/json"}, "url": "https://zenodo.org/api/records/21475232/requests", "withCredentials": true}, "invenio": {"requestSerializer": "InvenioRecordsResourcesRequestSerializer"}}, "sortOptions": [{"sortBy": "bestmatch", "text": "Best match"}, {"sortBy": "newest", "text": "Newest"}, {"sortBy": "oldest", "text": "Oldest"}, {"sortBy": "newestactivity", "text": "Newest activity"}, {"sortBy": "oldestactivity", "text": "Oldest activity"}], "sortOrderDisabled": true}'
+  data-permissions='{"can_edit": false, "can_immediately_delete": false, "can_manage": false, "can_media_read_files": true, "can_moderate": false, "can_new_version": false, "can_read_files": true, "can_remove_community_from_record": false, "can_request_deletion": false, "can_review": false, "can_update_draft": false, "can_view": false, "removable_community_ids": []}'
+  data-record='{"access": {"embargo": {"active": false, "reason": null}, "files": "public", "record": "public", "status": "open"}, "created": "2026-07-21T14:29:44.967331+00:00", "custom_fields": {"code:codeRepository": "https://github.com/next-state/open-dreamer"}, "deletion_status": {"is_deleted": false, "status": "P"}, "expanded": {"parent": {"access": {"owned_by": {"active": null, "blocked_at": null, "confirmed_at": null, "email": "", "id": "613965", "is_current_user": false, "links": {"avatar": "https://zenodo.org/api/users/613965/avatar.svg", "records_html": "https://zenodo.org/search?q=parent.access.owned_by.user:613965", "self": "https://zenodo.org/api/users/613965"}, "profile": {"affiliations": "", "full_name": "Francesco Sacco"}, "username": "Francesco215", "verified_at": null}}}}, "files": {"count": 20, "enabled": true, "entries": {"behaviour-cloning.gif": {"access": {"hidden": false}, "checksum": "md5:5710e41ee6c2c10d9039c904cda131ba", "ext": "gif", "id": "5045fa24-79e3-45fd-9305-437d85aff0e0", "key": "behaviour-cloning.gif", "links": {"content": "https://zenodo.org/api/records/21475232/files/behaviour-cloning.gif/content", "iiif_api": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/full/0/default.png", "iiif_base": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif", "iiif_canvas": "https://zenodo.org/api/iiif/record:21475232/canvas/behaviour-cloning.gif", "iiif_info": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/info.json", "self": "https://zenodo.org/api/records/21475232/files/behaviour-cloning.gif"}, "metadata": {"height": 64, "width": 256}, "mimetype": "image/gif", "size": 82171, "storage_class": "L"}, "bibliography.bib": {"access": {"hidden": false}, "checksum": "md5:133e2ce8e8f644156e04c73e8e474702", "ext": "bib", "id": "3abb85d7-9cf9-4054-86c5-df166e79e57e", "key": "bibliography.bib", "links": {"content": "https://zenodo.org/api/records/21475232/files/bibliography.bib/content", "self": "https://zenodo.org/api/records/21475232/files/bibliography.bib"}, "metadata": {}, "mimetype": "application/octet-stream", "size": 1740, "storage_class": "L"}, "causal-sequence.svg": {"access": {"hidden": false}, "checksum": "md5:ef14972bb1b0b0486c526456c49f065d", "ext": "svg", "id": "20be3edf-9f60-40e4-9e1f-7e7ae896ad89", "key": "causal-sequence.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/causal-sequence.svg/content", "self": "https://zenodo.org/api/records/21475232/files/causal-sequence.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 35250, "storage_class": "L"}, "causal-space-time.svg": {"access": {"hidden": false}, "checksum": "md5:21dc5201599b44e6c99e3e564e4050d4", "ext": "svg", "id": "ea667a6e-3d69-421f-a474-287f7d3c304b", "key": "causal-space-time.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/causal-space-time.svg/content", "self": "https://zenodo.org/api/records/21475232/files/causal-space-time.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 85491, "storage_class": "L"}, "coinrun-tokenizer.jpg": {"access": {"hidden": false}, "checksum": "md5:98089f1eebe71d38924aff5686d564c7", "ext": "jpg", "id": "b9ad2b10-1c79-46f3-ab30-35a12a2b9490", "key": "coinrun-tokenizer.jpg", "links": {"content": "https://zenodo.org/api/records/21475232/files/coinrun-tokenizer.jpg/content", "iiif_api": "https://zenodo.org/api/iiif/record:21475232:coinrun-tokenizer.jpg/full/full/0/default.png", "iiif_base": "https://zenodo.org/api/iiif/record:21475232:coinrun-tokenizer.jpg", "iiif_canvas": "https://zenodo.org/api/iiif/record:21475232/canvas/coinrun-tokenizer.jpg", "iiif_info": "https://zenodo.org/api/iiif/record:21475232:coinrun-tokenizer.jpg/info.json", "self": "https://zenodo.org/api/records/21475232/files/coinrun-tokenizer.jpg"}, "metadata": {"height": 256, "width": 326}, "mimetype": "image/jpeg", "size": 34844, "storage_class": "L"}, "coinrun-wm.mp4": {"access": {"hidden": false}, "checksum": "md5:9613c95da97da863770416c17f104347", "ext": "mp4", "id": "f311a766-d459-42c6-bbbf-5741941f5b8f", "key": "coinrun-wm.mp4", "links": {"content": "https://zenodo.org/api/records/21475232/files/coinrun-wm.mp4/content", "self": "https://zenodo.org/api/records/21475232/files/coinrun-wm.mp4"}, "metadata": {}, "mimetype": "video/mp4", "size": 1096930, "storage_class": "L"}, "coinrun.gif": {"access": {"hidden": false}, "checksum": "md5:ac8cd54ae4d3b0c697bd695ea8573589", "ext": "gif", "id": "c8b07ce6-26a6-466d-9860-012af2f584ba", "key": "coinrun.gif", "links": {"content": "https://zenodo.org/api/records/21475232/files/coinrun.gif/content", "iiif_api": "https://zenodo.org/api/iiif/record:21475232:coinrun.gif/full/full/0/default.png", "iiif_base": "https://zenodo.org/api/iiif/record:21475232:coinrun.gif", "iiif_canvas": "https://zenodo.org/api/iiif/record:21475232/canvas/coinrun.gif", "iiif_info": "https://zenodo.org/api/iiif/record:21475232:coinrun.gif/info.json", "self": "https://zenodo.org/api/records/21475232/files/coinrun.gif"}, "metadata": {"height": 576, "width": 624}, "mimetype": "image/gif", "size": 2608735, "storage_class": "L"}, "comparison.mp4": {"access": {"hidden": false}, "checksum": "md5:f2d22d0e3bbbad12b59bfd2145d81b67", "ext": "mp4", "id": "bab23b34-479a-4197-bdbc-90eb198be844", "key": "comparison.mp4", "links": {"content": "https://zenodo.org/api/records/21475232/files/comparison.mp4/content", "self": "https://zenodo.org/api/records/21475232/files/comparison.mp4"}, "metadata": {}, "mimetype": "video/mp4", "size": 3223628, "storage_class": "L"}, "compute_scaling_reconstructed.svg": {"access": {"hidden": false}, "checksum": "md5:4ae145d87d9042607dab2ebaa1e3309f", "ext": "svg", "id": "dd2587bb-4e32-4433-a650-d89fcbafd6ec", "key": "compute_scaling_reconstructed.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/compute_scaling_reconstructed.svg/content", "self": "https://zenodo.org/api/records/21475232/files/compute_scaling_reconstructed.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 16924, "storage_class": "L"}, "diffusion-forcing.svg": {"access": {"hidden": false}, "checksum": "md5:97726a231f8e330adca28d27b86cd8a6", "ext": "svg", "id": "b2b86231-5d22-4946-aac8-38e3356dc6a9", "key": "diffusion-forcing.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/diffusion-forcing.svg/content", "self": "https://zenodo.org/api/records/21475232/files/diffusion-forcing.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 1947162, "storage_class": "L"}, "distill.pub_template.v2.js": {"access": {"hidden": false}, "checksum": "md5:9055824229a78830a87c4ef5129516e1", "ext": "js", "id": "2d38f3ee-7bc9-4ede-ab6a-92ad5b383aa2", "key": "distill.pub_template.v2.js", "links": {"content": "https://zenodo.org/api/records/21475232/files/distill.pub_template.v2.js/content", "self": "https://zenodo.org/api/records/21475232/files/distill.pub_template.v2.js"}, "metadata": {}, "mimetype": "text/javascript", "size": 292568, "storage_class": "L"}, "hollow-inside.jpg": {"access": {"hidden": false}, "checksum": "md5:3fdc9a5c26459bcb4294b7acc3bccf19", "ext": "jpg", "id": "0847dac4-a9dc-48a2-b1ee-775c2baaa310", "key": "hollow-inside.jpg", "links": {"content": "https://zenodo.org/api/records/21475232/files/hollow-inside.jpg/content", "iiif_api": "https://zenodo.org/api/iiif/record:21475232:hollow-inside.jpg/full/full/0/default.png", "iiif_base": "https://zenodo.org/api/iiif/record:21475232:hollow-inside.jpg", "iiif_canvas": "https://zenodo.org/api/iiif/record:21475232/canvas/hollow-inside.jpg", "iiif_info": "https://zenodo.org/api/iiif/record:21475232:hollow-inside.jpg/info.json", "self": "https://zenodo.org/api/records/21475232/files/hollow-inside.jpg"}, "metadata": {"height": 209, "width": 236}, "mimetype": "image/jpeg", "size": 15754, "storage_class": "L"}, "index.html": {"access": {"hidden": false}, "checksum": "md5:a6290ee87371b65ef59aa032f1a4a203", "ext": "html", "id": "8328dd27-c1f6-4bf2-98bf-98341e55b727", "key": "index.html", "links": {"content": "https://zenodo.org/api/records/21475232/files/index.html/content", "self": "https://zenodo.org/api/records/21475232/files/index.html"}, "metadata": {}, "mimetype": "text/html", "size": 36705, "storage_class": "L"}, "maetok-autoencoder-platformer.svg": {"access": {"hidden": false}, "checksum": "md5:bb4a70593f8e48512cc2ce06616234b1", "ext": "svg", "id": "8be0e917-4130-4b31-818a-81bf97df8261", "key": "maetok-autoencoder-platformer.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/maetok-autoencoder-platformer.svg/content", "self": "https://zenodo.org/api/records/21475232/files/maetok-autoencoder-platformer.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 459202, "storage_class": "L"}, "optimizer-comparison.svg": {"access": {"hidden": false}, "checksum": "md5:0e6265dc3344313e8702e2971fedf8ad", "ext": "svg", "id": "e93ed0b5-7979-47af-95ea-75b87bf7126d", "key": "optimizer-comparison.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/optimizer-comparison.svg/content", "self": "https://zenodo.org/api/records/21475232/files/optimizer-comparison.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 73012, "storage_class": "L"}, "roofline-analysis.svg": {"access": {"hidden": false}, "checksum": "md5:c678c7963929c5ddd732fc6cdca3108c", "ext": "svg", "id": "250ae8e9-038b-48c2-a5b2-a39bf68e7bc2", "key": "roofline-analysis.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/roofline-analysis.svg/content", "self": "https://zenodo.org/api/records/21475232/files/roofline-analysis.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 3982, "storage_class": "L"}, "search-space.svg": {"access": {"hidden": false}, "checksum": "md5:bcdf523de2d92f494ffd69f5b765b117", "ext": "svg", "id": "ffe84567-361c-406e-84a3-dfd4d21618da", "key": "search-space.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/search-space.svg/content", "self": "https://zenodo.org/api/records/21475232/files/search-space.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 1825, "storage_class": "L"}, "space-layer-mask.html": {"access": {"hidden": false}, "checksum": "md5:a7d1f76a22f11ae6d05b952dbf092850", "ext": "html", "id": "78af0892-99a3-48f7-9b61-47d15072668d", "key": "space-layer-mask.html", "links": {"content": "https://zenodo.org/api/records/21475232/files/space-layer-mask.html/content", "self": "https://zenodo.org/api/records/21475232/files/space-layer-mask.html"}, "metadata": {}, "mimetype": "text/html", "size": 28945, "storage_class": "L"}, "style.css": {"access": {"hidden": false}, "checksum": "md5:16a595e20312a2c463b71b4bb26704da", "ext": "css", "id": "9868229e-edec-4342-85cd-4a1b7d02bb2e", "key": "style.css", "links": {"content": "https://zenodo.org/api/records/21475232/files/style.css/content", "self": "https://zenodo.org/api/records/21475232/files/style.css"}, "metadata": {}, "mimetype": "text/css", "size": 10595, "storage_class": "L"}, "xpred-vpred-noise-comparison.svg": {"access": {"hidden": false}, "checksum": "md5:abf8dad8cd497598c7755f5ce52382e6", "ext": "svg", "id": "e930b0a1-f198-4f1b-8e8c-82ffd7560c88", "key": "xpred-vpred-noise-comparison.svg", "links": {"content": "https://zenodo.org/api/records/21475232/files/xpred-vpred-noise-comparison.svg/content", "self": "https://zenodo.org/api/records/21475232/files/xpred-vpred-noise-comparison.svg"}, "metadata": {}, "mimetype": "image/svg+xml", "size": 6230516, "storage_class": "L"}}, "order": [], "total_bytes": 16285979}, "id": "21475232", "is_draft": false, "is_published": true, "links": {"access": "https://zenodo.org/api/records/21475232/access", "access_grants": "https://zenodo.org/api/records/21475232/access/grants", "access_links": "https://zenodo.org/api/records/21475232/access/links", "access_request": "https://zenodo.org/api/records/21475232/access/request", "access_users": "https://zenodo.org/api/records/21475232/access/users", "archive": "https://zenodo.org/api/records/21475232/files-archive", "archive_media": "https://zenodo.org/api/records/21475232/media-files-archive", "communities": "https://zenodo.org/api/records/21475232/communities", "communities-suggestions": "https://zenodo.org/api/records/21475232/communities-suggestions", "doi": "https://doi.org/10.5281/zenodo.21475232", "draft": "https://zenodo.org/api/records/21475232/draft", "file_modification": "https://zenodo.org/api/records/21475232/file-modification", "files": "https://zenodo.org/api/records/21475232/files", "latest": "https://zenodo.org/api/records/21475232/versions/latest", "latest_html": "https://zenodo.org/records/21475232/latest", "media_files": "https://zenodo.org/api/records/21475232/media-files", "parent": "https://zenodo.org/api/records/21475231", "parent_doi": "https://doi.org/10.5281/zenodo.21475231", "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.21475231", "parent_html": "https://zenodo.org/records/21475231", "preview_html": "https://zenodo.org/records/21475232?preview=1", "quota_increase": "https://zenodo.org/api/records/21475232/quota-increase", "request_deletion": "https://zenodo.org/api/records/21475232/request-deletion", "requests": "https://zenodo.org/api/records/21475232/requests", "reserve_doi": "https://zenodo.org/api/records/21475232/draft/pids/doi", "self": "https://zenodo.org/api/records/21475232", "self_doi": "https://doi.org/10.5281/zenodo.21475232", "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.21475232", "self_html": "https://zenodo.org/records/21475232", "self_iiif_manifest": "https://zenodo.org/api/iiif/record:21475232/manifest", "self_iiif_sequence": "https://zenodo.org/api/iiif/record:21475232/sequence/default", "thumbnails": {"10": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E10,/0/default.jpg", "100": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E100,/0/default.jpg", "1200": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E1200,/0/default.jpg", "250": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E250,/0/default.jpg", "50": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E50,/0/default.jpg", "750": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E750,/0/default.jpg"}, "versions": "https://zenodo.org/api/records/21475232/versions"}, "media_files": {"count": 2, "enabled": true, "entries": {"coinrun-tokenizer.jpg.ptif": {"access": {"hidden": true}, "ext": "ptif", "id": "445c573b-9034-4bc2-a281-5aab000ddb48", "key": "coinrun-tokenizer.jpg.ptif", "links": {"content": "https://zenodo.org/api/records/21475232/files/coinrun-tokenizer.jpg.ptif/content", "self": "https://zenodo.org/api/records/21475232/files/coinrun-tokenizer.jpg.ptif"}, "metadata": null, "mimetype": "application/octet-stream", "processor": {"source_file_id": "b9ad2b10-1c79-46f3-ab30-35a12a2b9490", "status": "finished", "type": "image-tiles"}, "size": 0, "storage_class": "L"}, "hollow-inside.jpg.ptif": {"access": {"hidden": true}, "ext": "ptif", "id": "938dd8a1-3288-407f-a5a8-e4f956aa470b", "key": "hollow-inside.jpg.ptif", "links": {"content": "https://zenodo.org/api/records/21475232/files/hollow-inside.jpg.ptif/content", "self": "https://zenodo.org/api/records/21475232/files/hollow-inside.jpg.ptif"}, "metadata": null, "mimetype": "application/octet-stream", "processor": {"source_file_id": "0847dac4-a9dc-48a2-b1ee-775c2baaa310", "status": "finished", "type": "image-tiles"}, "size": 0, "storage_class": "L"}}, "order": [], "total_bytes": 0}, "metadata": {"creators": [{"person_or_org": {"family_name": "Diego", "given_name": "Mart\u00ec Mons\u00f2", "identifiers": [{"identifier": "0009-0006-7580-6035", "scheme": "orcid"}], "name": "Diego, Mart\u00ec Mons\u00f2", "type": "personal"}}, {"person_or_org": {"family_name": "Sacco", "given_name": "Francesco", "identifiers": [{"identifier": "0000-0002-9565-4722", "scheme": "orcid"}], "name": "Sacco, Francesco", "type": "personal"}}, {"affiliations": [{"id": "00b30xv10", "identifiers": [{"identifier": "00b30xv10", "scheme": "ror"}, {"identifier": "grid.25879.31", "scheme": "grid"}, {"identifier": "0000 0004 1936 8972", "scheme": "isni"}], "name": "University of Pennsylvania"}], "person_or_org": {"family_name": "Hu", "given_name": "Edward", "identifiers": [{"identifier": "0009-0005-9339-5156", "scheme": "orcid"}], "name": "Hu, Edward", "type": "personal"}}], "publication_date": "2026-07-21", "publisher": "Zenodo", "resource_type": {"id": "publication-report", "title": {"de": "Bericht", "en": "Report"}}, "rights": [{"description": {"en": "The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited."}, "icon": "cc-by-icon", "id": "cc-by-4.0", "props": {"scheme": "spdx", "url": "https://creativecommons.org/licenses/by/4.0/legalcode"}, "title": {"en": "Creative Commons Attribution 4.0 International"}}], "title": "How to train a frontier-level world model"}, "parent": {"access": {"owned_by": {"user": "613965"}, "settings": {"accept_conditions_text": null, "allow_guest_requests": false, "allow_user_requests": false, "secret_link_expiration": 0}}, "communities": {}, "id": "21475231", "pids": {"doi": {"client": "datacite", "identifier": "10.5281/zenodo.21475231", "provider": "datacite"}}}, "pids": {"doi": {"client": "datacite", "identifier": "10.5281/zenodo.21475232", "provider": "datacite"}, "oai": {"identifier": "oai:zenodo.org:21475232", "provider": "oai"}}, "revision_id": 4, "stats": {"all_versions": {"data_volume": 33371592.0, "downloads": 38, "unique_downloads": 38, "unique_views": 74, "views": 100}, "this_version": {"data_volume": 33371592.0, "downloads": 38, "unique_downloads": 38, "unique_views": 74, "views": 100}}, "status": "published", "swh": {}, "ui": {"access_status": {"description_l10n": "The record and files are publicly accessible.", "embargo_date_l10n": null, "icon": "unlock", "id": "open", "message_class": "", "title_l10n": "Open"}, "created_date_l10n_long": "July 21, 2026", "creators": {"affiliations": [[1, "University of Pennsylvania", "00b30xv10"]], "creators": [{"person_or_org": {"family_name": "Diego", "given_name": "Mart\u00ec Mons\u00f2", "identifiers": [{"identifier": "0009-0006-7580-6035", "scheme": "orcid"}], "name": "Diego, Mart\u00ec Mons\u00f2", "type": "personal"}}, {"person_or_org": {"family_name": "Sacco", "given_name": "Francesco", "identifiers": [{"identifier": "0000-0002-9565-4722", "scheme": "orcid"}], "name": "Sacco, Francesco", "type": "personal"}}, {"affiliations": [[1, "University of Pennsylvania"]], "person_or_org": {"family_name": "Hu", "given_name": "Edward", "identifiers": [{"identifier": "0009-0005-9339-5156", "scheme": "orcid"}], "name": "Hu, Edward", "type": "personal"}}]}, "custom_fields": {"code:codeRepository": "https://github.com/next-state/open-dreamer"}, "is_draft": false, "publication_date_l10n_long": "July 21, 2026", "publication_date_l10n_medium": "Jul 21, 2026", "resource_type": {"id": "publication-report", "title_l10n": "Report"}, "rights": [{"description_l10n": "The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.", "icon": "cc-by-icon", "id": "cc-by-4.0", "props": {"scheme": "spdx", "url": "https://creativecommons.org/licenses/by/4.0/legalcode"}, "title_l10n": "Creative Commons Attribution 4.0 International"}], "updated_date_l10n_long": "July 21, 2026", "version": "v1"}, "updated": "2026-07-21T14:29:47.411677+00:00", "versions": {"index": 1, "is_latest": true}}'
+  data-record-requests='{}'
+  class='sidebar-container'
+>
+
+  <h2 class="ui medium top attached header">Communities</h2>
+
+  <div class="ui segment bottom attached rdm-sidebar">
+    <div class="ui fluid placeholder">
+      <div class="image header">
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+      <div class="image header">
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+      <div class="image header">
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="sidebar-container">
+  <h2 class="ui medium top attached header mt-0">Details</h2>
+  <div id="record-details" class="ui segment bottom attached rdm-sidebar">
+
+    <dl class="details-list">
+      
+
+ 
+  <dt class="ui tiny header">DOI
+    
+  </dt>
+  <dd>
+    <span class="get-badge details-doi-section" data-toggle="tooltip" data-placement="bottom">
+      <img id='record-doi-badge' data-target="[data-modal='10.5281/zenodo.21475232']" title="Get the DOI badge!"
+        src="/badge/DOI/10.5281/zenodo.21475232.svg" alt="10.5281/zenodo.21475232" />
+      <div id="copy-button-record-doi-badge" class="copy-doi-button" data-value=https://doi.org/10.5281/zenodo.21475232 data-size="mini"></div>
+    </span>
+
+    <div id="doi-modal" class="ui modal fade badge-modal" data-modal="10.5281/zenodo.21475232">
+      <div class="header">DOI Badge</div>
+      <div class="content">
+        <h4>
+          <small>DOI</small>
+        </h4>
+        <h4>
+          <pre>10.5281/zenodo.21475232</pre>
+        </h4>
+        
+        
+
+    <h3 class="ui small header">
+      Markdown
+    </h3>
+    <div class="ui message code">
+      <pre>[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21475232.svg)](https://doi.org/10.5281/zenodo.21475232)</pre>
+    </div>
+
+    <h3 class="ui small header">
+      reStructuredText
+    </h3>
+      <div class="ui message code">
+        <pre>.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.21475232.svg
+  :target: https://doi.org/10.5281/zenodo.21475232</pre>
+      </div>
+
+    <h3 class="ui small header">
+      HTML
+    </h3>
+    <div class="ui message code">
+      <pre>&lt;a href="https://doi.org/10.5281/zenodo.21475232"&gt;&lt;img src="https://zenodo.org/badge/DOI/10.5281/zenodo.21475232.svg" alt="DOI"&gt;&lt;/a&gt;</pre>
+    </div>
+
+    <h3 class="ui small header">
+      Image URL
+    </h3>
+    <div class="ui message code">
+      <pre>https://zenodo.org/badge/DOI/10.5281/zenodo.21475232.svg</pre>
+    </div>
+
+    <h3 class="ui small header">
+    Target URL
+    </h3>
+    <div class="ui message code">
+      <pre>https://doi.org/10.5281/zenodo.21475232</pre>
+    </div>
+      </div>
+    </div>
+  </dd>
+
+      
+      
+  <dt class="ui tiny header">Resource type</dt>
+  <dd>Report</dd>
+      
+      
+  <dt class="ui tiny header">Publisher</dt>
+  <dd>Zenodo</dd>
+      
+      
+      
+      
+      
+      
+      
+    </dl>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+  <div class="sidebar-container">
+    <h2 class="ui medium top attached header mt-0">Rights</h2>
+    <div id="licenses" class="ui segment bottom attached rdm-sidebar">
+      <dl class="details-list">
+      
+        <dt class="ui tiny header">License</dt><dd id="license-cc-by-4.0-1" class="has-popup">
+              <div id="title-cc-by-4.0-1"
+                   class="license clickable"
+                   tabindex="0"
+                   aria-haspopup="dialog"
+                   aria-expanded="false"
+                   role="button"
+                   aria-label="Creative Commons Attribution 4.0 International"
+              >
+                
+                  
+                  <span class="icon-wrap">
+                  <img class="icon" src="/static/icons/licenses/cc-by-icon.svg"
+                       alt="cc-by-4.0 icon"/>
+                </span>
+                
+                <span class="title-text">
+                Creative Commons Attribution 4.0 International
+              </span>
+              </div>
+              <div id="description-cc-by-4.0-1"
+                   class="licenses-description ui flowing popup transition hidden"
+                   role="dialog"
+                   aria-labelledby="title-cc-by-4.0-1"
+              >
+                <i role="button" tabindex="0" class="close icon text-muted"
+                   aria-label="Close"></i>
+                <div id="license-description-1" class="description">
+                <span class="text-muted">
+                  The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited.
+                </span>
+                  
+  
+    <a class="license-link" href="https://creativecommons.org/licenses/by/4.0/legalcode" target="_blank"
+       title="Opens in new tab">Read more</a>
+  
+
+                </div>
+              </div>
+            </dd>
+          
+      
+      
+      </dl>
+    </div>
+  </div>
+
+<div class="sidebar-container">
+  <h2 class="ui medium top attached header mt-0">Citation</h2>
+  <div id="citation" class="ui segment bottom attached rdm-sidebar">
+
+<div id="recordCitation" data-record-links='{"access": "https://zenodo.org/api/records/21475232/access", "access_grants": "https://zenodo.org/api/records/21475232/access/grants", "access_links": "https://zenodo.org/api/records/21475232/access/links", "access_request": "https://zenodo.org/api/records/21475232/access/request", "access_users": "https://zenodo.org/api/records/21475232/access/users", "archive": "https://zenodo.org/api/records/21475232/files-archive", "archive_media": "https://zenodo.org/api/records/21475232/media-files-archive", "communities": "https://zenodo.org/api/records/21475232/communities", "communities-suggestions": "https://zenodo.org/api/records/21475232/communities-suggestions", "doi": "https://doi.org/10.5281/zenodo.21475232", "draft": "https://zenodo.org/api/records/21475232/draft", "file_modification": "https://zenodo.org/api/records/21475232/file-modification", "files": "https://zenodo.org/api/records/21475232/files", "latest": "https://zenodo.org/api/records/21475232/versions/latest", "latest_html": "https://zenodo.org/records/21475232/latest", "media_files": "https://zenodo.org/api/records/21475232/media-files", "parent": "https://zenodo.org/api/records/21475231", "parent_doi": "https://doi.org/10.5281/zenodo.21475231", "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.21475231", "parent_html": "https://zenodo.org/records/21475231", "preview_html": "https://zenodo.org/records/21475232?preview=1", "quota_increase": "https://zenodo.org/api/records/21475232/quota-increase", "request_deletion": "https://zenodo.org/api/records/21475232/request-deletion", "requests": "https://zenodo.org/api/records/21475232/requests", "reserve_doi": "https://zenodo.org/api/records/21475232/draft/pids/doi", "self": "https://zenodo.org/api/records/21475232", "self_doi": "https://doi.org/10.5281/zenodo.21475232", "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.21475232", "self_html": "https://zenodo.org/records/21475232", "self_iiif_manifest": "https://zenodo.org/api/iiif/record:21475232/manifest", "self_iiif_sequence": "https://zenodo.org/api/iiif/record:21475232/sequence/default", "thumbnails": {"10": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E10,/0/default.jpg", "100": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E100,/0/default.jpg", "1200": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E1200,/0/default.jpg", "250": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E250,/0/default.jpg", "50": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E50,/0/default.jpg", "750": "https://zenodo.org/api/iiif/record:21475232:behaviour-cloning.gif/full/%5E750,/0/default.jpg"}, "versions": "https://zenodo.org/api/records/21475232/versions"}'
+  data-styles='[["apa", "APA"], ["harvard-cite-them-right", "Harvard"], ["modern-language-association", "MLA"], ["nlm-citation-sequence", "Vancouver"], ["chicago-notes-bibliography", "Chicago"], ["ieee", "IEEE"]]'
+  data-defaultstyle='"apa"'
+  data-include-deleted='false'>
+</div>
+  </div>
+</div>
+  <div class="sidebar-container">
+    <h2 class="ui medium top attached header mt-0">Export</h2>
+    <div id="export-record" class="ui segment bottom attached exports rdm-sidebar">
+
+      
+      
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        <div id="recordExportDownload" data-formats='[{"export_url": "/records/21475232/export/json", "name": "JSON"}, {"export_url": "/records/21475232/export/json-ld", "name": "JSON-LD"}, {"export_url": "/records/21475232/export/csl", "name": "CSL"}, {"export_url": "/records/21475232/export/datacite-json", "name": "DataCite JSON"}, {"export_url": "/records/21475232/export/datacite-xml", "name": "DataCite XML"}, {"export_url": "/records/21475232/export/dublincore", "name": "Dublin Core XML"}, {"export_url": "/records/21475232/export/marcxml", "name": "MARCXML"}, {"export_url": "/records/21475232/export/bibtex", "name": "BibTeX"}, {"export_url": "/records/21475232/export/geojson", "name": "GeoJSON"}, {"export_url": "/records/21475232/export/dcat-ap", "name": "DCAT"}, {"export_url": "/records/21475232/export/codemeta", "name": "Codemeta"}, {"export_url": "/records/21475232/export/cff", "name": "Citation File Format"}, {"export_url": "/records/21475232/export/datapackage", "name": "Data Package JSON"}]'></div>
+    </div>
+  </div>
+
+<section
+  id="upload-info"
+  role="note"
+  aria-label="Upload information"
+  class="sidebar-container ui segment rdm-sidebar text-muted"
+>
+  <h2 class="ui small header text-muted p-0 mb-5"><small>Technical metadata</small></h2>
+  <dl class="m-0">
+    <dt class="inline"><small>Created</small></dt>
+    <dd class="inline">
+      <small>July 21, 2026</small>
+    </dd>
+    <div>
+      <dt class="rel-mt-1 inline"><small>Modified</small></dt>
+      <dd class="inline">
+        <small>July 21, 2026</small>
+      </dd>
+    </div>
+  </dl>
+</section>
+          
+        </aside>
+      </div>
+    </div>
+
+    <div class="ui container">
+      <div class="ui relaxed grid">
+        <div class="two column row">
+          <div class="sixteen wide tablet eleven wide computer column">
+            <div class="ui grid">
+                <div class="centered row rel-mt-1">
+                  <button id="jump-btn" class="jump-to-top ui button labeled icon"
+                          aria-label="Jump to top of page">
+                    <i class="arrow alternate circle up outline icon"></i>
+                    Jump up
+                  </button>
+                </div>
+              </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </main>
+    <footer id="rdm-footer-element">
+        
+
+  <div class="footer-top">
+    <div class="ui container app-rdm-footer">
+<div class="ui equal width stackable grid zenodo-footer">
+  <div class="column">
+    <h2 class="ui inverted tiny header">About</h2>
+    <ul class="ui inverted link list">
+      <li class="item">
+        <a href="https://about.zenodo.org">About</a>
+      </li>
+      <li class="item">
+        <a href="https://about.zenodo.org/policies">Policies</a>
+      </li>
+      <li class="item">
+        <a href="https://about.zenodo.org/infrastructure">Infrastructure</a>
+      </li>
+      <li class="item">
+        <a href="https://about.zenodo.org/principles">Principles</a>
+      </li>
+      <li class="item">
+        <a href="https://about.zenodo.org/projects/">Projects</a>
+      </li>
+      <li class="item">
+        <a href="https://about.zenodo.org/roadmap/">Roadmap</a>
+      </li>
+      <li class="item">
+        <a href="https://about.zenodo.org/contact">Contact</a>
+      </li>
+    </ul>
+  </div>
+  <div class="column">
+    <h2 class="ui inverted tiny header">Blog</h2>
+    <ul class="ui inverted link list">
+      <li class="item">
+        <a href="https://blog.zenodo.org">Blog</a>
+      </li>
+    </ul>
+  </div>
+  <div class="column">
+    <h2 class="ui inverted tiny header">Support</h2>
+    <ul class="ui inverted link list">
+      <li class="item">
+        <a href="https://help.zenodo.org/">Help</a>
+      </li>
+      <li class="item">
+        <a href="https://support.zenodo.org/help/">FAQ</a>
+      </li>
+    </ul>
+  </div>
+  <div class="column">
+    <h2 class="ui inverted tiny header">Developers</h2>
+    <ul class="ui inverted link list">
+      <li class="item">
+        <a href="https://developers.zenodo.org">REST API</a>
+      </li>
+      <li class="item">
+        <a href="https://developers.zenodo.org#oai-pmh">OAI-PMH</a>
+      </li>
+    </ul>
+  </div>
+  <div class="column">
+    <h2 class="ui inverted tiny header">Contribute</h2>
+    <ul class="ui inverted link list">
+      <li class="item">
+        <a href="https://github.com/zenodo/zenodo-rdm">
+          <i class="icon external" aria-hidden="true"></i>
+          GitHub
+        </a>
+      </li>
+      <li class="item">
+        <a href="/donate">
+          <i class="icon external" aria-hidden="true"></i>
+          Donate
+        </a>
+      </li>
+    </ul>
+  </div>
+      <div class="six wide column right aligned">
+  <h2 class="ui inverted tiny header">Funded by</h2>
+  <ul class="ui horizontal link list">
+    <li class="item">
+      <a href="https://home.cern" aria-label="CERN">
+        <img src="/static/images/cern.png" width="60" height="60" alt="" />
+      </a>
+    </li>
+    <li class="item">
+      <a href="https://www.openaire.eu" aria-label="OpenAIRE">
+        <img src="/static/images/openaire.png" width="60" height="60" alt="" />
+      </a>
+    </li>
+    <li class="item">
+      <a href="https://commission.europa.eu/index_en" aria-label="European Commission">
+        <img src="/static/images/eu.png" width="88" height="60" alt="" />
+      </a>
+    </li>
+  </ul>
+      </div>
+      </div>
+    </div>
+
+  </div>
+        
+<div class="footer-bottom">
+  <div class="ui inverted container">
+    <div class="ui grid">
+      <div class="eight wide column left middle aligned">
+        <p class="m-0">
+          Powered by
+          <a href="https://home.cern/science/computing/data-centre">CERN Data Centre</a> & <a href="https://inveniordm.docs.cern.ch/">InvenioRDM</a>
+        </p>
+      </div>
+      <div class="eight wide column right aligned">
+        <ul class="ui inverted horizontal link list">
+          <li class="item">
+            <a href="https://stats.uptimerobot.com/vlYOVuWgM/">Status</a>
+          </li>
+          <li class="item">
+            <a href="https://about.zenodo.org/privacy-policy">Privacy policy</a>
+          </li>
+          <li class="item">
+            <a href="https://about.zenodo.org/cookie-policy">Cookie policy</a>
+          </li>
+          <li class="item">
+            <a href="https://about.zenodo.org/terms">Terms of Use</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+    </footer>
+  
+  
+    
+
+        
+          <script type="text/javascript">
+            window.MathJax = {
+              tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                processEscapes: true // Allows escaping $ signs if needed
+              }
+            };
+          </script>
+          <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        
+<script src="/static/dist/js/manifest.19e7088b1d606958.js"></script>
+<script src="/static/dist/js/2210.0ab43f134e1f4741.js"></script>
+<script src="/static/dist/js/6874.65ec0a8b2c6353ef.js"></script>
+<script src="/static/dist/js/theme.94dcfaf40ce89fce.js"></script>
+<script src="/static/dist/js/9516.90bfb7abfc1a57cc.js"></script>
+<script src="/static/dist/js/4993.8b71b9b033297984.js"></script>
+<script src="/static/dist/js/1514.d8373180d308ebb1.js"></script>
+<script src="/static/dist/js/7211.6d2b6f902ee9e311.js"></script>
+<script src="/static/dist/js/6555.699b01c9afd09bbc.js"></script>
+<script src="/static/dist/js/2028.1d4b59f583a7c22e.js"></script>
+<script src="/static/dist/js/9515.2e7aeb0a90110547.js"></script>
+<script src="/static/dist/js/1242.6d3433e37788315a.js"></script>
+<script src="/static/dist/js/4413.6964d435bb536ad3.js"></script>
+<script src="/static/dist/js/1930.5c46a3667e424fff.js"></script>
+<script src="/static/dist/js/700.874be66ad204dbca.js"></script>
+<script src="/static/dist/js/8532.08a266dd14b72292.js"></script>
+<script src="/static/dist/js/1246.6ee2537656af5076.js"></script>
+<script src="/static/dist/js/2620.bf73f48484645965.js"></script>
+<script src="/static/dist/js/7954.0f565d246955cad5.js"></script>
+<script src="/static/dist/js/base-theme-rdm.7c5ef1e992944e6e.js"></script>
+<script src="/static/dist/js/i18n_app.f29ad99db6b3d7b0.js"></script>
+<script src="/static/dist/js/1947.077e50def0d12fe6.js"></script>
+<script src="/static/dist/js/5250.accef40e35b05da8.js"></script>
+<script src="/static/dist/js/overridable-registry.1f90648db5424404.js"></script>
+  
+    
+      <script type='application/ld+json'>{"@context": "http://schema.org", "@id": "https://doi.org/10.5281/zenodo.21475232", "@type": "https://schema.org/ScholarlyArticle", "author": [{"@id": "https://orcid.org/0009-0006-7580-6035", "@type": "Person", "familyName": "Diego", "givenName": "Mart\u00ec Mons\u00f2", "name": "Diego, Mart\u00ec Mons\u00f2"}, {"@id": "https://orcid.org/0000-0002-9565-4722", "@type": "Person", "familyName": "Sacco", "givenName": "Francesco", "name": "Sacco, Francesco"}, {"@id": "https://orcid.org/0009-0005-9339-5156", "@type": "Person", "affiliation": [{"@id": "https://ror.org/00b30xv10", "@type": "Organization", "name": "University of Pennsylvania"}], "familyName": "Hu", "givenName": "Edward", "name": "Hu, Edward"}], "contentSize": "15.53 MB", "creator": [{"@id": "https://orcid.org/0009-0006-7580-6035", "@type": "Person", "familyName": "Diego", "givenName": "Mart\u00ec Mons\u00f2", "name": "Diego, Mart\u00ec Mons\u00f2"}, {"@id": "https://orcid.org/0000-0002-9565-4722", "@type": "Person", "familyName": "Sacco", "givenName": "Francesco", "name": "Sacco, Francesco"}, {"@id": "https://orcid.org/0009-0005-9339-5156", "@type": "Person", "affiliation": [{"@id": "https://ror.org/00b30xv10", "@type": "Organization", "name": "University of Pennsylvania"}], "familyName": "Hu", "givenName": "Edward", "name": "Hu, Edward"}], "dateCreated": "2026-07-21T14:29:44.967331+00:00", "dateModified": "2026-07-21T14:29:47.411677+00:00", "datePublished": "2026-07-21", "identifier": "https://doi.org/10.5281/zenodo.21475232", "license": "https://creativecommons.org/licenses/by/4.0/legalcode", "name": "How to train a frontier-level world model", "publisher": {"@type": "Organization", "name": "Zenodo"}, "size": "15.53 MB", "url": "https://zenodo.org/records/21475232"}</script>
+
+  <script src="/static/dist/js/invenio-app-rdm-landing-page-theme.99f83766d5a7c257.js"></script>
+  <script src="/static/dist/js/4505.65e1ddec331f7631.js"></script>
+<script src="/static/dist/js/3323.aba018de16e78a1d.js"></script>
+<script src="/static/dist/js/2630.16ae8742145795e7.js"></script>
+<script src="/static/dist/js/1250.248520fe6fee03eb.js"></script>
+<script src="/static/dist/js/8397.4af1d10bb000f9fe.js"></script>
+<script src="/static/dist/js/6437.248ead3a7d252d62.js"></script>
+<script src="/static/dist/js/9530.d3064702990e5294.js"></script>
+<script src="/static/dist/js/3646.b86d4a9d2b6df68a.js"></script>
+<script src="/static/dist/js/8193.626ce6377d6899de.js"></script>
+<script src="/static/dist/js/5261.6505c7b9c606d47b.js"></script>
+<script src="/static/dist/js/7208.692023a639bbae93.js"></script>
+<script src="/static/dist/js/9150.e726f5a111882ff0.js"></script>
+<script src="/static/dist/js/1030.de6c5cb38086308e.js"></script>
+<script src="/static/dist/js/invenio-app-rdm-landing-page.f67be231036bf467.js"></script>
+  <script src="/static/dist/js/previewer_theme.ff6c7d90d51d22c5.js"></script>
+  <script src="/static/dist/js/zenodo-rdm-citations.5bf7a58075b014db.js"></script>
+  
+
+        <div class="ui container info message cookie-banner hidden">
+  <i class="close icon"></i>
+  <div>
+    <i aria-hidden="true" class="info icon"></i>
+    <p class="inline">This site uses cookies. Find out more on <a href="https://about.zenodo.org/cookie-policy">how we use cookies</a></p>
+  </div>
+  <div class="buttons">
+    <button class="ui button small primary" id="cookies-all">Accept all cookies</button>
+    <button class="ui button small" id="cookies-essential">Accept only essential cookies</button>
+  </div>
+</div>
+
+<script>
+  var _paq = window._paq = window._paq || [];
+  _paq.push(['requireCookieConsent']);
+
+  (function() {
+    var u="https://webanalytics.web.cern.ch/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', '366']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+
+  const cookieConsent = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("cookie_consent="))
+    ?.split("=")[1];
+
+  if (cookieConsent) {
+    if (cookieConsent === "all") {
+      matomo();
+    }
+  } else {
+    document.querySelector(".cookie-banner").classList.remove("hidden")
+    _paq.push(['forgetConsentGiven']);
+  }
+
+  $('.cookie-banner .close')
+    .on('click', function () {
+      $(this)
+        .closest('.message')
+        .transition('fade');
+      setCookie("cookie_consent","essential");
+    });
+
+  $('#cookies-essential')
+    .on('click', function () {
+      $(this)
+        .closest('.message')
+        .transition('fade');
+      setCookie("cookie_consent","essential");
+    });
+
+  $('#cookies-all')
+    .on('click', function () {
+      $(this)
+        .closest('.message')
+        .transition('fade');
+      setCookie("cookie_consent","all");
+      _paq.push(['rememberCookieConsentGiven']);
+      matomo();
+    });
+
+  function matomo() {
+    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+  }
+
+  function setCookie(cname, cvalue) {
+    var d = new Date();
+    d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000)); // one year
+    var expires = "expires=" + d.toUTCString();
+    var cookie = cname + "=" + cvalue + ";" + expires + ";"
+    cookie += "Domain=zenodo.org;Path=/;SameSite=None; Secure";
+    document.cookie = cookie;
+  }
+</script>
+  </body>
+</html>

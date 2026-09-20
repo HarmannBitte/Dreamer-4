@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dreamer 4: AI Imagines Its Way to Minecraft Diamonds</title>
+  <meta name="description" content="Discover how DeepMind&#x27;s Dreamer 4 AI learns to mine diamonds in Minecraft, training entirely inside its own imagined world model. A breakthrough for agent AI.">
+    <link rel="icon" href="https://www.implicator.ai/content/images/size/w256h256/2025/04/Logo_impli_full.png" type="image/png">
+    <link rel="canonical" href="https://www.implicator.ai/dreamer-4-mines-diamonds-in-an-imagined-minecraft/">
+    <link rel="alternate" type="text/markdown" href="https://www.implicator.ai/dreamer-4-mines-diamonds-in-an-imagined-minecraft.md">
+    <meta name="referrer" content="origin-when-cross-origin">
+    
+    <meta property="og:site_name" content="Implicator.ai">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Dreamer 4: AI Imagines Its Way to Minecraft Diamonds">
+    <meta property="og:description" content="How can an AI master a complex game without ever playing it? DeepMind&#x27;s Dreamer 4 learns by watching, then trains in imagination. This shift from big data to efficient world models could be key for real-world robotics and autonomous systems.">
+    <meta property="og:url" content="https://www.implicator.ai/dreamer-4-mines-diamonds-in-an-imagined-minecraft/">
+    <meta property="og:image" content="https://www.implicator.ai/content/images/2025/10/2025-10-02-18.18.59-deepmind_minevraft@2x.webp">
+    <meta property="article:published_time" content="2025-10-03T01:32:49.000Z">
+    <meta property="article:modified_time" content="2026-02-18T03:23:38.000Z">
+    <meta property="article:tag" content="AI Research">
+    
+    <meta property="article:publisher" content="https://www.facebook.com/implicatorai">
+    <meta property="article:author" content="https://www.facebook.com/implicatorai">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dreamer 4: AI Imagines Its Way to Minecraft Diamonds">
+    <meta name="twitter:description" content="How can an AI master a complex game without ever playing it? DeepMind&#x27;s Dreamer 4 learns by watching, then trains in imagination. This shift from big data to efficient world models could be key for real-world robotics and autonomous systems.">
+    <meta name="twitter:url" content="https://www.implicator.ai/dreamer-4-mines-diamonds-in-an-imagined-minecraft/">
+    <meta name="twitter:image" content="https://www.implicator.ai/content/images/2025/10/2025-10-02-18.18.59-deepmind_minevraft@2x.webp">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Marcus Schuler">
+    <meta name="twitter:label2" content="Filed under">
+    <meta name="twitter:data2" content="AI Research">
+    <meta name="twitter:site" content="@implicatorai">
+    <meta name="twitter:creator" content="@implicatorai">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="800">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Implicator.ai",
+        "url": "https://www.implicator.ai/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.implicator.ai/content/images/2025/11/implicator_logo_new.png"
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Marcus Schuler",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://www.implicator.ai/content/images/size/w1200/2025/12/marcus_schuler_impli.jpg",
+            "width": 1200,
+            "height": 1429
+        },
+        "url": "https://www.implicator.ai/author/marcus-schuler/",
+        "sameAs": [
+            "https://marcus-schuler.com",
+            "https://www.facebook.com/implicatorai",
+            "https://x.com/implicatorai",
+            "https://www.threads.net/@marcus_sanfrancisco",
+            "https://bsky.app/profile/marcus-schuler.com",
+            "https://mastodon.social/@schuler",
+            "https://www.linkedin.com/in/marcusschuler"
+        ]
+    },
+    "headline": "Dreamer 4: AI Imagines Its Way to Minecraft Diamonds",
+    "url": "https://www.implicator.ai/dreamer-4-mines-diamonds-in-an-imagined-minecraft/",
+    "datePublished": "2025-10-03T01:32:49.000Z",
+    "dateModified": "2026-02-18T03:23:38.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "https://www.implicator.ai/content/images/2025/10/2025-10-02-18.18.59-deepmind_minevraft@2x.webp",
+        "width": 1200,
+        "height": 800
+    },
+    "keywords": "AI Research",
+    "description": "How can an AI master a complex game without ever playing it? DeepMind's Dreamer 4 learns by watching, then trains in imagination. This shift from big data to efficient world models could be key for real-world robotics and autonomous systems.",
+    "mainEntityOfPage": "https://www.implicator.ai/dreamer-4-mines-diamonds-in-an-imagined-minecraft/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 6.64">
+    <link rel="alternate" type="application/rss+xml" title="Implicator.ai" href="https://www.implicator.ai/latest/rss/">
+    <script defer src="https://www.implicator.ai/content/files/ghost-apps/portal/portal.min.js" data-i18n="true" data-ghost="https://www.implicator.ai/" data-key="8252045c107d83c25c466a3a2b" data-api="https://www.implicator.ai/ghost/api/content/" data-locale="en" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style><script async src="https://js.stripe.com/v3/"></script>
+    <script defer src="https://www.implicator.ai/content/files/search/search.min.js" data-key="8252045c107d83c25c466a3a2b" data-styles="https://www.implicator.ai/content/files/ghost-apps/sodo-search/main.css" data-sodo-search="https://www.implicator.ai/" data-locale="en" crossorigin="anonymous"></script>
+    
+    <link href="https://www.implicator.ai/webmentions/receive/" rel="webmention">
+    <script defer src="/public/cards.min.js?v=ShRHxgy4po8zN-Wf"></script>
+    <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=WwnU9jw5ancNC8Gc">
+    <script defer src="/public/comment-counts.min.js?v=oFYkaGLdiMqB8VN9" data-ghost-comments-counts-api="https://www.implicator.ai/members/api/comments/counts/"></script>
+    <script defer src="/public/member-attribution.min.js?v=AKG4hWena9j3yX3I"></script>
+    <script defer src="/public/ghost-stats.min.js?v=vFcCUf6ZQ0Hyhc8h" data-stringify-payload="false" data-datasource="analytics_events" data-storage="localStorage" data-host="https://www.implicator.ai/.ghost/analytics/api/v1/page_hit"  tb_site_uuid="c746e8a9-f8dd-402a-9362-7eb210338c5b" tb_post_uuid="07090a17-b94b-465f-8db1-21d704f25d82" tb_post_type="post" tb_member_uuid="undefined" tb_member_status="undefined" tb_gift_link=""></script><style>:root {--ghost-accent-color: #caafba;}</style>
+    <!-- === Analytics === -->
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K0WKPX335Q"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-K0WKPX335Q');
+</script>
+
+
+<!-- Umami (privacy-friendly analytics) -->
+<script defer src="https://umami.relusch.com/script.js" data-website-id="f0e24e04-5b91-4391-9353-69853d403017"></script>
+<script>(()=>{let r=window,C="__ghostUmamiEventsV1";if(r.__ghostUmamiEventsV1)return;r.__ghostUmamiEventsV1=!0;let u=document,_="ghost-umami-member-v1",L=!1,m,p,E=(t)=>/@|%40/i.test(t),w=(t)=>String(t).split("/").map((e)=>E(e)?"[redacted]":e).join("/"),q=(t)=>String(t).replace(/\s+/g," ").trim().split(" ").map((e)=>E(e)?"[redacted]":e).join(" "),S=(t)=>typeof t==="string"&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(t),g=()=>{try{let t=r.umami;return t&&typeof t==="object"&&typeof t.track==="function"&&typeof t.identify==="function"?t:null}catch(t){return null}},v=(t)=>{try{if(t&&typeof t.catch==="function")t.catch(()=>{})}catch(e){}},b=(t,e)=>{try{let n=g();if(n)v(n.track(t,e))}catch(n){}},O=(t,e)=>{try{let n=g();if(n)v(n.identify(t,{plan:e}))}catch(n){}},y=(t)=>{try{r.sessionStorage.setItem(_,JSON.stringify(t))}catch(e){}},P=()=>{try{let t=r.sessionStorage.getItem(_);if(t){let e=JSON.parse(t);if(e&&e.attempted===!0)return;if(e&&e.none===!0)return;if(e&&S(e.uuid)&&(e.plan==="paid"||e.plan==="free")){O(e.uuid,e.plan);return}}}catch(t){}y({attempted:!0});try{let t=r.fetch("/members/api/member",{credentials:"same-origin"});v(t.then((e)=>{if(!e)return;if(e.status===204){y({none:!0});return}if(!e.ok)return;return e.json().then((n)=>{if(n===null||n&&Object.prototype.hasOwnProperty.call(n,"member")&&n.member===null){y({none:!0});return}let s=n&&Object.prototype.hasOwnProperty.call(n,"member")?n.member:n;if(!s||typeof s!=="object"||!S(s.uuid))return;let l=s.uuid,d=s.paid?"paid":"free";y({uuid:l,plan:d}),O(l,d)})}))}catch(t){}},T=()=>{u.addEventListener("click",(t)=>{try{let e=t.target;if(!e||e.nodeType!==1)e=e&&e.parentElement;let n=e&&typeof e.closest==="function"?e.closest("a[href]"):null;if(!n)return;let s=new r.URL(n.getAttribute("href"),r.location.href);if(s.protocol!=="http:"&&s.protocol!=="https:"||s.hostname===r.location.hostname)return;b("outbound-click",{url:(s.hostname+w(s.pathname)).slice(0,500),domain:s.hostname,text:q(n.textContent||"").slice(0,100)})}catch(e){}},!0)},x=()=>{let t=!1,e,n=()=>{try{if(e)e.disconnect()}catch(o){}r.removeEventListener("hashchange",d)},s=(o)=>{if(t)return;t=!0,n(),b("newsletter-signup",{source:o,path:w(r.location.pathname||"")})},l=()=>{try{let o=u.querySelectorAll("form[data-members-form].success");for(let a of o){let c=a.getAttribute("data-members-form");if(c===""||c==="signup"||c==="subscribe"){s("form");return}}}catch(o){}},d=()=>{try{let o=String(r.location.hash||"");if(!o.startsWith("#/portal/"))return;let a=o.slice(1),c=a.indexOf("?"),h=c<0?a:a.slice(0,c);if(!/^\/portal\/(?:signup|subscribe)(?:\/|$)/.test(h))return;let i=new r.URLSearchParams(c<0?"":a.slice(c+1)),k=i.getAll("success");if(k.includes("false"))return;if(k.includes("true")||i.getAll("status").includes("success")||/(?:^|\/)success(?:\/|$)/.test(h))s("portal")}catch(o){}};if(l(),t)return;try{e=new r.MutationObserver(l),e.observe(u.documentElement,{subtree:!0,childList:!0,attributes:!0,attributeFilter:["class"]})}catch(o){}r.addEventListener("hashchange",d),d()},I=()=>{try{if(!u.body||!u.body.classList.contains("post-template"))return;let t,e=()=>{let c=200;try{for(let h of u.querySelectorAll(".article-body, article"))try{let i=h.getBoundingClientRect().height;if(i>c)t=h,c=i}catch(i){}}catch(h){}};e();let n=[25,50,75,100],s=new Set,l=!1,d=!1,o=()=>{if(l=!1,d)return;try{if(!t)e();if(!t)return;let c=t.getBoundingClientRect();if(!(c.height>0))return;let h=Math.max(0,Math.min(100,(r.innerHeight-c.top)/c.height*100));for(let i of n)if(h>=i&&!s.has(i))s.add(i),b("read-depth",{depth:i});if(s.has(100))d=!0,r.removeEventListener("scroll",a),r.removeEventListener("resize",a)}catch(c){}},a=()=>{if(l||d)return;try{l=!0,r.requestAnimationFrame(o)}catch(c){l=!1}};r.addEventListener("scroll",a,{passive:!0}),r.addEventListener("resize",a,{passive:!0}),a()}catch(t){}},j=()=>{if(m!==void 0)r.clearInterval(m),m=void 0;if(p!==void 0)r.clearTimeout(p),p=void 0;r.removeEventListener("load",f),r.removeEventListener("umami:ready",f),u.removeEventListener("readystatechange",f)},R=()=>{P(),T(),x(),I()};function f(){if(L||!g())return;L=!0,j(),u.removeEventListener("load",A,!0);try{R()}catch(t){}}function A(t){try{if(t.target&&t.target.nodeType===1&&t.target.tagName==="SCRIPT")f()}catch(e){}}r.addEventListener("load",f),r.addEventListener("umami:ready",f),u.addEventListener("readystatechange",f),u.addEventListener("load",A,!0),m=r.setInterval(f,200),p=r.setTimeout(j,1e4),f()})();</script>
+
+
+<!-- === Search/News helpers === -->
+<!-- Allow large image previews for Google News/Discover -->
+<meta name="robots" content="max-image-preview:large">
+
+<!-- Ghost Portal CTA text override -->
+  <style>
+  .gh-post-upgrade-cta-content h2 { font-size: 0 !important; line-height: 0 !important; }
+  .gh-post-upgrade-cta-content h2::after { content: "Sign up to keep reading"; font-size: 2rem; line-height: 1.3;
+  display: block; }
+  .gh-post-upgrade-cta-content .gh-btn { font-size: 0 !important; }
+  .gh-post-upgrade-cta-content .gh-btn::after { content: "Sign up"; font-size: 1rem; }
+  </style>
+
+
+
+<!-- Matomo: Implicator -->
+<script>
+window.__editorialMatomoConfig = {"siteId": "7", "dimensions": {"type": 1, "topic": 2, "access": 3}, "hosts": ["www.implicator.ai", "implicator.ai"]};
+(function (root, factory) {
+    'use strict';
+
+    var api = factory();
+
+    if (typeof module === 'object' && module.exports) {
+        module.exports = api;
+        return;
+    }
+
+    if (!root || !root.document || root.__editorialMatomoTrackerStarted) {
+        return;
+    }
+
+    root.__editorialMatomoTrackerStarted = true;
+    root.__editorialMatomoTracker = api;
+    api.initialize(root).catch(function () {
+        // Analytics must never interfere with the page or Ghost membership UI.
+    });
+}(typeof window !== 'undefined' ? window : null, function () {
+    'use strict';
+
+    var MATOMO_BASE = 'https://matomo.relusch.com/';
+    var ACCESS_LABELS = ['public', 'members', 'paid', 'tiers', 'private-preview', 'unknown'];
+    var DEPTH_MINIMUM_SECONDS = {25: 10, 50: 20, 75: 30, 100: 45};
+
+    function asUrl(value, base) {
+        try {
+            return new URL(value, base);
+        } catch (_error) {
+            return null;
+        }
+    }
+
+    function sanitizeUrl(value, base) {
+        if (value === null || value === undefined || String(value).trim() === '') {
+            return '';
+        }
+        var parsed = asUrl(value, base);
+        if (!parsed || (parsed.protocol !== 'http:' && parsed.protocol !== 'https:')) {
+            return '';
+        }
+
+        var kept = new URLSearchParams();
+        parsed.searchParams.forEach(function (parameterValue, parameterName) {
+            if (/^(utm_|mtm_)/i.test(parameterName)) {
+                kept.append(parameterName, parameterValue);
+            }
+        });
+        parsed.search = kept.toString();
+        parsed.hash = '';
+        parsed.username = '';
+        parsed.password = '';
+        return parsed.href;
+    }
+
+    function bodyHas(documentObject, className) {
+        return Boolean(documentObject && documentObject.body && documentObject.body.classList && documentObject.body.classList.contains(className));
+    }
+
+    function firstTopic(documentObject) {
+        var meta = documentObject && documentObject.querySelector && documentObject.querySelector('meta[property="article:tag"]');
+        var value = meta && meta.getAttribute && meta.getAttribute('content');
+        return typeof value === 'string' && value.trim() ? value.trim() : 'none';
+    }
+
+    function firstDeclaredType(documentObject, mappings) {
+        for (var index = 0; index < mappings.length; index += 1) {
+            var mapping = mappings[index];
+            for (var classIndex = 0; classIndex < mapping.classes.length; classIndex += 1) {
+                if (bodyHas(documentObject, mapping.classes[classIndex])) {
+                    return mapping.label;
+                }
+            }
+        }
+        return 'article';
+    }
+
+    function classifyContent(documentObject, hostname, pathname) {
+        var normalizedHost = String(hostname || '').toLowerCase().replace(/^www\./, '');
+        var normalizedPath = pathname || '/';
+        var isPost = bodyHas(documentObject, 'post-template');
+
+        if (normalizedPath === '/' || bodyHas(documentObject, 'home-template')) {
+            return {type: 'home', topic: 'none', isPost: false};
+        }
+        if (bodyHas(documentObject, 'tag-template') || bodyHas(documentObject, 'author-template') || bodyHas(documentObject, 'archive-template')) {
+            return {type: 'archive', topic: firstTopic(documentObject), isPost: false};
+        }
+        if (bodyHas(documentObject, 'page-template')) {
+            return {type: 'page', topic: firstTopic(documentObject), isPost: false};
+        }
+        if (!isPost) {
+            return {type: 'archive', topic: firstTopic(documentObject), isPost: false};
+        }
+
+        var mappings = normalizedHost === 'implicator.ai' ? [
+            {classes: ['tag-nl'], label: 'newsletter'},
+            {classes: ['tag-analysis'], label: 'analysis'},
+            {classes: ['tag-opinion'], label: 'opinion'},
+            {classes: ['tag-vibecoding'], label: 'vibecoding'},
+            {classes: ['tag-funding'], label: 'funding'},
+            {classes: ['tag-model-catalog'], label: 'model catalog'},
+            {classes: ['tag-llm-meter', 'tag-hash-llm-meter'], label: 'llm meter'},
+            {classes: ['tag-implicator-pro-briefing'], label: 'implicator pro briefing'}
+        ] : [
+            {classes: ['tag-hash-daily-brief'], label: 'daily brief'},
+            {classes: ['tag-hash-analysis'], label: 'analysis'},
+            {classes: ['tag-hash-newsletter'], label: 'newsletter'},
+            {classes: ['tag-company-profile', 'tag-hash-company-profile'], label: 'company profile'},
+            {classes: ['tag-lexicon', 'tag-hash-lexicon'], label: 'lexicon'}
+        ];
+
+        return {
+            type: firstDeclaredType(documentObject, mappings),
+            topic: firstTopic(documentObject),
+            isPost: true
+        };
+    }
+
+    function publicContentApi(documentObject, locationObject) {
+        var script = documentObject && documentObject.querySelector && documentObject.querySelector('script[data-api][data-key]');
+        if (!script || !script.getAttribute) return null;
+
+        var apiValue = script.getAttribute('data-api');
+        var key = script.getAttribute('data-key');
+        var apiUrl = asUrl(apiValue, locationObject.href);
+        if (!apiUrl || apiUrl.origin !== locationObject.origin || !key) return null;
+
+        return {apiUrl: apiUrl, key: key};
+    }
+
+    function postSlug(pathname) {
+        var parts = String(pathname || '').split('/').filter(Boolean);
+        return parts.length === 1 ? parts[0] : '';
+    }
+
+    function withTimeout(root, promise, timeoutMs, abortController) {
+        return new Promise(function (resolve, reject) {
+            var settled = false;
+            var timer = root.setTimeout(function () {
+                if (settled) return;
+                settled = true;
+                if (abortController) abortController.abort();
+                reject(new Error('metadata timeout'));
+            }, timeoutMs);
+
+            Promise.resolve(promise).then(function (value) {
+                if (settled) return;
+                settled = true;
+                root.clearTimeout(timer);
+                resolve(value);
+            }, function (error) {
+                if (settled) return;
+                settled = true;
+                root.clearTimeout(timer);
+                reject(error);
+            });
+        });
+    }
+
+    function normalizeAccess(value) {
+        return ACCESS_LABELS.indexOf(value) >= 0 ? value : 'unknown';
+    }
+
+    async function resolveMetadata(root, options) {
+        options = options || {};
+        var locationObject = root.location;
+        var classified = classifyContent(root.document, locationObject.hostname, locationObject.pathname);
+        var metadata = {
+            type: classified.type,
+            topic: classified.topic,
+            isPost: classified.isPost,
+            access: 'unknown',
+            hasAccess: null
+        };
+
+        if (!classified.isPost || typeof root.fetch !== 'function') return metadata;
+
+        var api = publicContentApi(root.document, locationObject);
+        var slug = postSlug(locationObject.pathname);
+        if (!api || !slug) return metadata;
+
+        var endpoint = new URL('posts/slug/' + encodeURIComponent(slug) + '/', api.apiUrl);
+        endpoint.searchParams.set('key', api.key);
+        endpoint.searchParams.set('fields', 'slug,visibility,access');
+
+        var AbortControllerCtor = root.AbortController || (typeof AbortController !== 'undefined' ? AbortController : null);
+        var controller = AbortControllerCtor ? new AbortControllerCtor() : null;
+        try {
+            var operation = root.fetch(endpoint.href, {
+                method: 'GET',
+                credentials: 'same-origin',
+                signal: controller ? controller.signal : undefined,
+                headers: {'Accept': 'application/json'}
+            }).then(async function (response) {
+                if (!response || !response.ok) return null;
+                return response.json();
+            });
+            var data = await withTimeout(root, operation, options.metadataTimeoutMs || 1500, controller);
+            var post = data && Array.isArray(data.posts) && data.posts[0];
+            if (!post) return metadata;
+            metadata.access = normalizeAccess(post.visibility);
+            metadata.hasAccess = typeof post.access === 'boolean' ? post.access : null;
+        } catch (_error) {
+            // The pageview still records with unknown access after the bounded wait.
+        }
+        return metadata;
+    }
+
+    function createReadingMeter(options) {
+        var documentObject = options.document;
+        var content = options.content;
+        var now = options.now;
+        var emit = options.emit;
+        var preview = Boolean(options.preview);
+        var category = preview ? 'Preview reading' : 'Reading';
+        var activeMilliseconds = 0;
+        var lastTick = now();
+        var maxProgress = 0;
+        var sawScroll = false;
+        var emitted = Object.create(null);
+        var stopped = false;
+
+        function hasForegroundFocus() {
+            return !documentObject.hidden && (!documentObject.hasFocus || documentObject.hasFocus());
+        }
+
+        function currentProgress() {
+            if (!content || !content.getBoundingClientRect) return 0;
+            var rect = content.getBoundingClientRect();
+            var height = Number(rect && rect.height);
+            if (!(height > 0)) return 0;
+            var viewportBottom = Number(options.viewportHeight());
+            var traversed = viewportBottom - Number(rect.top || 0);
+            return Math.max(0, Math.min(100, traversed / height * 100));
+        }
+
+        function emitOnce(key, action) {
+            if (emitted[key]) return;
+            emitted[key] = true;
+            emit({category: category, action: action});
+        }
+
+        function evaluate() {
+            if (!sawScroll || stopped) return;
+            var activeSeconds = activeMilliseconds / 1000;
+            [25, 50, 75, 100].forEach(function (depth) {
+                if (maxProgress >= depth && activeSeconds >= DEPTH_MINIMUM_SECONDS[depth]) {
+                    emitOnce('depth-' + depth, 'Depth ' + depth + '%');
+                }
+            });
+            if (maxProgress >= 50 && activeSeconds >= 30) {
+                emitOnce('engaged', preview ? 'Preview engaged read' : 'Engaged read');
+            }
+        }
+
+        function tick() {
+            var current = now();
+            var elapsed = Math.max(0, current - lastTick);
+            lastTick = current;
+            if (!stopped && hasForegroundFocus()) {
+                activeMilliseconds += Math.min(elapsed, 1500);
+            }
+            evaluate();
+        }
+
+        function onScroll() {
+            if (stopped || !hasForegroundFocus()) return;
+            sawScroll = true;
+            maxProgress = Math.max(maxProgress, currentProgress());
+            evaluate();
+        }
+
+        function onVisibilityChange() {
+            lastTick = now();
+        }
+
+        function onFocusChange() {
+            lastTick = now();
+        }
+
+        function stop() {
+            stopped = true;
+        }
+
+        return {
+            tick: tick,
+            onScroll: onScroll,
+            onVisibilityChange: onVisibilityChange,
+            onFocusChange: onFocusChange,
+            stop: stop,
+            state: function () {
+                return {activeMilliseconds: activeMilliseconds, maxProgress: maxProgress, sawScroll: sawScroll, stopped: stopped};
+            }
+        };
+    }
+
+    function isPrivacySignalSet(root) {
+        var navigatorObject = root.navigator || {};
+        var dnt = navigatorObject.doNotTrack || root.doNotTrack || navigatorObject.msDoNotTrack;
+        return navigatorObject.globalPrivacyControl === true || dnt === '1' || dnt === 'yes';
+    }
+
+    function hostAllowed(locationObject, hosts) {
+        if (!Array.isArray(hosts) || !hosts.length) return false;
+        var current = String(locationObject.hostname || '').toLowerCase().replace(/\.$/, '');
+        return hosts.some(function (host) {
+            return current === String(host || '').toLowerCase().replace(/^https?:\/\//, '').replace(/\/$/, '').replace(/\.$/, '');
+        });
+    }
+
+    function queueEvent(root, event) {
+        var command = ['trackEvent', event.category, event.action];
+        if (event.name) command.push(event.name);
+        root._paq.push(command);
+    }
+
+    function safeStorage(root) {
+        try { return root.localStorage; } catch (_error) { return null; }
+    }
+
+    function excludedActivity(root) {
+        var url = asUrl(root.location.href);
+        if (!url) return true;
+        var flag = url.searchParams.get('analytics_test');
+        var storage = safeStorage(root);
+        try {
+            if (storage && flag === '1') storage.setItem('editorial-matomo:exclude', '1');
+            if (storage && flag === '0') storage.removeItem('editorial-matomo:exclude');
+            if (storage && storage.getItem('editorial-matomo:exclude') === '1') return true;
+        } catch (_error) { /* The explicit QA URL still suppresses this page. */ }
+        return flag === '1' || /^\/p\//.test(url.pathname) || url.searchParams.has('preview');
+    }
+
+    var FUNNEL_ACTIONS = ['Paid CTA click', 'Plan selected', 'Checkout requested',
+        'Checkout session created', 'Checkout failed', 'Signup email requested'];
+    var FUNNEL_PLACEMENTS = ['subscribe', 'article-gate', 'pro-archive', 'pro-landing'];
+    var MEMBERSHIP_INTENT_ACTIONS = ['Paid CTA click', 'Signup CTA click', 'Signup email requested'];
+    var PENDING_MEMBERSHIP_KEY = 'editorial-matomo:pending-membership';
+    var PENDING_MEMBERSHIP_MAX_AGE_MS = 5 * 60 * 1000;
+
+    function funnelEvent(detail) {
+        if (!detail || FUNNEL_ACTIONS.indexOf(detail.action) < 0) return null;
+        var placement = FUNNEL_PLACEMENTS.indexOf(detail.placement) >= 0 ? detail.placement : 'unknown';
+        var cadence = ['month', 'year'].indexOf(detail.cadence) >= 0 ? ':' + detail.cadence : '';
+        return {category: 'Membership funnel', action: detail.action, name: placement + cadence};
+    }
+
+    function safeSessionStorage(root) {
+        try { return root.sessionStorage; } catch (_error) { return null; }
+    }
+
+    function clearPendingMembershipEvents(root) {
+        var storage = safeSessionStorage(root);
+        if (!storage || typeof storage.removeItem !== 'function') return;
+        try { storage.removeItem(PENDING_MEMBERSHIP_KEY); } catch (_error) { /* Storage is optional. */ }
+    }
+
+    function sanitizedPendingMembershipEvent(event) {
+        if (!event || typeof event !== 'object') return null;
+        if (event.category === 'Membership funnel' && FUNNEL_ACTIONS.indexOf(event.action) >= 0) {
+            var match = /^(subscribe|article-gate|pro-archive|pro-landing|unknown)(?::(month|year))?$/.exec(event.name);
+            if (!match) return null;
+            return {category: 'Membership funnel', action: event.action, name: match[0]};
+        }
+        if (event.category === 'Membership intent' && MEMBERSHIP_INTENT_ACTIONS.indexOf(event.action) >= 0) {
+            return {category: 'Membership intent', action: event.action};
+        }
+        return null;
+    }
+
+    function readPendingMembershipEvents(root) {
+        var storage = safeSessionStorage(root);
+        if (!storage || typeof storage.getItem !== 'function' || typeof storage.removeItem !== 'function') return [];
+        var raw;
+        try {
+            raw = storage.getItem(PENDING_MEMBERSHIP_KEY);
+            if (!raw) return [];
+            storage.removeItem(PENDING_MEMBERSHIP_KEY);
+        } catch (_error) {
+            return [];
+        }
+
+        try {
+            var payload = JSON.parse(raw);
+            var age = Date.now() - Number(payload && payload.storedAt);
+            if (!payload || payload.version !== 1 || !Array.isArray(payload.events) || typeof payload.storedAt !== 'number' || !Number.isFinite(age) || age < 0 || age > PENDING_MEMBERSHIP_MAX_AGE_MS) return [];
+            return payload.events.slice(0, 20).map(sanitizedPendingMembershipEvent).filter(Boolean);
+        } catch (_error) {
+            return [];
+        }
+    }
+
+    function persistPendingMembershipEvents(root, events) {
+        var storage = safeSessionStorage(root);
+        if (!storage || typeof storage.setItem !== 'function') return;
+        var sanitized = events.slice(0, 20).map(sanitizedPendingMembershipEvent).filter(Boolean);
+        if (!sanitized.length) {
+            clearPendingMembershipEvents(root);
+            return;
+        }
+        try {
+            storage.setItem(PENDING_MEMBERSHIP_KEY, JSON.stringify({
+                version: 1,
+                storedAt: Date.now(),
+                events: sanitized
+            }));
+        } catch (_error) {
+            // Analytics persistence must never interfere with navigation.
+        }
+    }
+
+    function installOfferVisibility(root, emit) {
+        if (!root.IntersectionObserver || !root.document.querySelectorAll) return;
+        var seen = new WeakSet();
+        var observer = new root.IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (root.document.hidden || !entry.isIntersecting || entry.intersectionRatio < 0.25 || seen.has(entry.target)) return;
+                var placement = entry.target.getAttribute('data-membership-offer');
+                if (FUNNEL_PLACEMENTS.indexOf(placement) < 0) return;
+                seen.add(entry.target);
+                emit({category: 'Membership funnel', action: 'PRO offer visible', name: placement});
+                observer.unobserve(entry.target);
+            });
+        }, {threshold: [0.25]});
+        root.document.querySelectorAll('[data-membership-offer]').forEach(function (element) { observer.observe(element); });
+    }
+
+    function closestLink(target) {
+        if (!target) return null;
+        if (target.closest) return target.closest('a[href]');
+        while (target) {
+            if (target.tagName && String(target.tagName).toLowerCase() === 'a' && target.href) return target;
+            target = target.parentNode;
+        }
+        return null;
+    }
+
+    function membershipIntent(href, locationObject) {
+        var target = asUrl(href, locationObject.href);
+        if (!target || target.origin !== locationObject.origin) return '';
+        var hash = target.hash.toLowerCase();
+        var path = target.pathname.replace(/\/+$/, '').toLowerCase() || '/';
+        if (path === '/pro' || (path === '/subscribe' && target.searchParams.get('plan') === 'pro') || hash.indexOf('#/portal/account/plans') === 0) return 'Paid CTA click';
+        if (hash.indexOf('#/portal/signup/') === 0) return 'Paid CTA click';
+        if (hash.indexOf('#/portal/signup') === 0 || path === '/signup') return 'Signup CTA click';
+        if (hash.indexOf('#/portal/subscribe') === 0 || path === '/become-an-implicator-pro-member' || path === '/membership') return 'Paid CTA click';
+        return '';
+    }
+
+    function installMembershipAnchorIntents(root, emit) {
+        var documentObject = root.document;
+        documentObject.addEventListener('click', function (event) {
+            var link = closestLink(event.target);
+            var explicit = link && link.getAttribute && link.getAttribute('data-membership-action');
+            if (explicit === 'Paid CTA click') {
+                var marked = funnelEvent({action: explicit, placement: link.getAttribute('data-membership-placement')});
+                emit(marked);
+                return;
+            }
+            var portal = link && link.getAttribute && link.getAttribute('data-portal');
+            if (portal && /^signup\/[^/]+\/(monthly|yearly)$/.test(portal)) {
+                var cadence = /\/monthly$/.test(portal) ? 'month' : 'year';
+                emit(funnelEvent({action: 'Paid CTA click', placement: 'pro-landing', cadence: cadence}));
+                emit(funnelEvent({action: 'Plan selected', placement: 'pro-landing', cadence: cadence}));
+                return;
+            }
+            var action = link && membershipIntent(link.href || link.getAttribute('href'), root.location);
+            if (action) emit({category: 'Membership intent', action: action});
+        });
+    }
+
+    function installMembershipFormIntents(root, emit) {
+        var documentObject = root.document;
+        var seenForms = typeof WeakSet === 'function' ? new WeakSet() : null;
+
+        function inspectForm(form) {
+            if (!form || !form.matches || !form.matches('form[data-members-form]') || !form.classList || !form.classList.contains('success')) return;
+            if (seenForms && seenForms.has(form)) return;
+            if (seenForms) seenForms.add(form);
+            emit({category: 'Membership intent', action: 'Signup email requested'});
+        }
+
+        if (root.MutationObserver && documentObject.body) {
+            var observer = new root.MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) { inspectForm(mutation.target); });
+            });
+            observer.observe(documentObject.body, {subtree: true, attributes: true, attributeFilter: ['class']});
+        }
+    }
+
+    function isDownloadPath(pathname) {
+        return /\.(?:7z|avi|csv|docx?|dmg|epub|exe|gz|gzip|mov|mp3|mp4|mpe?g|msi|od[st]|pdf|pptx?|rar|rtf|tar|tgz|wav|wmv|xlsx?|zip)$/i.test(pathname || '');
+    }
+
+    function installSanitizedLinkTracking(root) {
+        root.document.addEventListener('click', function (event) {
+            var link = closestLink(event.target);
+            if (!link) return;
+            var href = link.href || (link.getAttribute && link.getAttribute('href'));
+            var target = asUrl(href, root.location.href);
+            if (!target || (target.protocol !== 'http:' && target.protocol !== 'https:')) return;
+
+            var download = isDownloadPath(target.pathname);
+            var internal = hostAllowed(target, root.__editorialMatomoConfig.hosts);
+            if (!download && internal) return;
+
+            var clean = sanitizeUrl(target.href);
+            if (!clean) return;
+            root._paq.push(['trackLink', clean, download ? 'download' : 'link']);
+        });
+    }
+
+    function activePaidSubscription(member) {
+        if (!member || member.paid !== true || !Array.isArray(member.subscriptions)) return null;
+        for (var index = 0; index < member.subscriptions.length; index += 1) {
+            var subscription = member.subscriptions[index];
+            var price = subscription && (subscription.price || subscription.plan);
+            if (subscription && subscription.id && subscription.status === 'active' && price && Number(price.amount) > 0) {
+                return subscription;
+            }
+        }
+        return null;
+    }
+
+    function evaluateConversions(url, member) {
+        var parsed = asUrl(url);
+        if (!parsed || !member || !member.uuid) {
+            return {signup: false, paid: false, subscription: null};
+        }
+        var signupReturn = parsed.searchParams.get('action') === 'signup' && parsed.searchParams.get('success') === 'true';
+        var paidReturn = parsed.searchParams.get('stripe') === 'success';
+        var subscription = paidReturn ? activePaidSubscription(member) : null;
+        return {
+            signup: signupReturn,
+            paid: Boolean(subscription),
+            subscription: subscription
+        };
+    }
+
+    async function sha256Hex(cryptoObject, TextEncoderCtor, value) {
+        if (!cryptoObject || !cryptoObject.subtle || !TextEncoderCtor) return '';
+        var bytes = new TextEncoderCtor().encode(value);
+        var digest = await cryptoObject.subtle.digest('SHA-256', bytes);
+        return Array.prototype.map.call(new Uint8Array(digest), function (byte) {
+            return byte.toString(16).padStart(2, '0');
+        }).join('');
+    }
+
+    async function emitDeduplicatedConversion(options, kind, identityMaterial, action) {
+        var digest = await sha256Hex(options.crypto, options.TextEncoder, 'editorial-matomo|' + options.siteId + '|' + kind + '|' + identityMaterial);
+        if (!digest || !options.storage) return false;
+        var key = 'editorial-matomo:' + kind + ':' + digest;
+        try {
+            if (options.storage.getItem(key)) return false;
+            options.storage.setItem(key, '1');
+            options.emit({category: 'Membership', action: action});
+            return true;
+        } catch (_error) {
+            // Without durable deduplication, do not risk duplicate conversions.
+            return false;
+        }
+    }
+
+    async function processConversions(options) {
+        var eligible = evaluateConversions(options.url, options.member);
+        if (eligible.signup) {
+            await emitDeduplicatedConversion(options, 'signup', options.member.uuid, 'Member signup confirmed');
+        }
+        if (eligible.paid) {
+            await emitDeduplicatedConversion(options, 'paid', options.member.uuid + '|' + eligible.subscription.id, 'Paid browser return verified');
+        }
+        return eligible;
+    }
+
+    async function fetchCurrentMember(root) {
+        if (typeof root.fetch !== 'function') return null;
+        try {
+            var response = await root.fetch(new URL('/members/api/member/', root.location.href).href, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {'Accept': 'application/json'}
+            });
+            if (!response || !response.ok || response.status === 204) return null;
+            var data = await response.json();
+            return data && data.member ? data.member : data;
+        } catch (_error) {
+            return null;
+        }
+    }
+
+    function waitForDom(root) {
+        if (root.document.readyState !== 'loading') return Promise.resolve();
+        return new Promise(function (resolve) {
+            root.document.addEventListener('DOMContentLoaded', resolve, {once: true});
+        });
+    }
+
+    function loadMatomo(root) {
+        if (root.document.querySelector && root.document.querySelector('script[data-editorial-matomo="true"]')) return;
+        var script = root.document.createElement('script');
+        script.async = true;
+        script.src = MATOMO_BASE + 'matomo.js';
+        if (script.setAttribute) script.setAttribute('data-editorial-matomo', 'true');
+        var parent = root.document.head || root.document.body || root.document.documentElement;
+        if (parent && parent.appendChild) parent.appendChild(script);
+    }
+
+    function installReading(root, metadata, emit) {
+        var selector = String(root.location.hostname || '').toLowerCase().replace(/^www\./, '') === 'implicator.ai' ? '.article-body' : '.gh-content';
+        var content = root.document.querySelector(selector);
+        if (!content) return null;
+        var preview = metadata.hasAccess === false || Boolean(root.document.querySelector('.gh-post-upgrade-cta'));
+        var meter = createReadingMeter({
+            document: root.document,
+            content: content,
+            viewportHeight: function () { return root.innerHeight || 0; },
+            now: function () { return Date.now(); },
+            preview: preview,
+            emit: emit
+        });
+        var timer = root.setInterval(function () { meter.tick(); }, 1000);
+        var onScroll = function () { meter.onScroll(); };
+        var onVisibilityChange = function () { meter.onVisibilityChange(); };
+        var onFocusChange = function () { meter.onFocusChange(); };
+        var onPageHide = function () {
+            meter.stop();
+            root.clearInterval(timer);
+            root.removeEventListener('scroll', onScroll);
+            root.removeEventListener('blur', onFocusChange);
+            root.removeEventListener('focus', onFocusChange);
+            root.document.removeEventListener('visibilitychange', onVisibilityChange);
+        };
+        root.addEventListener('scroll', onScroll, {passive: true});
+        root.addEventListener('blur', onFocusChange);
+        root.addEventListener('focus', onFocusChange);
+        root.document.addEventListener('visibilitychange', onVisibilityChange);
+        root.addEventListener('pagehide', onPageHide, {once: true});
+        return meter;
+    }
+
+    async function initialize(root, options) {
+        options = options || {};
+        var config = root.__editorialMatomoConfig || {};
+        var excluded = excludedActivity(root);
+        var privacySuppressed = isPrivacySignalSet(root);
+        if (excluded || privacySuppressed) {
+            clearPendingMembershipEvents(root);
+            return {started: false};
+        }
+        if (root.__editorialMatomoInitialized || !hostAllowed(root.location, config.hosts)) {
+            return {started: false};
+        }
+        if (!config.siteId || !config.dimensions || !config.dimensions.type || !config.dimensions.topic || !config.dimensions.access) {
+            return {started: false};
+        }
+        root.__editorialMatomoInitialized = true;
+        var pending = readPendingMembershipEvents(root);
+        var ready = false;
+        var departed = false;
+        var emit = function (event) {
+            if (ready) {
+                clearPendingMembershipEvents(root);
+                queueEvent(root, event);
+            }
+            else if (pending.length < 20) pending.push(event);
+        };
+        root.addEventListener('editorial:membership', function (event) {
+            var sanitized = funnelEvent(event.detail);
+            if (sanitized) emit(sanitized);
+        });
+        installMembershipAnchorIntents(root, emit);
+        root.addEventListener('pagehide', function () {
+            if (ready || departed) return;
+            persistPendingMembershipEvents(root, pending);
+            pending = [];
+            departed = true;
+        }, {once: true});
+        await waitForDom(root);
+        if (departed) return {started: false};
+
+        var metadata = await resolveMetadata(root, options);
+        if (departed) return {started: false};
+        root._paq = root._paq || [];
+        root._paq.push(['setTrackerUrl', MATOMO_BASE + 'matomo.php']);
+        root._paq.push(['setSiteId', String(config.siteId)]);
+        root._paq.push(['setDomains', config.hosts.slice()]);
+
+        var cleanPageUrl = sanitizeUrl(root.location.href);
+        var cleanReferrer = sanitizeUrl(root.document.referrer, root.location.href);
+        if (cleanPageUrl) root._paq.push(['setCustomUrl', cleanPageUrl]);
+        if (cleanReferrer) root._paq.push(['setReferrerUrl', cleanReferrer]);
+
+        root._paq.push(['setCustomDimension', config.dimensions.type, metadata.type]);
+        root._paq.push(['setCustomDimension', config.dimensions.topic, metadata.topic]);
+        root._paq.push(['setCustomDimension', config.dimensions.access, metadata.access]);
+        root._paq.push(['trackPageView']);
+        root._paq.push(['enableHeartBeatTimer', 15]);
+
+        ready = true;
+        pending.forEach(function (event) { queueEvent(root, event); });
+        pending = [];
+        clearPendingMembershipEvents(root);
+        installReading(root, metadata, emit);
+        installMembershipFormIntents(root, emit);
+        installOfferVisibility(root, emit);
+        installSanitizedLinkTracking(root);
+        if (options.loadMatomo !== false) loadMatomo(root);
+
+        var member = await fetchCurrentMember(root);
+        await processConversions({
+            url: root.location.href,
+            member: member,
+            storage: safeStorage(root),
+            crypto: root.crypto,
+            TextEncoder: root.TextEncoder || (typeof TextEncoder !== 'undefined' ? TextEncoder : null),
+            siteId: String(config.siteId),
+            emit: emit
+        });
+
+        return {started: true, metadata: metadata};
+    }
+
+    return {
+        sanitizeUrl: sanitizeUrl,
+        classifyContent: classifyContent,
+        resolveMetadata: resolveMetadata,
+        createReadingMeter: createReadingMeter,
+        membershipIntent: membershipIntent,
+        activePaidSubscription: activePaidSubscription,
+        evaluateConversions: evaluateConversions,
+        processConversions: processConversions,
+        fetchCurrentMember: fetchCurrentMember,
+        initialize: initialize
+    };
+}));
+
+</script>
+<!-- End Matomo: Implicator -->
+
+  <link rel="dns-prefetch" href="https://umami.relusch.com">
+  <link rel="dns-prefetch" href="https://ttn.relusch.com">
+
+  <link rel="preload" href="/assets/fonts/inter-normal-latin.woff2?v=yUB2RZPQ_l1Za-Mn" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/source-serif-4-normal-latin.woff2?v=KiS61Gbwm4i46cvE" as="font" type="font/woff2" crossorigin>
+
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--font-display:'Inter Variable',Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-body:'Source Serif 4',Georgia,serif;--font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Consolas,monospace;--color-paper:oklch(99% 0.004 70);--color-paper-warm:oklch(96% 0.018 72);--color-coral:oklch(79% 0.104 25);--color-coral-ink:oklch(52% 0.135 25);--color-steel:oklch(61% 0.071 244);--color-steel-light:oklch(90% 0.025 241);--color-navy:oklch(42% 0.072 245);--color-navy-deep:oklch(29% 0.052 244);--color-ink:oklch(23% 0.012 245);--color-muted:oklch(52% 0.025 245);--color-rule:oklch(86% 0.025 240);--color-focus:oklch(54% 0.13 245);--color-on-dark:var(--color-paper);--bg:var(--color-paper);--bg-warm:var(--color-paper-warm);--bg-dark:var(--color-navy);--bg-darker:var(--color-navy-deep);--ink:var(--color-ink);--ink-soft:var(--color-muted);--red:var(--color-coral);--red-text:var(--color-coral-ink);--red-btn:var(--color-navy-deep);--stone:var(--color-muted);--stone-on-dark:var(--color-on-dark);--stone-light:var(--color-steel);--stone-lighter:var(--color-rule);--gold:var(--color-coral);--gold-ink:var(--color-navy);--focus-ring:var(--color-focus);--focus-ring-on-dark:var(--color-focus);--cream:var(--color-on-dark);--text-min:0.72rem;--text-label:0.75rem;--text-masthead:clamp(2.15rem,1rem + 5.2vw,6.75rem);--rule-structural:3px;--max-width:1400px;--gutter:clamp(1rem,3vw,2.5rem)}
+    html,body{overflow-x:clip}
+    html{width:100%}
+    body{font-family:var(--font-body);font-size:1.05rem;line-height:1.65;color:var(--ink);background:var(--bg)}
+    body.dark{--color-paper:oklch(25% 0.035 245);--color-paper-warm:oklch(30% 0.038 245);--color-coral:oklch(79% 0.104 25);--color-coral-ink:oklch(85% 0.072 24);--color-steel:oklch(74% 0.055 241);--color-steel-light:oklch(40% 0.045 242);--color-navy:oklch(86% 0.035 241);--color-navy-deep:oklch(20% 0.028 245);--color-ink:oklch(97% 0.008 70);--color-muted:oklch(80% 0.025 241);--color-rule:oklch(48% 0.045 242);--color-focus:oklch(82% 0.10 80);--color-on-dark:var(--color-ink);color-scheme:dark}
+    @media(prefers-color-scheme:dark){body.system{--color-paper:oklch(25% 0.035 245);--color-paper-warm:oklch(30% 0.038 245);--color-coral:oklch(79% 0.104 25);--color-coral-ink:oklch(85% 0.072 24);--color-steel:oklch(74% 0.055 241);--color-steel-light:oklch(40% 0.045 242);--color-navy:oklch(86% 0.035 241);--color-navy-deep:oklch(20% 0.028 245);--color-ink:oklch(97% 0.008 70);--color-muted:oklch(80% 0.025 241);--color-rule:oklch(48% 0.045 242);--color-focus:oklch(82% 0.10 80);--color-on-dark:var(--color-ink);color-scheme:dark}}
+    img{max-width:100%;height:auto;display:block}
+    .container{max-width:var(--max-width);margin:0 auto;padding:0 var(--gutter)}
+    .masthead{position:relative;padding:clamp(1.5rem,3vw,2.25rem) 0 clamp(1rem,2vw,1.5rem);border-bottom:var(--rule-structural) solid var(--color-ink);background:var(--color-coral);text-align:center}
+    .masthead-logo{display:inline-flex;min-width:0;align-items:baseline;justify-content:center;gap:0;overflow-wrap:anywhere;color:var(--color-navy-deep);font-family:var(--font-display);font-size:var(--text-masthead);font-style:normal;font-weight:900;letter-spacing:-0.085em;line-height:.84;text-transform:uppercase}
+    .masthead-logo .dot{color:var(--color-paper);font-size:1em;font-weight:300;text-transform:none}
+    .masthead-tagline{margin-top:1rem;color:var(--color-navy-deep);font-family:var(--font-display);font-size:clamp(.65rem,1.4vw,.85rem);font-style:normal;font-weight:800;letter-spacing:.08em;line-height:1.2;text-transform:uppercase}
+    a{color:inherit;text-decoration:none}
+  </style>
+
+  <link rel="preload" href="/assets/dist/app.min.css?v=o3_40U5m-8aP_DZC" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="/assets/dist/app.min.css?v=o3_40U5m-8aP_DZC"></noscript>
+
+    <meta name="google-adsense-account" content="ca-pub-2414090272567803">
+
+  
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2414090272567803" crossorigin="anonymous"></script>
+  
+</head>
+<body class="post-template tag-research tag-hash-robert-brown light">
+
+        <div class="progress-bar" id="progressBar"></div>
+
+  <div class="edition-bar">
+  <div class="container">
+    <div class="edition-left">
+      <button class="burger-toggle" id="burgerToggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="edition-date">Sunday, September 20, 2026 &middot; San Francisco</span>
+    </div>
+    <div class="edition-links">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="search-toggle" id="searchToggle" aria-label="Search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <a href="/subscribe/">Subscribe</a>
+      <a href="/signin/">Sign In</a>
+    </div>
+  </div>
+</div>
+
+<nav class="burger-menu" id="burgerMenu">
+  <div class="burger-menu-header">
+    <span class="burger-menu-title">Menu</span>
+    <button class="burger-close" id="burgerClose" aria-label="Close menu">&times;</button>
+  </div>
+  <div class="burger-menu-links">
+      <button class="burger-menu-link" onclick="window.location.assign('/')">Home</button>
+      <button class="burger-menu-link" onclick="window.location.assign('/pro/')">PRO</button>
+      <button class="burger-menu-link" onclick="window.location.assign('/tag/ai-news/')">News</button>
+      <button class="burger-menu-link" onclick="window.location.assign('/tag/analysis/')">Analysis</button>
+      <button class="burger-menu-link" onclick="window.location.assign('/tag/politics/')">Policy</button>
+      <button class="burger-menu-link" onclick="window.location.assign('/tag/nl/')">Briefing</button>
+  </div>
+  <div class="burger-menu-links-sub">
+      <button class="burger-menu-link burger-menu-link-sub" onclick="window.location.assign('/tag/research/')">Research</button>
+      <button class="burger-menu-link burger-menu-link-sub" onclick="window.location.assign('/tag/funding/')">Funding</button>
+      <button class="burger-menu-link burger-menu-link-sub" onclick="window.location.assign('/tag/vibecoding/')">Tools</button>
+  </div>
+  <div class="burger-menu-secondary">
+    <a href="https://www.implicator.ai/about/">About</a>
+    <a href="https://www.implicator.ai/get-in-touch/">Contact</a>
+    <a href="https://www.implicator.ai/latest/rss/">RSS</a>
+  </div>
+</nav>
+<div class="burger-overlay" id="burgerOverlay"></div>
+
+  <header class="masthead">
+  <div class="container">
+    <a href="https://www.implicator.ai" class="masthead-logo">
+        <img class="logo-icon" src="https://www.implicator.ai/content/images/2025/04/Logo_impli_full.png" alt="Implicator.ai">
+      IMPLICATOR<span class="dot">.ai</span>
+    </a>
+    <div class="masthead-tagline">Strategic AI Intelligence from San Francisco</div>
+  </div>
+</header>
+
+  <nav class="main-nav" id="mainNav">
+  <div class="container">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/pro/" class="nav-link">PRO</a>
+      <a href="/tag/ai-news/" class="nav-link">News</a>
+      <a href="/tag/analysis/" class="nav-link">Analysis</a>
+      <a href="/tag/politics/" class="nav-link">Policy</a>
+      <a href="/tag/nl/" class="nav-link">Briefing</a>
+        <a href="/tag/research/" class="nav-link">Research</a>
+        <a href="/tag/funding/" class="nav-link">Funding</a>
+        <a href="/tag/vibecoding/" class="nav-link">Tools</a>
+  </div>
+</nav>
+
+  
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.implicator.ai"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "AI Research",
+      "item": "https://www.implicator.ai/tag/research/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Dreamer 4 mines diamonds in an imagined Minecraft"
+    }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.implicator.ai/dreamer-4-mines-diamonds-in-an-imagined-minecraft/"
+  },
+  "headline": "Dreamer 4 mines diamonds in an imagined Minecraft",
+  "description": "Discover how DeepMind&#x27;s Dreamer 4 AI learns to mine diamonds in Minecraft, training entirely inside its own imagined world model. A breakthrough for agent AI.",
+  "alternativeHeadline": "How can an AI master a complex game without ever playing it? DeepMind&#x27;s Dreamer 4 learns by watching, then trains in imagination. This shift from big data to efficient world models could be key for real-world robotics and autonomous systems.",
+  "image": [{
+    "@type": "ImageObject",
+    "url": "https://www.implicator.ai/content/images/2025/10/2025-10-02-18.18.59-deepmind_minevraft@2x.webp",
+    "width": 1200,
+    "height": 800
+  }],
+  "thumbnailUrl": "https://www.implicator.ai/content/images/2025/10/2025-10-02-18.18.59-deepmind_minevraft@2x.webp",
+  "datePublished": "2025-10-03T01:32:49Z",
+  "dateModified": "2026-02-18T03:23:38Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Marcus Schuler",
+      "url": "https://www.implicator.ai/author/marcus-schuler/",
+      "description": "Editor-in-Chief and founder of Implicator.ai. Former ARD correspondent and senior broadcast journalist with 10+ years covering tech. Writes daily briefings on policy and market developments. Based in San Francisco.
+E-mail: editor@implicator.ai",
+      "image": "https://www.implicator.ai/content/images/2025/12/marcus_schuler_impli.jpg",
+      "sameAs": [
+        "https://www.implicator.ai",
+        "https://x.com/implicatorai",
+        "https://bsky.app/profile/marcus-schuler.com",
+        "https://www.linkedin.com/in/marcusschuler"
+      ]
+    }
+  ],
+  "publisher": {
+    "@type": "NewsMediaOrganization",
+    "@id": "https://www.implicator.ai/#publisher",
+    "name": "Implicator.ai",
+    "url": "https://www.implicator.ai/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.implicator.ai/content/images/2025/11/implicator_logo_new.png",
+      "width": 256,
+      "height": 256
+    }
+  },
+  "articleSection": "AI Research",
+  "keywords": ["AI Research"],
+  "articleBody": "How can an AI master a complex game without ever playing it? DeepMind&#39;s Dreamer 4 learns by watching, then trains in imagination. This shift from big data to efficient world models could be key for real-world robotics and autonomous systems.",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true
+}
+</script>
+
+<div class="article-header">
+    <a href="https://www.implicator.ai/tag/research/" class="article-tag">AI Research</a>
+  <h1 class="article-title">Dreamer 4 mines diamonds in an imagined Minecraft</h1>
+        <p class="article-excerpt">How can an AI master a complex game without ever playing it? DeepMind&#x27;s Dreamer 4 learns by watching, then trains in imagination. This shift from big data to efficient world models could be key for real-world robotics and autonomous systems.</p>
+  <div class="article-meta">
+      <a href="https://www.implicator.ai/author/marcus-schuler/" class="author-avatar">
+        <img src="https://www.implicator.ai/content/images/2025/12/marcus_schuler_impli.jpg" alt="Marcus Schuler">
+      </a>
+    <div class="meta-text">
+      <strong><a href="https://www.implicator.ai/author/marcus-schuler/">Marcus Schuler</a></strong>
+      <span>October 2, 2025, 6:32 PM PST &middot; <span class="reading-time" data-id="68df1d706f799800014bfde1">9 min read</span></span>
+    </div>
+  </div>
+</div>
+
+  <figure class="article-feature-image">
+    <img src="/content/images/size/w1000/2025/10/2025-10-02-18.18.59-deepmind_minevraft@2x.webp"
+         srcset="/content/images/size/w600/2025/10/2025-10-02-18.18.59-deepmind_minevraft@2x.webp 600w,
+                 /content/images/size/w1000/2025/10/2025-10-02-18.18.59-deepmind_minevraft@2x.webp 1000w,
+                 /content/images/size/w2000/2025/10/2025-10-02-18.18.59-deepmind_minevraft@2x.webp 2000w"
+         sizes="(max-width: 960px) 100vw, 960px"
+         width="1000" height="563"
+         alt="Dreamer 4 mines diamonds in an imagined Minecraft">
+  </figure>
+
+<div class="article-body has-dropcap">
+  
+<!--kg-card-begin: html-->
+<div style="background-color: #F5F5F5; border: 2px solid #333; border-radius: 8px; padding: 20px; margin: 30px 0;">
+  <p style="margin-top: 0; margin-bottom: 15px; color: #333; font-weight: bold;">💡 TL;DR - The 30 Seconds Version</p>
+  <p style="margin: 0 0 10px 0; color: #333; line-height: 1.6;">🎮 Dreamer 4 became the first agent to mine diamonds in Minecraft (0.7% success rate) using only offline video data and simulated practice—never touching the real game during training.</p>
+  <p style="margin: 0 0 10px 0; color: #333; line-height: 1.6;">📊 The system needed just 100 hours of action-paired video out of 2,500 total hours to reach 85% performance, proving most world knowledge extracts from unlabeled footage.</p>
+  <p style="margin: 0 0 10px 0; color: #333; line-height: 1.6;">⚡ Runs at 21 FPS on a single H100 GPU in real-time—13 to 26 times faster than competing approaches—enabling the millions of simulated rollouts required for reinforcement learning.</p>
+  <p style="margin: 0 0 10px 0; color: #333; line-height: 1.6;">🧪 Human operators successfully completed 14 out of 16 complex tasks inside the simulated environment, from combat to crafting, proving the world model captures causal accuracy.</p>
+  <p style="margin: 0 0 10px 0; color: #333; line-height: 1.6;">🌍 Action conditioning learned from one Minecraft environment generalized to entirely unseen dimensions with 76% accuracy, suggesting transferable physics understanding rather than memorization.</p>
+  <p style="margin: 0 0 0 0; color: #333; line-height: 1.6;">🚀 The constraint binding agent development appears to be world model quality, not RL algorithms—reshaping priorities for robotics, autonomous systems, and domains where online exploration is expensive or dangerous.</p>
+</div>
+<!--kg-card-end: html-->
+<p>Google DeepMind says its new agent can mine diamonds in Minecraft without ever touching the real game during training. <a href="https://www.alphaxiv.org/abs/2509.24527v1?ref=implicator.ai">The paper backs that up</a>: Dreamer 4 learns from offline video, then trains entirely inside its own world model to execute the 20,000-plus actions needed to reach the game’s hardest milestone. </p>
+<!--kg-card-begin: html-->
+<style>
+.newsletter-box {
+    background: #0a0a0a;
+    border: 4px solid #00ff88;
+    padding: 40px 32px;
+    margin: 50px auto;
+    max-width: 650px;
+    transform: rotate(-0.8deg);
+    box-shadow: 0 8px 32px rgba(0, 255, 136, 0.15);
+    position: relative;
+    overflow: hidden;
+    animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+    0%, 100% {
+        box-shadow: 0 8px 32px rgba(0, 255, 136, 0.15);
+    }
+    50% {
+        box-shadow: 0 8px 32px rgba(0, 255, 136, 0.3);
+    }
+}
+
+.newsletter-box::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ff88, transparent);
+    animation: scan 4s ease-in-out infinite;
+    opacity: 0.3;
+}
+
+@keyframes scan {
+    0% { top: -100%; }
+    50% { top: 100%; }
+    100% { top: 100%; }
+}
+
+.newsletter-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.newsletter-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        transform: scale(1.1) rotate(5deg);
+    }
+}
+
+.newsletter-box h3 {
+    color: white;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.newsletter-box .highlight {
+    color: #00ff88;
+}
+
+.newsletter-tagline {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    margin-bottom: 24px;
+    font-style: italic;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.newsletter-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    color: white;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.newsletter-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #00ff88;
+    box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+}
+
+.newsletter-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.newsletter-button {
+    padding: 16px 40px;
+    background: #00ff88;
+    color: #0a0a0a;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.newsletter-button:hover {
+    background: #00dd77;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 255, 136, 0.3);
+}
+
+.newsletter-button:active {
+    transform: translateY(0);
+}
+
+.newsletter-footer {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .newsletter-box {
+        padding: 32px 24px;
+        transform: rotate(-0.5deg);
+    }
+    .newsletter-box h3 {
+        font-size: 24px;
+    }
+    .newsletter-form {
+        flex-direction: column;
+    }
+    .newsletter-input {
+        min-width: 100%;
+    }
+    .newsletter-button {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="newsletter-box">
+    <div class="newsletter-inner">
+        <div class="newsletter-icon">⚡</div>
+        <h3>AI moved <span class="highlight">fast</span> today. Did you?</h3>
+        <p class="newsletter-tagline">Daily. No fluff. What matters in AI today.</p>
+        <form class="newsletter-form" data-members-form="subscribe">
+            <input 
+                type="email" 
+                class="newsletter-input" 
+                data-members-email 
+                placeholder="your@email.com" 
+                required>
+            <button type="submit" class="newsletter-button">
+                <span data-members-label>Get It Free</span>
+            </button>
+        </form>
+        <p class="newsletter-footer" data-members-feedback>No spam. Unsubscribe anytime.</p>
+    </div>
+</div>
+<!--kg-card-end: html-->
+<h3 id="what%E2%80%99s-actually-new">What’s actually new</h3><p>Dreamer 4 collapses two previously separate lines of work—video generation and reinforcement learning—into a single, scalable world model that can be used for policy training. The model runs at the game’s native 360×640 resolution and matches real-time play on a single H100, with a 9.6-second temporal context. That matters because agents need millions of imagined rollouts to learn long sequences; most prior simulators couldn’t keep up. </p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://www.implicator.ai/content/images/2025/10/2025-10-02-18.16.12-minecraft_deepmind@2x.webp" class="kg-image" alt="" loading="lazy" width="1200" height="617" srcset="https://www.implicator.ai/content/images/size/w600/2025/10/2025-10-02-18.16.12-minecraft_deepmind@2x.webp 600w, https://www.implicator.ai/content/images/size/w1000/2025/10/2025-10-02-18.16.12-minecraft_deepmind@2x.webp 1000w, https://www.implicator.ai/content/images/2025/10/2025-10-02-18.16.12-minecraft_deepmind@2x.webp 1200w" sizes="(min-width: 720px) 720px"><figcaption><span style="white-space: pre-wrap;">Credit: DeepMind</span></figcaption></figure><p>Under the hood, DeepMind introduces “shortcut forcing,” plus a shift from v-prediction (predicting velocity/noise) to x-prediction (predicting clean latents). The point is simple: reduce high-frequency error that accumulates over long rollouts. In ablations, those choices unlock fast, stable generations with a handful of sampling steps while keeping fidelity high. </p><h3 id="evidence-not-hype">Evidence, not hype</h3><p>On the core benchmark—start in a fresh world with an empty inventory and play for 60 minutes—Dreamer 4 hits diamonds in 0.7% of 1,000 evaluation runs. That looks small until you compare baselines: OpenAI’s VPT, which used 2,500 hours of contractor play plus 270,000 hours of action-labeled web video, topped out at basic milestones and did not reliably progress into iron tools, let alone diamonds. Dreamer 4 uses the same 2,541-hour contractor dataset and still advances further by training its policy inside the learned simulator. </p><p>DeepMind also stress-tests the simulator with humans at the controls. Operators attempted 16 hand-crafted tasks—crafting, building, combat, navigation—purely inside each model’s imagined world. Dreamer 4 completes 14 of 16. Oasis (large) manages 5, Lucid-v1 effectively none, and MineWorld is too slow for practical testing. This is the key check: can a person perform complex actions inside your “fake” environment without it drifting into visual autocomplete? Dreamer 4 passes that bar.</p><h3 id="data-efficiency-is-the-headline">Data efficiency is the headline</h3><p>The most important number isn’t the 0.7%. It’s 100. Dreamer 4 learns robust action conditioning using just 100 hours of action-paired video out of 2,541 total hours; the rest can be unlabeled. With that tiny slice, the model reaches ~85% of the action-conditioned quality (PSNR/SSIM) of a fully labeled run. In a controlled test, action grounding learned in the Overworld generalizes to the Nether and End—with 76% of PSNR and 80% of SSIM relative to a model trained with all actions. Translation: most “world knowledge” comes from passive video; a little action data goes a long way. </p><h3 id="compute-and-speed-in-balance">Compute and speed, in balance</h3><p>Training uses 2-billion-parameter models across 256–1,024 TPU v5p chips, then the learned world model offers interactive inference beyond 20 FPS on a single H100. Competing Minecraft simulators either fall below real-time (MineWorld ~2 FPS) or only approach it at small scale (Oasis small is real-time; Oasis large is roughly 5 FPS on one H100). For RL, those deltas are decisive—if the simulator can’t run fast, imagination training stalls. </p><h3 id="how-the-agent-learns">How the agent learns</h3><p>The recipe is three-phase. First, pretrain a causal tokenizer and dynamics model on video (with optional actions) to predict future frames. Second, insert “agent tokens” and fine-tune the same transformer to predict actions and rewards for multiple tasks. Third, do reinforcement learning entirely inside the model’s imagination—no online environment interaction required. It’s one architecture serving both simulation and policy learning, which tightens the loop and speeds iteration. </p>
+<!--kg-card-begin: html-->
+<style>
+.newsletter-box {
+    background: #0a0a0a;
+    border: 4px solid #00ff88;
+    padding: 40px 32px;
+    margin: 50px auto;
+    max-width: 650px;
+    transform: rotate(-0.8deg);
+    box-shadow: 0 8px 32px rgba(0, 255, 136, 0.15);
+    position: relative;
+    overflow: hidden;
+    animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+    0%, 100% {
+        box-shadow: 0 8px 32px rgba(0, 255, 136, 0.15);
+    }
+    50% {
+        box-shadow: 0 8px 32px rgba(0, 255, 136, 0.3);
+    }
+}
+
+.newsletter-box::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ff88, transparent);
+    animation: scan 4s ease-in-out infinite;
+    opacity: 0.3;
+}
+
+@keyframes scan {
+    0% { top: -100%; }
+    50% { top: 100%; }
+    100% { top: 100%; }
+}
+
+.newsletter-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.newsletter-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        transform: scale(1.1) rotate(5deg);
+    }
+}
+
+.newsletter-box h3 {
+    color: white;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.newsletter-box .highlight {
+    color: #00ff88;
+}
+
+.newsletter-tagline {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    margin-bottom: 24px;
+    font-style: italic;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.newsletter-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    color: white;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.newsletter-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #00ff88;
+    box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+}
+
+.newsletter-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.newsletter-button {
+    padding: 16px 40px;
+    background: #00ff88;
+    color: #0a0a0a;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.newsletter-button:hover {
+    background: #00dd77;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 255, 136, 0.3);
+}
+
+.newsletter-button:active {
+    transform: translateY(0);
+}
+
+.newsletter-footer {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .newsletter-box {
+        padding: 32px 24px;
+        transform: rotate(-0.5deg);
+    }
+    .newsletter-box h3 {
+        font-size: 24px;
+    }
+    .newsletter-form {
+        flex-direction: column;
+    }
+    .newsletter-input {
+        min-width: 100%;
+    }
+    .newsletter-button {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="newsletter-box">
+    <div class="newsletter-inner">
+        <div class="newsletter-icon">✨</div>
+        <h3>Stop doomscrolling <span class="highlight">AI Twitter.</span></h3>
+        <p class="newsletter-tagline">Get the summary free. Every morning.</p>
+        <form class="newsletter-form" data-members-form="subscribe">
+            <input 
+                type="email" 
+                class="newsletter-input" 
+                data-members-email 
+                placeholder="your@email.com" 
+                required>
+            <button type="submit" class="newsletter-button">
+                <span data-members-label>Subscribe</span>
+            </button>
+        </form>
+        <p class="newsletter-footer" data-members-feedback>Free forever. Leave whenever.</p>
+    </div>
+</div>
+<!--kg-card-end: html-->
+<h3 id="where-this-diverges-from-text-to-video">Where this diverges from text-to-video</h3><p>Generative video aims for pretty frames on prompt. Agent world models aim for causal accuracy, long-horizon consistency, and real-time throughput. Dreamer 4 shows you can get usable visuals and precise control, but the objective is different: predict the consequences of the next action well enough to learn strategy, not to win a film festival. That difference explains why “autocomplete” failure modes doom some flashy video models in interactive tests. </p><h3 id="the-wider-stakes">The wider stakes</h3><p>If you can learn competent world models from mostly unlabeled video—and only sprinkle in a little action data—you can pretrain on the internet’s archives, then specialize with small, domain-specific traces. That reframes data collection for robotics, AV, and industrial control, where online exploration is unsafe or expensive. And because inference is real-time on one GPU, you can actually use the thing.</p><p>It’s still early. Memory is short; inventories drift; success on diamonds is rare. But the constraint looks clear: world model quality, not RL trickery, is the bottleneck. Improve the simulator and the agent follows.</p><h3 id="why-this-matters">Why this matters</h3><ul><li>World-model first: The binding constraint for agents is an accurate, fast simulator; better models beat bigger offline datasets and fancy RL alone.</li><li>Safer, cheaper training: Learning from video plus imagination reduces the need for risky online exploration in robotics, vehicles, and infrastructure.</li></ul>
+<!--kg-card-begin: html-->
+<style>
+.newsletter-box {
+    background: #0a0a0a;
+    border: 4px solid #00ff88;
+    padding: 40px 32px;
+    margin: 50px auto;
+    max-width: 650px;
+    transform: rotate(-0.8deg);
+    box-shadow: 0 8px 32px rgba(0, 255, 136, 0.15);
+    position: relative;
+    overflow: hidden;
+    animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+    0%, 100% {
+        box-shadow: 0 8px 32px rgba(0, 255, 136, 0.15);
+    }
+    50% {
+        box-shadow: 0 8px 32px rgba(0, 255, 136, 0.3);
+    }
+}
+
+.newsletter-box::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ff88, transparent);
+    animation: scan 4s ease-in-out infinite;
+    opacity: 0.3;
+}
+
+@keyframes scan {
+    0% { top: -100%; }
+    50% { top: 100%; }
+    100% { top: 100%; }
+}
+
+.newsletter-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.newsletter-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        transform: scale(1.1) rotate(5deg);
+    }
+}
+
+.newsletter-box h3 {
+    color: white;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.newsletter-box .highlight {
+    color: #00ff88;
+}
+
+.newsletter-tagline {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    margin-bottom: 24px;
+    font-style: italic;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.newsletter-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    color: white;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.newsletter-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #00ff88;
+    box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+}
+
+.newsletter-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.newsletter-button {
+    padding: 16px 40px;
+    background: #00ff88;
+    color: #0a0a0a;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.newsletter-button:hover {
+    background: #00dd77;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 255, 136, 0.3);
+}
+
+.newsletter-button:active {
+    transform: translateY(0);
+}
+
+.newsletter-footer {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .newsletter-box {
+        padding: 32px 24px;
+        transform: rotate(-0.5deg);
+    }
+    .newsletter-box h3 {
+        font-size: 24px;
+    }
+    .newsletter-form {
+        flex-direction: column;
+    }
+    .newsletter-input {
+        min-width: 100%;
+    }
+    .newsletter-button {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="newsletter-box">
+    <div class="newsletter-inner">
+        <div class="newsletter-icon">🔥</div>
+        <h3>Your competitors read this at <span class="highlight">breakfast.</span></h3>
+        <p class="newsletter-tagline">Join them. Free daily AI updates.</p>
+        <form class="newsletter-form" data-members-form="subscribe">
+            <input 
+                type="email" 
+                class="newsletter-input" 
+                data-members-email 
+                placeholder="your@email.com" 
+                required>
+            <button type="submit" class="newsletter-button">
+                <span data-members-label>Join Them</span>
+            </button>
+        </form>
+        <p class="newsletter-footer" data-members-feedback>Unsubscribe anytime. We're cool like that.</p>
+    </div>
+</div>
+<!--kg-card-end: html-->
+
+
+    <div class="article-tags">
+        <a href="/tag/research/">AI Research</a>
+    </div>
+
+  <div class="share-bar">
+  <span class="share-label">Share</span>
+  <button class="share-btn" id="copyLinkBtn"><span class="share-btn-text">Copy link</span></button>
+  <a href="https://twitter.com/intent/tweet?url=https://www.implicator.ai/dreamer-4-mines-diamonds-in-an-imagined-minecraft/&text=Dreamer%204%20mines%20diamonds%20in%20an%20imagined%20Minecraft" class="share-btn" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://www.implicator.ai/dreamer-4-mines-diamonds-in-an-imagined-minecraft/" class="share-btn" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+  <a href="mailto:?subject=Dreamer%204%20mines%20diamonds%20in%20an%20imagined%20Minecraft&body=https://www.implicator.ai/dreamer-4-mines-diamonds-in-an-imagined-minecraft/" class="share-btn">Email</a>
+</div>
+
+      <div class="author-bio" itemscope itemtype="https://schema.org/Person">
+          <a href="/author/marcus-schuler/" class="bio-avatar" rel="author"><img itemprop="image" src="https://www.implicator.ai/content/images/2025/12/marcus_schuler_impli.jpg" alt="Marcus Schuler"></a>
+        <div class="bio-text">
+          <h3><a href="/author/marcus-schuler/" itemprop="name" rel="author">Marcus Schuler</a></h3>
+            <div class="bio-role" itemprop="jobTitle">San Francisco</div>
+            <p itemprop="description">Editor-in-Chief and founder of Implicator.ai. Former ARD correspondent and senior broadcast journalist with 10+ years covering tech. Writes daily briefings on policy and market developments. Based in San Francisco.
+E-mail: editor@implicator.ai</p>
+        </div>
+      </div>
+</div>
+
+<div class="imp-ad imp-ad--flow">
+  <span class="imp-ad__label">Advertisement</span>
+  <div class="imp-ad__unit">
+    <ins class="adsbygoogle"
+         data-ad-client="ca-pub-2414090272567803"
+         data-ad-slot="9150306671"
+         data-ad-format="auto"
+         data-full-width-responsive="false"></ins>
+  </div>
+</div>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+
+<aside class="article-newsletter" aria-labelledby="article-newsletter-heading">
+  <p class="article-newsletter__kicker">The Morning Briefing</p>
+
+  <h3 class="article-newsletter__heading" id="article-newsletter-heading">
+    The AI news that changes decisions, one email each weekday morning.
+  </h3>
+
+  <p class="article-newsletter__standfirst">
+    Written for executives and strategists who have to act on the news, not just follow it.
+  </p>
+
+  <form class="article-newsletter__form" data-members-form="subscribe">
+    <div class="article-newsletter__field">
+      <label class="article-newsletter__label" for="article-newsletter-email">Email address</label>
+      <input
+        class="article-newsletter__input"
+        id="article-newsletter-email"
+        type="email"
+        name="email"
+        placeholder="you@company.com"
+        autocomplete="email"
+        spellcheck="false"
+        required
+        data-members-email
+        aria-describedby="article-newsletter-note"
+      >
+    </div>
+
+    <button class="article-newsletter__button" type="submit">
+      <span class="article-newsletter__button-label">Get the Briefing</span>
+      <span class="article-newsletter__spinner" aria-hidden="true"></span>
+    </button>
+
+    <p class="article-newsletter__note" id="article-newsletter-note">
+      <span class="article-newsletter__note-line article-newsletter__note-line--default">
+        Free. Unsubscribe in one click.
+      </span>
+      <span class="article-newsletter__note-line article-newsletter__note-line--error" role="alert">
+        That address was not accepted. Check the spelling, then try again.
+      </span>
+      <span class="article-newsletter__note-line article-newsletter__note-line--success" role="status">
+        Check your inbox for the confirmation link.
+      </span>
+    </p>
+  </form>
+</aside>
+
+        <div class="related-section">
+          <h3 class="related-title">Related Stories</h3>
+          <div class="related-grid">
+              <article class="related-card">
+  <a href="/25-fields-medalists-say-ai-labs-race-to-solve-math-problems-is-harming-mathematics/">
+      <div class="card-image">
+        <img src="/content/images/size/w600/2026/09/20260913-061103-fields_math_declaration.webp"
+             srcset="/content/images/size/w300/2026/09/20260913-061103-fields_math_declaration.webp 300w,
+                     /content/images/size/w600/2026/09/20260913-061103-fields_math_declaration.webp 600w,
+                     /content/images/size/w1000/2026/09/20260913-061103-fields_math_declaration.webp 1000w"
+             sizes="(max-width: 768px) 100vw, 33vw"
+             width="1000" height="563"
+             alt="25 Fields Medalists Say AI Labs&#x27; Race to Solve Math Problems Is Harming Mathematics" loading="lazy">
+      </div>
+      <div class="card-tag">AI News</div>
+    <h3>25 Fields Medalists Say AI Labs&#x27; Race to Solve Math Problems Is Harming Mathematics</h3>
+    <div class="card-meta"><time datetime="2026-09-13T09:16:09-07:00">September 13, 2026</time></div>
+  </a>
+</article>
+              <article class="related-card">
+  <a href="/anthropic-coxon-unvested-equity-ai-safety/">
+      <div class="card-image">
+        <img src="/content/images/size/w600/2026/09/20260910-080500-coxon_equity_exit.webp"
+             srcset="/content/images/size/w300/2026/09/20260910-080500-coxon_equity_exit.webp 300w,
+                     /content/images/size/w600/2026/09/20260910-080500-coxon_equity_exit.webp 600w,
+                     /content/images/size/w1000/2026/09/20260910-080500-coxon_equity_exit.webp 1000w"
+             sizes="(max-width: 768px) 100vw, 33vw"
+             width="1000" height="563"
+             alt="Anthropic’s Jacob Coxon Gave Up Unvested Equity Over AI Safety Fears" loading="lazy">
+      </div>
+      <div class="card-tag">AI Research</div>
+    <h3>Anthropic’s Jacob Coxon Gave Up Unvested Equity Over AI Safety Fears</h3>
+    <div class="card-meta"><time datetime="2026-09-10T08:46:53-07:00">September 10, 2026</time></div>
+  </a>
+</article>
+              <article class="related-card">
+  <a href="/clay-institute-navier-stokes-openai-proof-claim/">
+      <div class="card-image">
+        <img src="/content/images/size/w600/2026/09/2026-09-08-clay-institute-navier-stokes-openai-proof-claim.webp"
+             srcset="/content/images/size/w300/2026/09/2026-09-08-clay-institute-navier-stokes-openai-proof-claim.webp 300w,
+                     /content/images/size/w600/2026/09/2026-09-08-clay-institute-navier-stokes-openai-proof-claim.webp 600w,
+                     /content/images/size/w1000/2026/09/2026-09-08-clay-institute-navier-stokes-openai-proof-claim.webp 1000w"
+             sizes="(max-width: 768px) 100vw, 33vw"
+             width="1000" height="563"
+             alt="Clay Institute Won&#x27;t Call Navier-Stokes Solved After OpenAI Proof Claim" loading="lazy">
+      </div>
+      <div class="card-tag">AI Research</div>
+    <h3>Clay Institute Won&#x27;t Call Navier-Stokes Solved After OpenAI Proof Claim</h3>
+    <div class="card-meta"><time datetime="2026-09-08T23:19:24-07:00">September 8, 2026</time></div>
+  </a>
+</article>
+          </div>
+        </div>
+
+
+
+
+  <footer class="site-footer">
+  <div class="container">
+    <div class="footer-masthead">
+      <a href="https://www.implicator.ai" class="footer-logo" aria-label="Implicator.ai home">IMPLICATOR<span class="dot">.ai</span></a>
+    </div>
+    <div class="footer-grid">
+      <div class="footer-brand-copy">
+        <p>Independent journalism from San Francisco about the AI industry. The smartest FREE briefing in your inbox.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Sections</h4>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/pro/">PRO</a></li>
+            <li><a href="/tag/ai-news/">News</a></li>
+            <li><a href="/tag/analysis/">Analysis</a></li>
+            <li><a href="/tag/politics/">Policy</a></li>
+            <li><a href="/tag/nl/">Briefing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Products</h4>
+        <ul>
+          <li><a href="https://www.implicator.ai/tag/nl/">Morning Briefing</a></li>
+          <li><a href="/subscribe/">PRO Intelligence</a></li>
+          <li><a href="https://www.implicator.ai/latest/rss/">RSS Feed</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://www.implicator.ai/about/">About</a></li>
+          <li><a href="https://www.implicator.ai/ethics/">Ethics</a></li>
+          <li><a href="https://www.implicator.ai/get-in-touch/">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Implicator.ai &middot; Published from San Francisco</p>
+      <div class="footer-bottom-links">
+        <a href="https://www.implicator.ai/about/#masthead">Masthead</a>
+        <a href="https://battlepolicy.com/">BattlePolicy</a>
+        <a href="https://theincidentboard.com/">The Incident Board</a>
+        <a href="https://www.implicator.ai/about/#editorial-standards">Editorial Policy</a>
+        <a href="https://www.implicator.ai/ethics/">Ethics</a>
+        <a href="https://www.implicator.ai/get-in-touch/">Contact</a>
+        <a href="https://www.implicator.ai/privacy-policy/">Privacy</a>
+        <a href="https://www.implicator.ai/terms-of-service/">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <!-- =========================
+     implicator.ai — Site Footer Injection (lean)
+     ========================= -->
+
+<!-- Optional, tiny style nudge for relative-time labels -->
+<style>
+  .post-card time.relative-time,
+  .post-info time.relative-time { font-weight: 500; opacity: .9; }
+  .home-template .post-card time,
+  .tag-template .post-card time,
+  .author-template .post-card time {
+    display: inline-block; font-size: .8rem; text-transform: uppercase; letter-spacing: .5px;
+  }
+</style>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---- Utilities ----------------------------------------------------
+  const rafIdle = window.requestIdleCallback || function (fn) { setTimeout(fn, 0); };
+  const onReady  = (fn) => {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, { once:true });
+    else fn();
+  };
+
+  // ---- 1) Copy-link handler (for buttons with .js-copy-link) -------
+  function bindCopyLinks() {
+    const btns = document.querySelectorAll('.js-copy-link');
+    btns.forEach((btn) => {
+      if (btn.dataset.copyBound) return;
+      btn.dataset.copyBound = '1';
+      btn.addEventListener('click', async (e) => {
+        const url = e.currentTarget.getAttribute('data-url');
+        if (!url) return;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(url);
+          } else {
+            // Fallback
+            const ta = document.createElement('textarea');
+            ta.value = url; ta.setAttribute('readonly',''); ta.style.position='absolute'; ta.style.left='-9999px';
+            document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+          }
+          e.currentTarget.classList.add('has-tooltip');
+          e.currentTarget.setAttribute('data-label', 'Copied!');
+          const leave = () => {
+            e.currentTarget.classList.remove('has-tooltip');
+            setTimeout(() => e.currentTarget.setAttribute('data-label',''), 400);
+            e.currentTarget.removeEventListener('mouseleave', leave);
+          };
+          e.currentTarget.addEventListener('mouseleave', leave);
+        } catch(_) {}
+      }, { passive:true });
+    });
+  }
+
+  // ---- 2) Relative-time labels on overview pages --------------------
+  function isOverview() {
+    const b = document.body.classList;
+    return b.contains('home-template') || b.contains('tag-template') || b.contains('author-template');
+  }
+
+  function updateRelativeTimes(now = new Date()) {
+    if (!isOverview()) return;
+    document.querySelectorAll('.post-card time, .post-info time').forEach((node) => {
+      const raw = node.getAttribute('data-published-at') || node.getAttribute('datetime');
+      if (!raw) return;
+      const published = new Date(raw);
+      if (Number.isNaN(+published)) return;
+
+      // Keep original as tooltip/aria
+      if (!node.dataset.absLabel) {
+        const abs = node.textContent.trim();
+        node.dataset.absLabel = abs;
+        node.setAttribute('aria-label', abs);
+        node.setAttribute('title', abs);
+      }
+
+      const diffMs = now - published;
+      const diffMin = Math.floor(diffMs / 60000);
+      const diffHr  = Math.floor(diffMin / 60);
+
+      let label;
+      if (diffMin < 1) label = 'Just now';
+      else if (diffMin === 1) label = '1 minute ago';
+      else if (diffMin < 60) label = `${diffMin} minutes ago`;
+      else if (diffHr === 1) label = '1 hour ago';
+      else if (diffHr < 12) label = `${diffHr} hours ago`;
+      else label = published.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }).toUpperCase();
+
+      node.textContent = label;
+      node.classList.add('relative-time');
+    });
+  }
+
+  let intervalId = null;
+  function startRelativeTimer() {
+    if (!isOverview()) return;
+    // Initial paint during idle time
+    rafIdle(() => updateRelativeTimes(new Date()));
+    // Refresh every minute while visible
+    const tick = () => updateRelativeTimes(new Date());
+    const ensureTimer = () => {
+      if (!intervalId && !document.hidden) intervalId = setInterval(tick, 60000);
+    };
+    const stopTimer = () => { if (intervalId) { clearInterval(intervalId); intervalId = null; } };
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopTimer(); else { tick(); ensureTimer(); }
+    });
+    ensureTimer();
+  }
+
+  // ---- Boot ---------------------------------------------------------
+  onReady(() => {
+    rafIdle(bindCopyLinks);
+    startRelativeTimer();
+  });
+})();
+</script>
+
+
+
+ <script src="/assets/js/sidebar-data.js"></script>
+
+  <div class="search-overlay" id="searchOverlay"></div>
+  <div class="search-modal" id="searchModal">
+    <div class="search-header">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--stone)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search articles…" autocomplete="off">
+      <kbd class="search-kbd">ESC</kbd>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <div class="grain-overlay" aria-hidden="true"></div>
+
+  <div class="floating-cta" id="floatingCta">
+  <a class="floating-cta__link" href="/subscribe/" aria-label="Join the Implicator.ai Morning Briefing for free">
+    <span class="floating-cta__rule" aria-hidden="true"></span>
+    <span class="floating-cta__content">
+      <span class="floating-cta__eyebrow">The Morning Briefing</span>
+      <span class="floating-cta__main">
+        <span class="floating-cta__label">Join Free</span>
+        <svg class="floating-cta__arrow" width="22" height="14" viewBox="0 0 22 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M1 7h19M14 1l6 6-6 6"/>
+        </svg>
+      </span>
+    </span>
+  </a>
+  <button class="floating-cta__dismiss" id="floatingCtaDismiss" type="button" aria-label="Dismiss the subscribe prompt">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+      <path d="M1 1l10 10M11 1L1 11"/>
+    </svg>
+  </button>
+</div>
+
+  <script defer src="/assets/dist/app.min.js?v=Dis3Zzq11IzVbRdD"></script>
+</body>
+</html>

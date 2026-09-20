@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamer-MC - Research Blog</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        gray: {
+                            50: '#F9FAFB',
+                            100: '#F3F4F6',
+                            800: '#1F2937',
+                            900: '#111827',
+                        }
+                    },
+                    typography: (theme) => ({
+                        DEFAULT: {
+                            css: {
+                                maxWidth: 'none',
+                                color: theme('colors.gray.800'),
+                                fontSize: '0.95rem', // Slightly adjusted base size
+                                lineHeight: '1.75',
+                                h1: { letterSpacing: '-0.025em', color: theme('colors.gray.900') },
+                                h2: { letterSpacing: '-0.025em', color: theme('colors.gray.900'), marginTop: '2.5em' },
+                                h3: { color: theme('colors.gray.900'), marginTop: '2em' },
+                                li: { marginTop: '0.25em', marginBottom: '0.25em' },
+                                'code::before': { content: '""' },
+                                'code::after': { content: '""' },
+                                img: { borderRadius: theme('borderRadius.2xl') },
+                            }
+                        }
+                    })
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-white text-gray-900 antialiased selection:bg-black selection:text-white">
+
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100 transition-all duration-300">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2 group">
+                <div class="w-5 h-5 bg-black rounded-full group-hover:scale-110 transition-transform duration-300"></div>
+                <span class="font-bold text-lg tracking-tight">Create AI</span>
+            </a>
+        </div>
+    </nav>
+
+    <header class="pt-16 pb-10 px-6">
+        <div class="max-w-3xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-2 text-xs font-semibold uppercase tracking-wider text-gray-500 mb-5">
+                <span>January 31, 2026</span>
+                <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                <span>Research</span>
+            </div>
+            
+            <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-black mb-6 leading-tight">
+                Dreamer-MC: A Real-Time Autoregressive World Model for Infinite Video Generation
+            </h1>
+
+            <div class="flex items-center justify-center gap-3 mb-8">
+                <div class="mb-8 text-center">
+                <div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-lg font-medium text-gray-900">
+                    
+                    <div class="relative group cursor-pointer">
+                        <span>Ming Gao<sup>*</sup></span>
+                    </div>
+
+                    <div class="relative group">
+                        <span>Yan Yan</span>
+                    </div>
+
+                    <div class="relative group">
+                        <span>ShengQu Xi</span>
+                    </div>
+
+                    <div class="relative group">
+                        <span>Yu Duan</span>
+                    </div>
+
+                    <div class="relative group">
+                        <span>ShengQian Li</span>
+                    </div>
+
+                    <div class="relative group cursor-pointer">
+                        <span>Feng Wang<sup>†</sup></span>
+                    </div>
+
+                </div>
+
+                <div class="mt-2 text-sm text-gray-500">
+                    Create AI
+                </div>
+                <div class="mt-5 flex justify-center">
+                    <a href="https://huggingface.co/IamCreateAI/Dreamerv4-MC" target="_blank" class="inline-flex items-center gap-2 px-5 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-full transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5">
+                        <span class="text-base">🤗</span>
+                        <span>Try Dreamer-MC</span>
+                    </a>
+                </div>
+            </div>
+                
+            </div>
+            
+            <p class="text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
+                A deep dive into the architecture behind our infinite video engine, achieving coherent open-world simulation at 20 FPS with sub-50ms latency and 256 frame context on single H200.
+            </p>
+        </div>
+    </header>
+
+    <div class="w-full max-w-4xl mx-auto px-6 my-10">
+        <div class="rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/5 bg-black">
+            <video 
+                src="video/first_view.mp4" 
+                autoplay 
+                loop 
+                muted 
+                playsinline 
+                class="w-full h-auto block"
+            >
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <p class="text-center text-sm text-gray-400 mt-3">Figure 1: Infinite procedural generation from the Dreamer-MC prior.</p>
+    </div>
+
+    <main class="max-w-3xl mx-auto px-6 pb-24">
+        
+        <article class="prose prose-slate mx-auto">
+             <p class="lead text-lg text-gray-600 font-normal">
+                We are thrilled to present our latest work: a real-time, infinite video generation model for Minecraft, developed as an adaptation of the DreamerV4 architecture. By leveraging this powerful foundation, we have achieved true autoregressive generation that streams indefinitely, efficiently managing temporal context to avoid the redundant re-computation of past frames. This system goes far beyond simple navigation; it captures the rich, emergent complexity of the Minecraft sandbox, seamlessly simulating intricate interactions—from the physics of archery and horse riding to the granular details of mining and consuming items.
+            </p>
+
+            <h3>Key Technical Innovations</h3>
+            <ul>
+                <li>
+                    <strong>MAE Tokenizer for Enhanced Representation:</strong> Instead of a standard VQ-VAE, we utilize a Masked Autoencoder (MAE) as our visual tokenizer. This enriches the latent space with stronger semantic signals, allowing the model to learn complex interactions in Minecraft more effectively than pure reconstruction methods.
+                </li>
+                <li>
+                    <strong>x0 Prediction to Eliminate Drift:</strong> As detailed below, we mitigate long-horizon drift by adopting an \( x_0 \) prediction objective. This ensures that the model predicts the clean original state at each step rather than the noise residual, effectively eliminating error accumulation and maintaining visual crispness over thousands of frames.
+                </li>
+                <li>
+                    <strong>Infinite Context with Ring Buffer & Sliding KV Cache:</strong> To support truly infinite generation without exploding memory usage, we implemented a ring buffer mechanism. Crucially, we dynamically re-apply Rotary Positional Embeddings (RoPE) during inference, allowing the model to stream continuously without being constrained by the training sequence length.
+                </li>
+                <li>
+                    <strong>CUDA Graphs for Real-Time Inference:</strong> Efficiency is paramount. We wrapped our inference pipeline using CUDA Graphs to minimize the overhead of CPU-side kernel launching. This eliminates the CPU bottleneck, allowing the GPU to execute operations continuously at interactive frame rates.
+                </li>
+            </ul>
+
+            <figure class="not-prose my-12">
+                <div class="w-full rounded-[2rem] overflow-hidden border border-gray-200 shadow-sm">
+                    <img src="image/compute_compare.png" alt="Comparison of generation with and without x0 prediction" class="w-full h-auto bg-gray-50" />
+                </div>
+                <figcaption class="text-center text-sm text-gray-500 mt-3 px-4">
+                    Figure 2: Without x0 prediction, standard autoregressive models attempting to maintain constant-time inference without recomputing history suffer from severe "drift," causing textures to melt into noise over long horizons.
+                </figcaption>
+            </figure>
+
+            <h2>The Challenge of Infinite Generation: Conquering Error Accumulation</h2>
+            <p>
+                One of the most persistent hurdles in autoregressive video generation is <strong>error accumulation</strong>. In a standard autoregressive setup, each new frame is generated based on the previous one; consequently, minor imperfections in early frames compound over time, leading to "drift." As the generation horizon extends, this drift manifests as severe geometric distortion, blurring, and significant color shifts, eventually causing the simulation to collapse into unintelligible noise.
+            </p>
+            <p>
+                Previous approaches have attempted to mitigate this with computationally expensive workarounds. Methods like <strong>Context as Memory</strong> effectively reduce drift by maintaining a bank of historical frames, but they often require re-computing or re-attending to past latents, which breaks the promise of constant-time inference. Other state-of-the-art attempts—such as <strong>Self-Forcing</strong> or <strong>Rolling Forcing</strong>—try to bridge the gap between training and inference. These methods typically involve fine-tuning a bidirectional model with "diffusion forcing" and then performing autoregressive distillation using <em>Distribution Matching Distillation (DMD)</em>. While these techniques delay the onset of degradation, they are not immune to it; once the generation length significantly exceeds the training window, the distribution inevitably shifts, resulting in the familiar artifacts of "melting" structures and washed-out colors.
+            </p>
+            <p>
+                Our model solves this fundamentally by adopting the <strong>\( x_0 \) prediction</strong> objective introduced in DreamerV4. Instead of predicting the noise residual (\( \epsilon \)) at every step—which allows errors to accumulate in the latent space—the model is trained to predict the clean, original image state (\( x_0 \)) directly. This effectively "resets" the noise floor at each step, preventing microscopic errors from compounding. This architectural choice is the key to our model's ability to sustain crisp, coherent gameplay visuals indefinitely, without the need for expensive history re-computation.
+            </p>
+            
+            <h2>Model Architecture</h2>
+            <p>
+                Unlike traditional video transformers that operate on VAE latents, our model learns a compact, semantic latent representation of the world. This allows us to separate the visual compression from the dynamics learning, achieving high-resolution output with manageable computational costs.
+            </p>
+
+            <figure class="not-prose my-12">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <div class="w-full rounded-[2rem] overflow-hidden border border-gray-200 shadow-sm mb-3">
+                            <img src="image/tokenizer.jpg" alt="Causal Gather-Token Temporal Autoencoder" class="w-full h-auto bg-gray-50" />
+                        </div>
+                        <figcaption class="text-center text-sm text-gray-500 leading-snug">
+                            Figure 3: Causal Gather-Token Temporal Autoencoder. Learnable tokens aggregate information from image patches across time.
+                        </figcaption>
+                    </div>
+                    <div>
+                        <div class="w-full rounded-[2rem] overflow-hidden border border-gray-200 shadow-sm mb-3">
+                            <img src="image/dynamic_attn.png" alt="Dynamic model architecture" class="w-full h-auto bg-gray-50" />
+                        </div>
+                        <figcaption class="text-center text-sm text-gray-500 leading-snug">
+                            Figure 4: Dynamic model architecture with decomposed spatial-temporal attention.
+                        </figcaption>
+                    </div>
+                </div>
+            </figure>
+
+            <h3>1. Causal Gather-Token Tokenizer</h3>
+            <p>
+                To achieve a high-level semantic understanding of the Minecraft world, we designed a Causal Gather-Token Temporal Autoencoder (Figure 3). Instead of processing the entire image grid directly, we introduce a set of learnable Gather Tokens (\( G \)). These tokens act as the primary information bottleneck; they query and aggregate features from the masked image patches via cross-attention, compressing the visual input into a compact latent representation \( z \).
+            </p>
+            <p>
+                Crucially, to ensure stability in video generation, this process is not processed in isolation per frame. We incorporate Temporal Attention layers that allow the gather tokens to attend to the gather tokens of previous frames. This causal temporal link ensures that the latent representation remains consistent over time, significantly reducing flickering and ensuring that the semantic understanding of the world evolves smoothly.
+            </p>
+
+            <h3>2. Dynamic Model: Decomposed Spatial-Temporal Attention</h3>
+            <ul>
+                <li>
+                    <strong>Input Sequence:</strong> At each frame, the input sequence is formed by directly concatenating the image patch tokens with specific control tokens: a Timestep Token, a Stride Token, and an Action Token.
+                </li>
+                <li>
+                    <strong>Spatial Attention (Simplified & Fast):</strong> Departing from standard Diffusion Transformer (DiT) architectures that rely on AdaIN (Adaptive Instance Normalization) to inject conditioning signals, we feed the Timestep and Stride tokens directly into the self-attention layers alongside the image tokens. By eliminating the complex and computationally expensive AdaIN modulation modules, we significantly simplify the architecture and accelerate inference speed. This streamlined design ensures the model remains lightweight enough for real-time deployment while still effectively conditioning the generation on the current state and control inputs.
+                </li>
+                <li>
+                    <strong>Temporal Attention (Inter-Frame):</strong> In the subsequent temporal layers, we restrict attention exclusively to the image patch tokens across frames. The control tokens are excluded from this step. This design efficiently propagates the "physics" of the world through time while keeping control signals localized to their specific steps, preventing signal leakage and further reducing computational overhead.
+                </li>
+            </ul>
+
+            <h2>Complex Interactions: Beyond Simple Navigation</h2>
+            <p>
+                Previous iterations of world models, including earlier Dreamer variants, were primarily benchmarked on simple locomotion tasks—essentially learning to "run" or "walk" through a static environment. While impressive, these models often struggled with the fine-grained manipulation and causal physics required for a true sandbox simulation.
+            </p>
+            <p>
+                Dreamer-MC significantly raises the bar by mastering a diverse array of <strong>complex, multi-step interactions</strong>. The model does not just predict camera movement; it accurately simulates the cause-and-effect of tool usage, navigation, and environmental modification.
+            </p>
+
+            <div class="not-prose space-y-10 my-12">
+                
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 border-b border-gray-100 pb-2">01. Boating & Water Physics</h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/boat_01.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/boat_02.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                             <video src="video/boat_03.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 border-b border-gray-100 pb-2">02. Consuming Items</h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/consume_item_01.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/consume_item_02.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/consume_item_03.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 border-b border-gray-100 pb-2">03. Archery & Projectiles</h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/arrow_01.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/arrow_02.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                           <video src="video/arrow_03.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 border-b border-gray-100 pb-2">04. Fluid Dynamics (Bucket)</h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/bucket_01.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/bucket_02.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                           <video src="video/bucket_03.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 border-b border-gray-100 pb-2">05. Mining & Breaking Blocks</h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/mining_01.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/mining_02.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/mining_03.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 border-b border-gray-100 pb-2">06. Sleeping / Time Skip</h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/sleep_01.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/sleep_02.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/sleep_03.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 border-b border-gray-100 pb-2">07. Nether Portals & Teleportation</h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/portal_01.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/portal_02.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg overflow-hidden relative aspect-video">
+                            <video src="video/portal_03.mp4" autoplay loop muted playsinline class="w-full h-full object-cover"></video>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <h2>Inference Optimization</h2>
+            <p class="lead text-lg text-gray-600 font-normal">
+                Achieving true real-time generation at high quality required moving beyond standard PyTorch implementations, with a heavily optimized inference pipeline designed for long-context workloads on a single H200 GPU.
+            </p>
+
+            <figure class="not-prose my-12">
+                <div class="w-full rounded-[2rem] overflow-hidden border border-gray-200 shadow-sm">
+                    <img src="image/ringbuffer.jpg" alt="Ring Buffer Mechanism" class="w-full h-auto bg-gray-50" />
+                </div>
+                <figcaption class="text-center text-sm text-gray-500 mt-3 px-4">
+                    Figure 5: Ring Buffer mechanism for infinite context. By re-applying RoPE embeddings dynamically during inference, we maintain temporal coherence without recomputing history.
+                </figcaption>
+            </figure>
+
+            <h3>1. Infinite Context via Ring Buffer & RoPE Re-indexing</h3>
+            <p>
+                Standard sliding-window implementations often rely on shifting memory (e.g., <code>torch.roll</code> or <code>memmove</code>) to discard old frames and make room for new ones. This data movement incurs a significant \( O(N) \) overhead at every step.
+            </p>
+            <p>
+                We solve this using a Ring Buffer KV Cache. Instead of shifting data, we maintain a fixed-size buffer and simply advance a write pointer, overwriting the oldest frame with the newest one (\( O(1) \) complexity). However, this introduces a new challenge: the physical position of a frame in the buffer no longer matches its logical temporal position, breaking standard Rotary Positional Embeddings (RoPE).
+            </p>
+            <p>To address this, we implement <strong>RoPE Re-indexing</strong>:</p>
+            <ul>
+                <li>
+                    <strong>Pre-cached RoPE:</strong> We pre-compute and cache the RoPE rotation matrices for the maximum context window size during initialization.
+                </li>
+                <li>
+                    <strong>Dynamic Re-indexing:</strong> During inference, we dynamically map the logical sequence order (Current Frame \( t \), Past Frame \( t-1 \), etc.) to the physical indices in the ring buffer. We then gather the corresponding position embeddings from our static RoPE cache. This effectively "slides" the positional information over the circular buffer, ensuring the model always sees a consistent temporal window without ever physically moving the heavy KV data.
+                </li>
+            </ul>
+
+            <h3>2. Removing CPU Overhead with CUDA Graphs</h3>
+            <p>
+                In autoregressive generation, the model executes thousands of small GPU kernels (e.g., LayerNorm, Attention, MLP) per frame. In a standard Python loop, the CPU overhead of dispatching these kernels often exceeds the actual GPU execution time, creating a severe bottleneck.
+            </p>
+            <p>
+                To eliminate this, we utilize CUDA Graphs. We capture the entire inference step—including the Ring Buffer update and RoPE application—into a static execution graph. This allows the GPU to launch the entire sequence of kernels autonomously, bypassing the Python/CPU bottleneck entirely. This optimization reduced our frame generation latency by over 40%, enabling high-resolution generation at steady interactive framerates.
+            </p>
+
+            <h2>Limitations & Future Work</h2>
+            <p>
+                While our model demonstrates the feasibility of real-time, infinite video generation, it remains a stepping stone toward a truly general-purpose world model. Several limitations currently exist that we plan to address in future iterations:
+            </p>
+            <ul>
+                <li>
+                    <strong>Tokenizer Reconstruction Fidelity:</strong> Although our MAE-based tokenizer excels at capturing semantic logic and game mechanics, this comes at the cost of fine-grained visual reconstruction. High-frequency details—such as specific block textures or text on signs—can sometimes appear blurry or lack sharpness. Improving the tokenizer's compression rate without sacrificing pixel-level fidelity is a primary target for our next update.
+                </li>
+                <li>
+                    <strong>Temporal Stability & Consistency:</strong> While x0 prediction significantly mitigates long-term drift, inter-frame flickering can still occur during rapid camera movements or complex scene transitions. Achieving perfectly smooth, temporal coherence that matches the stability of a game engine remains an open challenge.
+                </li>
+                <li>
+                    <strong>Imperfect Context Utilization:</strong> Our model currently utilizes a 256-frame context window. However, having the context available in the buffer does not guarantee perfect recall. We have observed instances where the model struggles to maintain consistency for objects or events that occurred early in the context window (e.g., "forgetting" a block placed 200 frames ago). Improving the attention mechanism's ability to effectively utilize the full depth of the sliding window is crucial for complex, long-duration tasks.
+                </li> 
+                <li>
+                    <strong>Domain Specificity & Scale:</strong> Currently, the model is trained exclusively on Minecraft data. It is a "specialist" model with a relatively modest parameter count. Our ultimate vision is to scale up both the model size and the training data. Future work will involve expanding training to include other video games and, eventually, real-world video data, moving closer to a General World Model capable of simulating diverse physical laws and environments.
+                </li> 
+            </ul>
+            <div class="mt-20 border-t border-gray-200 pt-10 not-prose">
+                <h2 class="text-xl font-bold text-gray-900 mb-5">Citations</h2>
+                
+                <div class="space-y-3">
+                    
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                        <div class="overflow-x-auto">
+<pre class="text-xs font-mono text-gray-600">@article{hafner2025dreamerv4,
+    title   = {Dreamer-MC: A Real-Time Autoregressive World Model for Infinite Video Generation},
+    author  = {Ming Gao, Yan Yan, ShengQu Xi, Yu Duan, ShengQian Li, Feng Wang},
+    year    = {2026},
+    url     = {https://findlamp.github.io/dreamer-mc.github.io/}
+}</pre>
+                        </div>
+                    </div>
+            </div>
+            <div class="mt-20 border-t border-gray-200 pt-10 not-prose">
+                <h2 class="text-lg font-bold text-gray-900 mb-5">References</h2>
+                
+                <div class="space-y-3">
+                    
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                        <div class="overflow-x-auto">
+<pre class="text-xs font-mono text-gray-600">@article{hafner2025dreamerv4,
+    title   = {Training Agents Inside of Scalable World Models},
+    author  = {Hafner, Danijar and Yan, Wilson and Lillicrap, Timothy},
+    journal = {arXiv preprint arXiv:2509.24527},
+    year    = {2025},
+    url     = {https://arxiv.org/abs/2509.24527}
+}</pre>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                        <div class="overflow-x-auto">
+<pre class="text-xs font-mono text-gray-600">@article{chen2025maetok,
+    title   = {Masked Autoencoders Are Effective Tokenizers for Diffusion Models},
+    author  = {Chen, Hao and Zhang, Michael and Li, Yuxin and others},
+    journal = {International Conference on Machine Learning (ICML)},
+    year    = {2025},
+    url     = {https://arxiv.org/abs/2502.03444}
+}</pre>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                        <div class="overflow-x-auto">
+<pre class="text-xs font-mono text-gray-600">@article{huang2025selfforcing,
+    title   = {Self Forcing: Bridging the Train-Test Gap in Autoregressive Video Diffusion},
+    author  = {Huang, Xun and Li, Zhengqi and He, Guande and Zhou, Mingyuan and Shechtman, Eli},
+    journal = {arXiv preprint arXiv:2506.08009},
+    year    = {2025},
+    url     = {https://arxiv.org/abs/2506.08009}
+}</pre>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                        <div class="overflow-x-auto">
+<pre class="text-xs font-mono text-gray-600">@article{liu2025rolling,
+    title   = {Rolling Forcing: Autoregressive Long Video Diffusion in Real Time},
+    author  = {Liu, Kunhao and Hu, Wenbo and Xu, Jiale and Shan, Ying and Lu, Shijian},
+    journal = {arXiv preprint arXiv:2509.25161},
+    year    = {2025},
+    url     = {https://arxiv.org/abs/2509.25161}
+}</pre>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                        <div class="overflow-x-auto">
+<pre class="text-xs font-mono text-gray-600">@article{yu2025context,
+    title   = {Context as Memory: Scene-Consistent Interactive Long Video Generation},
+    author  = {Yu, Jiwen and Bai, Jianhong and Qin, Yiran and Liu, Quande and others},
+    journal = {arXiv preprint arXiv:2506.03141},
+    year    = {2025},
+    url     = {https://arxiv.org/abs/2506.03141}
+}</pre>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+        
+        <div class="mt-16 pt-8 border-t border-gray-100 flex items-center gap-4">
+            <div class="w-10 h-10 bg-gray-200 rounded-full"></div>
+            <div>
+                <p class="text-sm font-bold text-black">Create AI Team</p>
+                <p class="text-sm font-bold text-black">Contact: dujinshidai30@gmail.com</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="py-10 text-center text-sm text-gray-400">
+        &copy; 2026 Create AI Inc.
+    </footer>
+
+</body>
+</html>
+
+```

@@ -1,0 +1,6 @@
+remote: https://github.com/nicklashansen/dreamer4.git
+branch: main
+commit: b8abafbf4da72c59b6aa09f8499ccde0d6a37fd6
+date:   2026-07-09 13:49:24 -0700
+subject: update README
+fetched: 2026-09-20T13:35:05Z (shallow clone, depth 1; .git removed to save space)

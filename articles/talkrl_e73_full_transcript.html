@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <script src="https://www.talkrl.com/theme-assets/theme-graphite-1789845215.js" data-turbo-track="reload"></script>
+        <meta name="transistor-theme" content="graphite" />
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-139598123-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-139598123-1');
+</script>
+<meta content="UA-139598123-1" name="ga-code" />
+<!-- / Google Analytics -->
+
+
+  
+    <link rel="shortcut icon" type="image/png" href="https://img.transistorcdn.com/jQ7ff7mUKIR7CCJHpSeue4e75Ovm96FBrbBqxr-jg34/rs:fill:0:0:1/w:16/h:16/q:90/mb:500000/aHR0cHM6Ly9pbWct/dXBsb2FkLXByb2R1/Y3Rpb24udHJhbnNp/c3Rvci5mbS9mYXZp/Y29ucy9zaXRlLzk1/Mi8xNzA3NzAwMzI4/LWZhdmljb24ucG5n.png" sizes="16x16" />
+    
+  
+    <link rel="shortcut icon" type="image/png" href="https://img.transistorcdn.com/91IFTUJy1-gbf-cb18nE1FKq1UVnWOO0HDfMw7Az_X0/rs:fill:0:0:1/w:32/h:32/q:90/mb:500000/aHR0cHM6Ly9pbWct/dXBsb2FkLXByb2R1/Y3Rpb24udHJhbnNp/c3Rvci5mbS9mYXZp/Y29ucy9zaXRlLzk1/Mi8xNzA3NzAwMzI4/LWZhdmljb24ucG5n.png" sizes="32x32" />
+    
+  
+    <link rel="shortcut icon" type="image/png" href="https://img.transistorcdn.com/v0M9n75CBEiZaWUwjBGhfudWCQypdG2U2ewseruuDXY/rs:fill:0:0:1/w:64/h:64/q:90/mb:500000/aHR0cHM6Ly9pbWct/dXBsb2FkLXByb2R1/Y3Rpb24udHJhbnNp/c3Rvci5mbS9mYXZp/Y29ucy9zaXRlLzk1/Mi8xNzA3NzAwMzI4/LWZhdmljb24ucG5n.png" sizes="64x54" />
+    
+  
+    <link rel="shortcut icon" type="image/png" href="https://img.transistorcdn.com/WQcwaW5UHVolEUk-VqIx5L4aSfY4KMaJjwXnQNJ8tYU/rs:fill:0:0:1/w:256/h:256/q:90/mb:500000/aHR0cHM6Ly9pbWct/dXBsb2FkLXByb2R1/Y3Rpb24udHJhbnNp/c3Rvci5mbS9mYXZp/Y29ucy9zaXRlLzk1/Mi8xNzA3NzAwMzI4/LWZhdmljb24ucG5n.png" sizes="256x256" />
+    
+      <link rel="apple-touch-icon" type="image/png" href="https://img.transistorcdn.com/WQcwaW5UHVolEUk-VqIx5L4aSfY4KMaJjwXnQNJ8tYU/rs:fill:0:0:1/w:256/h:256/q:90/mb:500000/aHR0cHM6Ly9pbWct/dXBsb2FkLXByb2R1/Y3Rpb24udHJhbnNp/c3Rvci5mbS9mYXZp/Y29ucy9zaXRlLzk1/Mi8xNzA3NzAwMzI4/LWZhdmljb24ucG5n.png" />
+    
+  
+
+
+    <!-- Twitter -->
+<meta name="twitter:site" content="@TransistorFM">
+<meta name="twitter:title" content="TalkRL: The Reinforcement Learning Podcast | Transcript: Danijar Hafner on Dreamer v4">
+<meta name="twitter:description" content="Danijar Hafner was a Research Scientist at Google DeepMind until recently.
+
+Featured References   
+Training Agents Inside of Scalable World Models [ blog ] 
+Danijar Hafner, Wilson Yan, Timothy Lill...">
+<meta name="twitter:card" content="player">
+<meta name="twitter:image" content="https://img.transistorcdn.com/ECIeBNHzLdA86haqi5JccfJNAwLi-M8BRYtIH6yosmM/rs:fill:0:0:1/w:800/h:800/q:60/mb:500000/aHR0cHM6Ly9pbWct/dXBsb2FkLXByb2R1/Y3Rpb24udHJhbnNp/c3Rvci5mbS9jODll/MTI1MjQyNGY4MDVl/NjdmNGIwN2NmMTE0/NTE5Yi5qcGc.webp">
+<meta name="twitter:player" content="https://share.transistor.fm/e/e440a692">
+<meta name="twitter:player:width" content="500">
+<meta name="twitter:player:height" content="180">
+<meta name="twitter:image:alt" content="TalkRL: The Reinforcement Learning Podcast | Transcript: Danijar Hafner on Dreamer v4">
+<meta name="twitter:player:stream" content="https://media.transistor.fm/e440a692/bfc0657e.mp3?src=site">
+<meta name="twitter:player:stream:content_type" content="audio/mpeg">
+<!-- /Twitter -->
+
+    <!-- Open Graph  -->
+<meta property="og:url" content="https://www.talkrl.com/episodes/danijar-hafner-on-dreamer-v4">
+  
+  <meta property="og:image" content="https://img.transistorcdn.com/ECIeBNHzLdA86haqi5JccfJNAwLi-M8BRYtIH6yosmM/rs:fill:0:0:1/w:800/h:800/q:60/mb:500000/aHR0cHM6Ly9pbWct/dXBsb2FkLXByb2R1/Y3Rpb24udHJhbnNp/c3Rvci5mbS9jODll/MTI1MjQyNGY4MDVl/NjdmNGIwN2NmMTE0/NTE5Yi5qcGc.webp">
+  <meta property="og:image:width" content="800">
+  <meta property="og:image:height" content="800">
+  
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TalkRL: The Reinforcement Learning Podcast">
+<meta property="og:description" content="Danijar Hafner was a Research Scientist at Google DeepMind until recently.
+
+Featured References   
+Training Agents Inside of Scalable World Models [ blog ] 
+Danijar Hafner, Wilson Yan, Timothy Lill...">
+<meta property="og:title" content="TalkRL: The Reinforcement Learning Podcast | Transcript: Danijar Hafner on Dreamer v4">
+<!-- /Open Graph  -->
+
+    <meta content="Danijar Hafner was a Research Scientist at Google DeepMind until recently.
+
+Featured References   
+Training Agents Inside of Scalable World Models [ blog ] 
+Danijar Hafner, Wilson Yan, Timothy Lill..." name="description" />
+    <meta content="Reinforcement Learning, Machine Learning, Artificial Intelligence" name="keywords" />
+    
+      <!-- iTunes Banner -->
+      <meta content="app-id=1478198107" name="apple-itunes-app">
+      <!-- /iTunes Banner -->
+    
+    <link rel="alternate" type="application/rss+xml" title="TalkRL: The Reinforcement Learning Podcast" href="https://feeds.transistor.fm/talkrl" />
+    <script src="https://assets.transistor.fm/assets/sites-e317b37b823fe078fc2f110973f47e11000eb700dc47c34b19890608b7eebfca.js" defer data-turbo-track="reload"></script>
+    <script>
+      document.addEventListener('alpine:init', () => {
+        transistor.translations.add({ comments: {"headline":"Comments and Discussion","loading":"Loading comments\u0026hellip;","view_and_reply":"View post and reply on Bluesky","likes":"likes","reposts":"reposts","replies":"replies","join_discussion":"Reply on Bluesky \u003ca :href=\"postUrl\" :title=\"t('comments.view_and_reply')\" target=\"_bsky\"\u003ehere\u003c/a\u003e to join the discussion.","no_comments":"No comments yet. Be the first by \u003ca :href=\"postUrl\" :title=\"t('comments.view_and_reply')\" target=\"_bsky\" class=\"episode-comments-reply-link\"\u003ereplying on Bluesky\u003c/a\u003e!","error_loading":"There was a problem loading the comments. Please try again soon."} })
+      })
+    </script>
+
+    <title>TalkRL: The Reinforcement Learning Podcast | Transcript: Danijar Hafner on Dreamer v4</title>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" name="viewport" />
+    <style>
+      :root {
+        --color-header: #1E293B;
+        --color-secondary: #3B82F6;
+        --color-background: #F1F5F9;
+        --color-header-text: #FFFFFF;
+        --color-link: #222222;
+        --color-player: #475569;
+        --color-transistor: #111827;
+        --color-text-secondary: #FFFFFF;
+      }
+    </style>
+    <link rel="stylesheet" media="all" href="https://www.talkrl.com/theme-assets/theme-graphite-1789845215.css" type="text/css" data-turbo-track="reload" />
+    
+    
+  </head>
+  <body x-data="{ mobileNavOpen: false }" class="transcript">
+    
+    <header class="site-header">
+      <div class="site-container">
+        <div class="site-header-intro">
+          
+            <a href="/" class="site-header-artwork" title="Home"><img src="https://img.transistorcdn.com/eJp59FG5jEn2v-RQUoivbjfF54eGcvDRzRvEmoqAaCU/rs:fill:0:0:1/w:800/h:800/q:60/mb:500000/aHR0cHM6Ly9pbWct/dXBsb2FkLXByb2R1/Y3Rpb24udHJhbnNp/c3Rvci5mbS9zaG93/LzIwNDcvMTcwNzk1/NDcxMS1hcnR3b3Jr/LmpwZw.webp" alt="TalkRL: The Reinforcement Learning Podcast"></a>
+          
+          <hgroup>
+            
+              <h1 class="site-header-title">TalkRL: The Reinforcement Learning Podcast</h1>
+            
+            <nav class="site-nav">
+              
+    <a title="Home" class="" href="/">Home</a>
+    <a title="Episodes" class="current" href="/episodes">Episodes</a>
+    <a title="People" class="" href="/people">People</a>
+    <a title="About" class="" href="/about">About</a>
+    <a title="Subscribe" class="" href="/subscribe">Subscribe</a>
+
+            </nav>
+          </hgroup>
+        </div>
+      </div>
+      <span x-show="!mobileNavOpen" class="site-mobile-nav-trigger" @click="mobileNavOpen = true">
+  <svg role="img" class="icon-menu" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><title>menu</title><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>
+
+</span>
+      <span x-cloak x-show="mobileNavOpen" class="site-mobile-nav-trigger" @click="mobileNavOpen = false">
+  <svg role="img" class="icon-close" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>close</title><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+
+</span>
+    </header>
+    <nav x-cloak @click.outside="mobileNavOpen = false" class="site-mobile-nav" x-show="mobileNavOpen" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95">
+      
+    <a title="Home" class="" href="/">Home</a>
+    <a title="Episodes" class="current" href="/episodes">Episodes</a>
+    <a title="People" class="" href="/people">People</a>
+    <a title="About" class="" href="/about">About</a>
+    <a title="Subscribe" class="" href="/subscribe">Subscribe</a>
+
+    </nav>
+
+    <main class="site-container site-container-main">
+      <section class="site-content-main">
+        <section class="site-content">
+          <div class="site-episode">
+  <header class="site-episode-header">
+    <button x-show="!($store.player.playing && $store.player.audio_url === 'https://media.transistor.fm/e440a692/bfc0657e.mp3?src=site')" data-url="https://media.transistor.fm/e440a692/bfc0657e.mp3?src=site" data-title="Danijar Hafner on Dreamer v4" data-show-title="TalkRL: The Reinforcement Learning Podcast" data-duration="6052" data-artwork="https://img.transistorcdn.com/ECIeBNHzLdA86haqi5JccfJNAwLi-M8BRYtIH6yosmM/rs:fill:0:0:1/w:800/h:800/q:60/mb:500000/aHR0cHM6Ly9pbWct/dXBsb2FkLXByb2R1/Y3Rpb24udHJhbnNp/c3Rvci5mbS9jODll/MTI1MjQyNGY4MDVl/NjdmNGIwN2NmMTE0/NTE5Yi5qcGc.webp" title="Play Episode" role="button" @click.prevent="$dispatch('play-episode', $event.currentTarget.dataset); $store.player.audio_url = $el.dataset.url; $store.player.playing = true" class="player-button site-episode-play">
+  
+  <svg role="img" class="icon-play" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><title>play</title><path fill-rule="evenodd" d="M8,16 C12.4183,16 16,12.4183 16,8 C16,3.58172 12.4183,0 8,0 C3.58172,0 0,3.58172 0,8 C0,12.4183 3.58172,16 8,16 Z M7.5547,5.16795 C7.24784,4.96338 6.8533,4.94431 6.52814,5.11833 C6.20298,5.29235 6,5.63121 6,6.00000106 L6,10.0000011 C6,10.3688 6.20298,10.7077 6.52814,10.8817 C6.8533,11.0557 7.24784,11.0366 7.5547,10.8321 L10.5547,8.8321 C10.8329,8.6466 11,8.3344 11,8.00000106 C11,7.66565 10.8329,7.35342 10.5547,7.16795 L7.5547,5.16795 Z"></path></svg>
+
+
+</button>
+<button x-show="$store.player.playing && $store.player.audio_url == 'https://media.transistor.fm/e440a692/bfc0657e.mp3?src=site'" title="Pause Episode" role="button" @click.prevent="$dispatch('pause-episode')" class="player-button site-episode-play">
+  
+  <svg role="img" class="icon-pause" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><title>pause</title><path fill-rule="evenodd" d="M16,8 C16,12.4183 12.4183,16 8,16 C3.58172,16 0,12.4183 0,8 C0,3.58172 3.58172,0 8,0 C12.4183,0 16,3.58172 16,8 Z M5,6 C5,5.44772 5.44772,5 6,5 C6.55228,5 7,5.44772 7,6 L7,10 C7,10.5523 6.55228,11 6,11 C5.44772,11 5,10.5523 5,10 L5,6 Z M10,5 C9.4477,5 9,5.44772 9,6 L9,10 C9,10.5523 9.4477,11 10,11 C10.5523,11 11,10.5523 11,10 L11,6 C11,5.44772 10.5523,5 10,5 Z"></path></svg>
+
+
+</button>
+
+    <hgroup>
+      <h2 class="site-episode-title">Danijar Hafner on Dreamer v4</h2>
+      <span class="site-episode-metadata">
+        <time>November 9, 2025</time>
+<span>/</span>
+<span>01:40:52</span><span>/</span><span>E73</span>
+      </span>
+      
+    </hgroup>
+  </header>
+
+  <div class="site-two-col-grid">
+    <div class="site-episode-grid-content">
+      
+
+      
+        <nav class="site-episode-nav">
+          <a href="/episodes/danijar-hafner-on-dreamer-v4" class="site-episode-notes-link" title="View episode details">Show Notes</a> <span>/</span>
+          <a href="/episodes/danijar-hafner-on-dreamer-v4/transcript" class="site-episode-transcript-link" title="View episode transcript">Transcript</a>
+        </nav>
+      
+
+      <div class="site-content-text site-episode-show-notes">
+        
+          <cite>Speaker 1:</cite>
+<time><a href="#t=0m1s" data-turbo="false" title="Jump to 00:01 in this episode">00:01</a></time>
+<p>Talk RL. Talk</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=0m5s" data-turbo="false" title="Jump to 00:05 in this episode">00:05</a></time>
+<p>RL podcast is all reinforcement learning, all the time. Featuring brilliant guests, both researched and applied. Join the conversation on Twitter at talk r l podcast. I'm your host, Robin Chauhan. Today, I'm very pleased to be joined by Danijar Hafner.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=0m25s" data-turbo="false" title="Jump to 00:25 in this episode">00:25</a></time>
+<p>Danijar is a research scientist at Google DeepMind. Welcome back, Danijar.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=0m29s" data-turbo="false" title="Jump to 00:29 in this episode">00:29</a></time>
+<p>Thanks, Robin. Good to be here.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=0m31s" data-turbo="false" title="Jump to 00:31 in this episode">00:31</a></time>
+<p>So this is your third visit on Taco RL. We first talked about Planet Dreamer, Dreamer one back in episode 11 in 2019, and then Dreamer two and three, and director in episode 42. And you know, you recently published your latest addition to the Dreamer series as Dreamer version four, training agents inside of scalable world models with yourself, Wilson Yan, Timothy Littlecrap. It's a very exciting paper and a very exciting series. Your your past Dreamer agents have shown remarkable efficiency and performance compared to other agents of their time, and this one's no exception.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1m10s" data-turbo="false" title="Jump to 01:10 in this episode">01:10</a></time>
+<p>So how do you like to describe the primary achievements here with Dreamer four?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1m15s" data-turbo="false" title="Jump to 01:15 in this episode">01:15</a></time>
+<p>Yeah. The main achievement is that we have a really scalable world model now that can take on real world diverse data and that we can train successful agents purely offline inside of that world model. So for DreamHut three, previously, the focus was really to make the algorithm robust so it works, you know, out of the box on new problems. You don't have to tune. And that was the prerequisite for scaling things up.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1m45s" data-turbo="false" title="Jump to 01:45 in this episode">01:45</a></time>
+<p>Because at scale, it gets really hard to, like, do a lot of tweaking because the training runs get more expensive and so on. So for dream of three, we had a very fast world model based on the variational objective and recurrent neural network. And in dream of four now, we have a very scalable world model that's more heavyweight based on a novel shortcut forcing objective, but basically resting on the principles of what's used for frontier video models. And so we can fit very diverse data. And the challenge was to make those models be conditioned on fine grained actions and get the generations to be fast enough.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=2m28s" data-turbo="false" title="Jump to 02:28 in this episode">02:28</a></time>
+<p>And then also on the agent side, in all the previous Dreamer versions, we had a closed loop with the environment where, you know, the policy would train only inside of the world model, but then it would interact with the real world to collect new data that gets fed back to improving the world model and patch holes in the world model. And so over time, it would sort of learn all the necessary dynamics about the world. But that becomes really tricky to do when we're talking about real world RL, like robotics, for example, which is what we're moving towards and making big steps towards with 3.4. Because a real robot can't really you can't really deploy, like, a partially trained policy on, let's say, a humanoid robot. It will just fall and break itself and maybe damage the environment.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=3m22s" data-turbo="false" title="Jump to 03:22 in this episode">03:22</a></time>
+<p>It's also besides that, it's really hard to, set up a lot of diverse like, truly diverse scenes and then reset those scenes between episodes and so on. So that's why it's a big deal to be able to purely learn just inside of the world model and get a a world model from a fixed offline dataset that is accurate enough to then learn successful behaviors without having to touch the actual environment.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=3m51s" data-turbo="false" title="Jump to 03:51 in this episode">03:51</a></time>
+<p>Now we spoke to Jeff Clune in episode 41 about OpenAI VPT, and I understand that was trying to tackle a very similar problem in terms of the Minecraft setting, offline Minecraft video. And you noted that that Dreamer v four improves over OpenAI VPT's offline agents despite using a 100 times less data. So that's pretty dramatic. How do you explain this performance difference? Or or is it is it many many things, or can you point to a few core core things?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=4m24s" data-turbo="false" title="Jump to 04:24 in this episode">04:24</a></time>
+<p>Yeah. There there are two key things. So like you said, we used getting diamonds in Minecraft as the main benchmark for the paper because it's a really challenging environment. We already used Minecraft in Dreamer three, but that was in the online setting without any external data. And now we're doing the opposite.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=4m44s" data-turbo="false" title="Jump to 04:44 in this episode">04:44</a></time>
+<p>We're only using external data from humans, two thousand five hundred hours that were provided by OpenAI contractors. And so it's the same dataset used for VPT or used initially for VPT to train the inverse dynamics model. But then, of course, they used a whole web dataset that's more than 10 times larger and label that with synthetic actions to learn from from that through imitation learning. But the VPT approach, which I think it's a really interesting paper, but I it it just doesn't leverage a lot of learning signal because predicting actions is a pretty, pretty weak learning signal. Actions are pretty low dimensional.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=5m27s" data-turbo="false" title="Jump to 05:27 in this episode">05:27</a></time>
+<p>And if you have a really high dimensional video input and you're trying to predict something, so low dimensional from it, then you're just not extracting a lot of information. And so you need a lot a lot of data to start to generalize. And yeah. So even those two thousand two hundred seventy thousand hours of web videos of just people playing Minecraft on the Internet was not enough to get a really good policy. And so what's different in Dreamer is basically two things.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=6m5s" data-turbo="false" title="Jump to 06:05 in this episode">06:05</a></time>
+<p>For one, predicting the future, which is the world model objective, helps you learn really good representations. Because to predict the future, you have to understand the past. You have to perceive semantic details from your past video and then be able to, you know, understand things like objects and how they interact to to forward. And so this gives you really good representations, especially for control because you sort of have to extract almost like a state of the world, at least a local view on the world. And so even just doing imitation learning, by fine tuning the world model instead of just learning a behavioral clonus cloning policy from scratch gives massive improvements, and that alone already beats VPT despite using, only the two thousand five hundred hours of contractor data without any web videos.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=7m12s" data-turbo="false" title="Jump to 07:12 in this episode">07:12</a></time>
+<p>On top of that, we then get pretty significant improvements by using the world model as a neural simulator to fine tune the policy with reinforcement learning, and that allows it allows us to specify concrete rewards for the things we care about and then to get the policy to directly optimize towards those goals. And so especially on the harder tasks, we see pretty clear benefits. But also across the board, we see that even the easier tasks are accomplished much faster by the policy that has been post trained with RL.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=7m50s" data-turbo="false" title="Jump to 07:50 in this episode">07:50</a></time>
+<p>Okay. And then you you start with this unlabeled video, and you also you add some action labeled video. Is that right? You have some small amount of of action labeled video?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=8m2s" data-turbo="false" title="Jump to 08:02 in this episode">08:02</a></time>
+<p>So for the main experiments, we used the whole dataset, the whole contracted dataset, which has video and mouse keyboard actions. Ah, okay. Yeah. And also game events annotated, which is part of the recording format they used. So there are events like mine cobblestone or mine or break woodblock or craft this tool or that tool or pick up this item, that item.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=8m34s" data-turbo="false" title="Jump to 08:34 in this episode">08:34</a></time>
+<p>So a lot of semantic events, and we use those to specify the rewards. We then separately did experiments to see how many actions are actually needed for training a good world model that accurately predicts all kinds of counterfactual interactions. And so for that, we masked out different fractions of all the actions. And so on the masked out parts, the model was purely training on video. We found that, actually, you can get away with shockingly small amounts of action data or, to be more precise, of aligned video action data.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=9m17s" data-turbo="false" title="Jump to 09:17 in this episode">09:17</a></time>
+<p>And the model can learn the majority of its knowledge just from video. And it's sort of intuitive if you think about it from a generative modeling perspective. You train a general generative model, and then it's sort of expected that you can fine tune in additional conditioning information relatively easily. But, of course, from the Aural perspective and robotics perspective, this is a really important result because it means that we can actually leverage a lot of knowledge or extract a lot of knowledge out of general web videos, potentially not even like, if you think about robotics, it probably doesn't even have to be video of robots doing things. It could be videos of people doing things, maybe even, you know, third person video and so on.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=10m9s" data-turbo="false" title="Jump to 10:09 in this episode">10:09</a></time>
+<p>And the model will extract knowledge from that, and it should be fairly easy to then fine tune the model to, let's say, simulate the egocentric experience of a specific robot. Actually, maybe to say one more thing about the action grounding, we did this one experiment where we had where we just masked out different amounts of actions, but we wanted to see not just if the actions generalize in distribution, but also to what extent there is strong generalization into a totally different distribution. And so we did an experiment that I was quite surprised of by the result, which is to split the whole Minecraft dataset into gameplay in the overworld, like the normal world that you know from most of the Minecraft videos with trees and mountains and caves and so on. And the other dimensions in Minecraft, which is the underworld, the nether, and then the, like, end world where you can fight the dragon if you wanna play through the whole game. And so those are, like, very different environments.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=11m22s" data-turbo="false" title="Jump to 11:22 in this episode">11:22</a></time>
+<p>Same physics, but made out of different materials. You know, the underworld, it's all, like, red blocks and a lot of lava and so on. You don't get to see that in the overworld data at all. And then the end world is sort of like a moon landscape. There's a lot of, you know, empty space and then, like, white blocks and these big towers and so on that the agent would never get to see in the overworld.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=11m50s" data-turbo="false" title="Jump to 11:50 in this episode">11:50</a></time>
+<p>And so training only on actions for the overworld, but on video from both the the overworld and these additional, like, the underworld and the end dimension, we actually get very good generalization, and the model makes accurate action condition predictions also in those other dimensions. And so just wanted to highlight that because, moving towards training agents in the real world, I think this is really promising because it shows that, there's actually basically nothing standing in the way of just using really diverse web data, even if it's not directly aligned with your robot.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=12m30s" data-turbo="false" title="Jump to 12:30 in this episode">12:30</a></time>
+<p>Do I understand correctly you do a type of curriculum training through the different types of crafting before you get to Diamond? How does that work?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=12m38s" data-turbo="false" title="Jump to 12:38 in this episode">12:38</a></time>
+<p>So it's not quite a curriculum. It's actually just a multitask agent, and it trains to equal amounts on all the tasks in parallel. We take the world model, which is, yeah, a sort of diffusion transformer, and then we fine tune the agent into that, and that allows us to reuse the representations and the knowledge that the WAP model has acquired. And so we do that by adding additional agent tokens to the model. And they're part of the same transformer, but there's an important detail about how the attention works where we can talk in more detail about in a moment.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=13m20s" data-turbo="false" title="Jump to 13:20 in this episode">13:20</a></time>
+<p>But, basically, the agent tokens get to attend to the video tokens and to the past agent tokens, but the video tokens don't get to attend to the agent tokens. So now the agent tokens get a task input, and that's just an embedding of the task. There's, I think, 20 tasks that we broke the whole sequence up to the diamond into. And so those are, like, the natural milestones for, you know, getting chopping trees and crafting crafting table and placing it and crafting a pickaxe and so on all the way to the diamond. And so from so the embedding of this task gets fed into the agent tokens.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=14m7s" data-turbo="false" title="Jump to 14:07 in this episode">14:07</a></time>
+<p>And then from the output embeddings, we predict the reward model for that task and the policy, and it's initialized just with behavioral cloning. And then, so that way, you get a multitask agent. And there are actually some details, on the RL side for how to get this to work and how to learn this multitask policy robustly. And once you have that, you can then at inference time, you have a controllable agent now, a steerable agent. So we have a a ladder of like, a prompt ladder, which is just the sequence of those 20 tasks and how often you should accomplish each of them before you move on to the next stage.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=14m51s" data-turbo="false" title="Jump to 14:51 in this episode">14:51</a></time>
+<p>And so that's how we guide the agent through the long horizon task during evaluation in the environment.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=14m57s" data-turbo="false" title="Jump to 14:57 in this episode">14:57</a></time>
+<p>So is this scalar reward, or is the multitask model this vector reward?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=15m1s" data-turbo="false" title="Jump to 15:01 in this episode">15:01</a></time>
+<p>It's task condition scalar reward. We also experimented with a vectorized reward turned out to not be necessary, and I think it's more general to have a scalar reward because then you could imagine you know, if you have a vector reward, you sort of need to know all the possible tasks in advance and maybe even have reward labels for all tasks on all your data points. Whereas, if you have a task condition scalar reward, then you could this could even work for, let's say, an open vocabulary task input where you can't really, you know, enumerate all the tasks in a feasible way.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=15m40s" data-turbo="false" title="Jump to 15:40 in this episode">15:40</a></time>
+<p>Okay. So when we think about moving from version three to version four, you said on Twitter that Dreamer three based on a more lightweight but less scalable RNN, while the lightweight approach still makes sense for easier tasks. So is it is it a case where you would you would select your agent according to the task difficulty and and and how much data like, how much of a data sponge you need?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=16m8s" data-turbo="false" title="Jump to 16:08 in this episode">16:08</a></time>
+<p>Yeah. Yeah. So for Dreamer three, also worked in Minecraft, but it was, like, 64 by 64 images. And we were using the MineRL competition action space, which has these abstract crafting actions. So you don't need to learn to predict mouse movement and item interactions in the inventory.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=16m29s" data-turbo="false" title="Jump to 16:29 in this episode">16:29</a></time>
+<p>That's abstracted away. Whereas for Dreamer four, we train on high resolution videos. So you can look at it as a human. You could play the game perfectly well from those inputs. And it's pure, you know, low level mouse keyboard inputs.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=16m49s" data-turbo="false" title="Jump to 16:49 in this episode">16:49</a></time>
+<p>All the inventory recipes for crafting and so on have to be learned by the model. And we have this, you know, much more diverse dataset of humans doing all kinds of stuff in Minecraft, and a lot of it is not even very relevant for, finding diamonds. There's, like, people building houses and people building, like, really advanced bases and so on and playing through the whole game and whatnot. So it's it's a lot more diverse of a dataset, and the old model just couldn't handle that. And so the RSSM so, basically, starting from RSSM in Dreamer three, this RNN based variational world model, we're first thinking about, you know, we should switch to diffusion transformers because they can fit much more diverse data.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=17m38s" data-turbo="false" title="Jump to 17:38 in this episode">17:38</a></time>
+<p>But the inference speed difference between those two is about a thousand times. So it becomes very, very slow to do any sort of imagination training in a diffusion forcing transformer. And and so that's a problem even just for solving a single task, but let alone trying to develop a new algorithm where you have to train thousands of agents to figure out the right hyper parameters, the right architecture details, and so on. So a big focus of DreamL four was to operate within the diffusion forcing paradigm. That's, you know, basic the basis of a lot of the frontier video models out there.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=18m28s" data-turbo="false" title="Jump to 18:28 in this episode">18:28</a></time>
+<p>It can fit very diverse data, but speed it up so that we can make it feasible for imagination training. And so DreamForm four lands sort of in the middle where it's, like, 30 times faster than a diffusion forcing transformer and 40 times slower than the Dreamer three model. So to answer your question about which one to use, I think, yeah, it does really depend on what you wanna do. If you wanna solve low dimensional tasks or relatively small, you know, simple images, not like a real world video input that or task where you have to really understand objects in the scene in detail and generalize to complexity of the real world, but maybe some simulation task. You can do a lot with the RSSM model, and you can do it with a lot less compute.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=19m23s" data-turbo="false" title="Jump to 19:23 in this episode">19:23</a></time>
+<p>And so for certain research, let's say, on the a role objective, we actually used the Dreamer three agent a lot and iterated on that because we can easily train on, you know, 30 tasks in parallel, 30 different environments even, and make sure that we come up with a robust solution there. So I think for, like, a lot of interesting research questions, they can be answered with, like, a lightweight model like RSSM. And then for tackling real world tasks and more complex tasks and also research that targets, like, efficiency in the actual architecture, then it makes sense to you basically have to use the more powerful model for that.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=20m8s" data-turbo="false" title="Jump to 20:08 in this episode">20:08</a></time>
+<p>And now some of your past dreamers, you know, your role model had some special components to deal with stochasticity in the environment. And of course, Minecraft is fairly deterministic. Does can you say more about how Dreamer four deals with stochasticity? Is that an issue at all, or is that just happens to be how Minecraft is?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=20m31s" data-turbo="false" title="Jump to 20:31 in this episode">20:31</a></time>
+<p>Minecraft is actually very, very stochastic. Oh, okay. It might not seem that way, but there's actually from an agent's perspective, there's no difference between a partially observed environment and a stochastic environment. Right? Like, when you turn around and you don't know what's gonna be there, then that has to that like, you'll get surprised by whatever gets filled in there, whether there's, like, you know, there's mountains or there's a river and what blocks there are and what creatures there are and so on.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=21m1s" data-turbo="false" title="Jump to 21:01 in this episode">21:01</a></time>
+<p>So as you walk around the world, it's very partially observed, and there are a lot of things the agent gets surprised by, and so it's a really stochastic environment. And that's a big reason why we actually had to move away from the variational model Mhmm. In Dreamer three, which can handle a moderate amount of stochasticity very efficiently. But the diffusion based approach in Dreamer four can handle much more complex correlations and multimodal distributions over the next frame.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=21m35s" data-turbo="false" title="Jump to 21:35 in this episode">21:35</a></time>
+<p>Take a step back. If we go back in world models and we can we compare Dreamer on a very high level to, like, professor Rich Sutton's Dyna architecture, or maybe a purely offline Dyna, if that makes any sense?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=21m49s" data-turbo="false" title="Jump to 21:49 in this episode">21:49</a></time>
+<p>Dyna is the sort of classical framework for, like, a hybrid model free model based RL loop, or agent blueprint. So you have an agent that interacts with some environment and gets data from that, and it trains on that data using model free RL. And it also learns the dynamics model and then uses that to further train the policy in imagination.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=22m18s" data-turbo="false" title="Jump to 22:18 in this episode">22:18</a></time>
+<p>Which is kinda like your previous dreamers. Right? Is it more like that?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=22m21s" data-turbo="false" title="Jump to 22:21 in this episode">22:21</a></time>
+<p>Yeah. Exactly. So yeah. We actually don't need any environment interaction for getting diamonds in Minecraft with Dreamer four. Of course of course, I think there so we did we did a lot of experiments that didn't make it into the paper, including, like, very various forms of, like, multimodal models and art like, more complex architectures and larger scale pretraining.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=22m51s" data-turbo="false" title="Jump to 22:51 in this episode">22:51</a></time>
+<p>And one of them was also to do, like, a small number of rounds of corrective data where we, you know, run the whole Dreamer for pipeline and then deploy the agent in the environment to evaluate it, but we record that data, and we feed it back, fine tune the model on that, and then do a bit more RL on the policy in that improved web model. And so that does help. And, especially, you know, of course, depends a lot on the actual data you have and how well that covers all the different things the policy could be doing. So I I think, you know, environment interaction and learning from that is generally a good thing. It's just it's just a big operational overhead, so you wanna do as little of it as necessary.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=23m45s" data-turbo="false" title="Jump to 23:45 in this episode">23:45</a></time>
+<p>And so, yeah, I think in general, you just wanna squeeze as much data, as much performance out of the data that you can get so that you know, because real world interaction is often the bottleneck, in, let's say, robotics applications. And so, yeah, it sort of fits in with Dyna quite well, where the idea is also to use a model to make it more efficient, but we're just, like, really leaning in on the imagination training. And I personally don't even think that model free the model free loss of Dyna will be that necessary in the future.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=24m25s" data-turbo="false" title="Jump to 24:25 in this episode">24:25</a></time>
+<p>Would you say you're a model based maximalist, in terms of RO?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=24m31s" data-turbo="false" title="Jump to 24:31 in this episode">24:31</a></time>
+<p>What does model based mean? So if I wanna train a robot to walk around, and I do that by training a policy with PPO inside of a MuJoCo simulator. Is that model based?</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=24m47s" data-turbo="false" title="Jump to 24:47 in this episode">24:47</a></time>
+<p>That's a</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=24m48s" data-turbo="false" title="Jump to 24:48 in this episode">24:48</a></time>
+<p>very important model based. Right? Because it's using a model of the of the real world to train a policy. For certain things, like, you know, Newtonian physics are like, we can simulate them very well, especially if it's, like, not a crazy number of objects and if, you know, their shapes are not too complicated and so on. And so it makes sense to then just use a manually specified model for that.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=25m16s" data-turbo="false" title="Jump to 25:16 in this episode">25:16</a></time>
+<p>And then if we want, let's say, robots that, you know, really deeply understand the physical world and perceive different objects and so on, that becomes a lot harder to simulate, especially not just looking at those objects, but interacting with them in all possible ways. And then there's articulated objects, like the keyboard in front of me. You know, it's very hard to generate those types of those types of objects or drawers and in the kitchen, let's say. It's very hard to generate those at scale in a diverse way for a classical simulator. And so, of course, there are people pushing that direction, and they're making progress.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=26m3s" data-turbo="false" title="Jump to 26:03 in this episode">26:03</a></time>
+<p>But seeing this tremendous progress in video modeling, I just I think it's pretty clear that we'll get to this really diverse simulator more quickly by just training on pixels and training on diverse web data. And all the data is already there to learn almost anything about the world. And so then so so, yeah, I think model based will be quite important, coming back to your question. I also I would say, though, that you can model free RL can still help you if you have a really good starting point. So if you have strong representations and then you do behavioral cloning on that, you get a policy that works most of the time, but maybe it's just a little slow, and sometimes it's get it gets stuck in ways where maybe it's not causing damage, but it can't progress towards the task, then fine tuning that with a little bit of model free on real data, seems like a good idea.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=27m9s" data-turbo="false" title="Jump to 27:09 in this episode">27:09</a></time>
+<p>But I just don't yeah. It it'll definitely help, but I think, using a video model will just be an an even more powerful approach. Because then you cannot just fine tune in a couple of you know, in a handful of scenarios, but you can actually use the video model to dream up a really diverse distribution of of scenarios that that the model can envision based on its pretraining knowledge and train your robot in all of those scenarios. And I think that's how we'll get, like, truly general robots.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=27m47s" data-turbo="false" title="Jump to 27:47 in this episode">27:47</a></time>
+<p>So I remember Yan Lakun talking about this, you know, how you do video predict prediction. If you balance a pencil, you can't you know, an expectation model is gonna is gonna pick one way for it to fall, and you don't really know. So if I understood do I understand correctly, the the type of diffusion model that you would use would predict a distribution of outcomes for that or a different one each time it's sampled? Is that how you deal with the stoke SSC?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=28m13s" data-turbo="false" title="Jump to 28:13 in this episode">28:13</a></time>
+<p>Yeah. That's right. You can sample from the model, and you'll potentially get a different outcome every time. And so that way, you can train your agent to learn what to do in all these potential scenarios.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=28m26s" data-turbo="false" title="Jump to 28:26 in this episode">28:26</a></time>
+<p>And this form of model is gonna give you results that are that really cover that distribution and that have the right coverage. I I guess models a few years ago weren't very good at that. They would kinda collapse.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=28m38s" data-turbo="false" title="Jump to 28:38 in this episode">28:38</a></time>
+<p>Yeah. Diffusion models cover modes pretty well. There's a little bit of mode collapse that you can get from discretizing the sampling process too harshly because you are sort of skipping over a bit of diversity if if you do fewer forward passes, but that's that's pretty minimal compared to, you know, how well it can fit a diverse dataset. And, yeah, I I agree with a lot of things Jan says and advocates for. And, I mean, he's using diffusion models for the dynamics part of some of the work they've been doing, and and I think that's a good idea.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=29m26s" data-turbo="false" title="Jump to 29:26 in this episode">29:26</a></time>
+<p>I think also the, you know, the focus on learning good representations is really important, and there's a lot lot of headroom there for improving agent performance by learning better representations.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=29m39s" data-turbo="false" title="Jump to 29:39 in this episode">29:39</a></time>
+<p>So I understand you're using shortcut forcing for your, as part of your dynamics model, from a recent paper, you wrote in 2024. Can you tell us a little bit about, shortcut forcing and and how that helps?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=29m52s" data-turbo="false" title="Jump to 29:52 in this episode">29:52</a></time>
+<p>The previous paper you mentioned introduced shortcut models, and that was work done with Kevin Frantz. And, yeah, he's a brilliant guy, and it was really fun working on this. And the goal for that was really to speed up diffusion model inference and to do it in a really simple way. There's various ways to distill diffusion models after after you've after you're done training them, but it's not super practical because then you have to decide when to cut off your training run. And then there are consistency models that also try to speed up diffusion models, but they're pretty finicky to get working and often need schedules.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=30m36s" data-turbo="false" title="Jump to 30:36 in this episode">30:36</a></time>
+<p>And, you know, then there's continuous time versions of that that need more expensive computation. And sort of yeah. There wasn't really a satisfying solution of an objective that I can just train with, and I will get a model out of it where I can later choose how many sampling steps I wanna do. Right? And maybe as a little bit of background, I should briefly summarize how diffusion models work in general.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=31m3s" data-turbo="false" title="Jump to 31:03 in this episode">31:03</a></time>
+<p>So we've been talking about diffusion models a lot. So, basically, a diffusion model is a neural network that learns to denoise. So you give it an input, and it's, let's say, an image of your dataset with a lot of noise added, and the diffusion model tries to predict what the clean data point was. You train on images with a lot of noise on them and images that only have a little little bit of noise on them, and so you can then generate from this model once it's done training by starting with pure noise and asking it, you know, what could the clean image be? And it will not be able to make a very good guess because no information about what the image should be based on just pure noise input, but it will make a guess, and you can go a little bit in that direction.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=31m49s" data-turbo="false" title="Jump to 31:49 in this episode">31:49</a></time>
+<p>So you interpolate, and you move a small step from the noise in the direction of what the model thinks could the could be the clean data point. And so now you have a slightly better guess about what the corresponding real image would be. And so you itch you repeat this process. You then give this slightly less but still mostly noise input to the model again and ask it for the clean data point. And so you end up following a trajectory of small steps that starts from pure noise and goes all the way to a clean data point that looks like it could have been in your dataset.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=32m28s" data-turbo="false" title="Jump to 32:28 in this episode">32:28</a></time>
+<p>And, of course, the diffusion model generalizes, so it will general generate things that aren't exactly in the in your dataset. So this approach is very effective at modeling complex distributions. Right? But the issue is doing all these little refinement steps during generation just makes it very slow to sample from the image. And so with shortcut models, we condition the model not just on the noisy image and on the amount of noise, like the current noise level, but we also tell the model how big of a step it's supposed to make.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=33m9s" data-turbo="false" title="Jump to 33:09 in this episode">33:09</a></time>
+<p>So it doesn't just learn the instantaneous direction, but it can learn to make a jump forward in in that sampling trajectory. And so you can learn that very efficiently by bootstrapping from the model itself. So, you know, for the smallest possible step size, you just train it like a diffusion model, and it will make this tiny little step. But then for for twice the step size, you can get a training target by asking your model to make two small steps with the smallest step size from the same starting point, from the same noisy training image. And so you get an idea of where the two small steps lead to, and you can train the model when you condition it on making a larger step to end up at the same point.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=34m1s" data-turbo="false" title="Jump to 34:01 in this episode">34:01</a></time>
+<p>Right? And then you can do that for any you know, for two times the step size, four times, eight times that step size, all the way to going in a single step from pure noise to a clean image. And so that's how shortcut models work. And, yeah, it's very stable training objective, and you don't need to schedule anything. And, you know, for video, we extended it to the shortcut forcing approach, which takes the best of both worlds from shortcut models and another approach called diffusion forcing.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=34m38s" data-turbo="false" title="Jump to 34:38 in this episode">34:38</a></time>
+<p>And so I'll explain that too. Diffusion forcing is a way to extend diffusion models to time series. So instead of just deciding how much noise to add, let's say 50% noise to your input image, and then you have, you know, the the Gaussian noise and the input image, and you take 50% of each and add it together and give it to your neural net. Instead of that, you can have a video with a lot of frames, and you choose a different noise level for each frame during training. You still train it to just predict the clean input.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=35m19s" data-turbo="false" title="Jump to 35:19 in this episode">35:19</a></time>
+<p>So what that lets you do is the model gets used to having certain frames be more clearly recognizable and others being harder to recognize during training. And so then you get a lot of flexibility when you want to general, generate with that model. Right? So you could generate with that model in a way where you're just creating a whole block of video in one go, where you happen to choose the same noise level for all the frames that you're trying to generate. But you can also generate one frame at a time by giving it almost clean inputs for all the past frames and then pure noise only for the next immediate frame that you want to generate.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=36m1s" data-turbo="false" title="Jump to 36:01 in this episode">36:01</a></time>
+<p>Do a couple of forward passes on that to to predict the clean frame, and then move on and generate the frame after that and so on. Diffusion forcing basically says, assign different noise levels to different frames in your input sequence. And so then it allows you to generate causally later on. For example, that allows you to generate blocks as well or some some somewhere in between where you have, you know, a block causal generation and so on. And so with shortcut forcing, we get a very efficient version of that, and that alone ends up speeding up speeding up generations by, like, 13 times.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=36m54s" data-turbo="false" title="Jump to 36:54 in this episode">36:54</a></time>
+<p>And then the remaining improvements we got or we needed to speed up the model more were architectural improvements.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=37m1s" data-turbo="false" title="Jump to 37:01 in this episode">37:01</a></time>
+<p>So before you could do this agent, you actually had to improve the underlying general models that really had nothing to do with the RO. Is that am I understanding this right?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=37m12s" data-turbo="false" title="Jump to 37:12 in this episode">37:12</a></time>
+<p>Yeah. That's exactly right. We knew we needed this. We wanted to use diffusion models, but they weren't fast enough. So we worked on a whole project to speed up diffusion models.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=37m23s" data-turbo="false" title="Jump to 37:23 in this episode">37:23</a></time>
+<p>Amazing. Quite a flex. And that worked amazingly well. Mean, none of this would have worked if you had those those models so slow. Like, is is this why you can look so far in the future because your models have are so high fidelity?</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=37m38s" data-turbo="false" title="Jump to 37:38 in this episode">37:38</a></time>
+<p>How do you how do you get that ability to go far into the future without the accumulating errors that we normally see?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=37m46s" data-turbo="false" title="Jump to 37:46 in this episode">37:46</a></time>
+<p>Yeah. Okay. So there are a couple more details after we got shortcut forcing to work in the first place. We refined it further to help reduce artifacts that can come up in auto aggressive generations. So traditional video models actually usually generate whole blocks of video.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=38m8s" data-turbo="false" title="Jump to 38:08 in this episode">38:08</a></time>
+<p>Maybe they generate a whole, like, twenty second clip jointly with a bidirectional transformer. Or maybe they do have some context, but they extend the video by a block that's a couple seconds long. And so if you do that, it's a little bit easier for the model because there's fewer extension steps in time, and so there's less of a chance for small prediction errors to accumulate over time and then trip up the model. For purely frame autoregressive generation, and that is something you do need if you wanna train your agent at a high control frequency. You have to generate some new input for the agent to then choose a new action based on that and feed it back into the model.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=38m56s" data-turbo="false" title="Jump to 38:56 in this episode">38:56</a></time>
+<p>So you need this very tight loop between the policy and the video model. And so one challenge with that is that there is a high potential for small prediction errors to accumulate over time. And, yeah. So a good amount of work also went into, figuring out how to reduce those, those accumulating errors, which, you know, is basically a problem with auto aggressive video generation and and has always been. And we ended up at a point at a point where you can generate from the model for basically as long as you want to.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=39m40s" data-turbo="false" title="Jump to 39:40 in this episode">39:40</a></time>
+<p>I've played Minecraft in this model for, like, twenty minutes, and it always makes reasonable generations. And sometimes, if there's a lot of moving objects at once, it gets a little more blurry, but it recovers a few seconds later. So it never falls off the manifold and, like, gets tripped up or anything like that. And so the main the main thing that helped with that was to predict the next frame, which is how I already explained everything so far, but it's actually not the most common way diffusion models work. Because instead of predicting the clean data point, you could also predict the noise, or you could predict the direction from noise to the clean data point, And you can convert all of these into each other if you know the, like, noisy input to the neural net, but there are different trade offs in terms of, basically, how much capacity the model assigns to the more noisy images and denoising those and denoising the cleaner images and so on.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=40m49s" data-turbo="false" title="Jump to 40:49 in this episode">40:49</a></time>
+<p>And people often train, a yeah. I guess, like, a flow matching approach where you usually predict the velocity, so the directs you from the noise to the data. And the issue with that in the video generation it works great for images, but the issue with that for video generation is that your neural net needs to preserve a lot of information about the exact noise pattern. It is activations all the way throughout the transformer because it needs to predict this velocity, contains, you know, which, like, really depends on what the input noise was. And so if it, like, messes things up slightly in the prediction, then, you know, there's a lot of, like, really small details the model needs to get right to be able to generate a clean next frame.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=41m48s" data-turbo="false" title="Jump to 41:48 in this episode">41:48</a></time>
+<p>Whereas if you're just predicting the next image, there's actually a lot more structure in that. And so, the model can really focus on predicting only the stuff that it actually needs to predict, and it's a bit lower frequency and harder to make these really small mistakes that or there are few of these really small mistakes to make in the first place that would then add up over time.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=42m16s" data-turbo="false" title="Jump to 42:16 in this episode">42:16</a></time>
+<p>So you said you would play up to twenty minutes. Is everything you're doing within the distribution of the training data? How do you think about Oud out of distribution in this setting?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=42m26s" data-turbo="false" title="Jump to 42:26 in this episode">42:26</a></time>
+<p>That's always a good question. So it's not limited to twenty minutes. You can play for as long as you want to, really. The context length of the model is limited to a couple seconds. Even though we improved that quite a bit compared to previous models, it's still quite limited.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=42m44s" data-turbo="false" title="Jump to 42:44 in this episode">42:44</a></time>
+<p>And so if you walk</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=42m46s" data-turbo="false" title="Jump to 42:46 in this episode">42:46</a></time>
+<p>That's like frame stacking that's used to predict the next one. Is that what you is that what that means? Or</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=42m52s" data-turbo="false" title="Jump to 42:52 in this episode">42:52</a></time>
+<p>Sort of. I mean, there's no actual frame stack stacking happening, but the transformer operates on a sequence of frames, and it can attend to its past activations, but only up to that many time steps. And so then past that, the old time steps will get evicted from the k v cache of the transformer, and so the model won't have access to that anymore. And so what that means in practice is if you, you know, let's say, walk into a house and you, you know, you do something in the house for thirty seconds and you walk back out of the door, then the outside world will look different suddenly because the model can't access that that anymore. And so it'll have to fill it in with something plausible again.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=43m39s" data-turbo="false" title="Jump to 43:39 in this episode">43:39</a></time>
+<p>And so that's, like, one of the big areas for improvement, just giving really long term memory to web models, but also and video models, but also to agents in general.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=43m52s" data-turbo="false" title="Jump to 43:52 in this episode">43:52</a></time>
+<p>And we we hear about in offline RL things like overestimation and and algorithms like CQL being needed. And then now you're in a fully offline setting. Is any of this relevant, or is this just not a concern here? Because we're we're somehow in distribution, or maybe the KL control just handles this somehow.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=44m16s" data-turbo="false" title="Jump to 44:16 in this episode">44:16</a></time>
+<p>It is somewhat relevant. I don't know if I've heard anybody say that CQL works that well in practice. I think But it</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=44m27s" data-turbo="false" title="Jump to 44:27 in this episode">44:27</a></time>
+<p>was the reason why it was a it was more like an illustrative algorithm, the overestimation problem.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=44m32s" data-turbo="false" title="Jump to 44:32 in this episode">44:32</a></time>
+<p>Yeah. I mean, of course. I think, yeah, doing offline RL is if we can crack offline RL, that that'll, like, really, yeah, be very relevant for robotics. And there have been various attempts made in the space of model free offline algorithms, and CQL is one of them. There are fewer details to get right.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=44m57s" data-turbo="false" title="Jump to 44:57 in this episode">44:57</a></time>
+<p>Right? Because it's, like, simpler in its implementation and hyperparameters than a model based approach. With a model based approach, though, you just get a lot better performance in practice right now. And so I actually think just RL in imagination is the right way to do offline RL. And you still need to be a little careful about going too far out of distribution.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=45m28s" data-turbo="false" title="Jump to 45:28 in this episode">45:28</a></time>
+<p>So for your previous question, when I, as a human player, interact with the world model, everything I do is out of distribution to the model. Right? It's never seen that action in that situation before. It's probably not even ever seen that same situation. But there are sort of semantically more different things.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=45m50s" data-turbo="false" title="Jump to 45:50 in this episode">45:50</a></time>
+<p>You could go more out of distribution at a at a higher level, let's say. Like, yeah, you there it is possible to exploit the world model, And you have to sort of if the world model is trained on a certain data distribution and that doesn't cover everything well enough, then you have to make sure that your policy doesn't go too far away from sort of the average human policy. And we do that with a simple KL constraint the same way it's done for language models when people train them with RLHF, and that works great. We also noticed that when we trained on corrective data, which is not something we ended up putting in the paper, but then you can get away with a much weaker KL, which also makes sense because even just after a pretty small number of rounds of correction, the world model starts to get really robust to exploitation.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=46m44s" data-turbo="false" title="Jump to 46:44 in this episode">46:44</a></time>
+<p>On a on a high level, what I'm hearing, if I understand this right, is that there's you have pretty good coverage of your actions space, so you don't have to worry too much about a completely unknown actions or</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=46m55s" data-turbo="false" title="Jump to 46:55 in this episode">46:55</a></time>
+<p>is that is that the case? Yeah. I'll give you an example. So there's pretty there's very good coverage when it comes to moving the camera and walking around in the world. And and then when it comes to, let's say, inventory interactions, it's a bit different because there are certain scenarios that are not covered in the data, and it's, like, not really obvious what the model should predict.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=47m21s" data-turbo="false" title="Jump to 47:21 in this episode">47:21</a></time>
+<p>So for people who've played Minecraft before, they will know that there are, you know, wooden pickaxes and stone pickaxes and iron pickaxes and diamond pickaxes. And so you craft them all in a pretty similar way. Right? There's this crafting grid, and you'd put two sticks above each other, and then you put, horizontally, you put three blocks of the material, like three stones, for example, and you get a stone pickaxe out on the other side. Now we've seen the agent attempt in imagination to craft other types of pickaxes where use, like, some rock material that you couldn't normally make a pickaxe within Minecraft, but none of the human players ever tried that.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=48m14s" data-turbo="false" title="Jump to 48:14 in this episode">48:14</a></time>
+<p>And and so there's no information for the world model to think that that would fail and actually generalizes in a pretty cool way by letting the agent craft this this pickaxe out of other materials, and and a pickaxe comes out. But that doesn't actually work in the real game. And so then that's an example of something where you either need corrective data or you need to keep the policy a little bit closer to the behavioral cloning policy that was trained on the human data.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=48m52s" data-turbo="false" title="Jump to 48:52 in this episode">48:52</a></time>
+<p>That's kind of almost like a charming out of distribution thing or a mistake. Right? It's like almost like a cute nice thing as opposed to when we're talking about safe RL and it's doing something that's just, just you wouldn't wanna do. I guess, there's not a lot of that in in Minecraft. Right?</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=49m6s" data-turbo="false" title="Jump to 49:06 in this episode">49:06</a></time>
+<p>Unsafe actions?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=49m7s" data-turbo="false" title="Jump to 49:07 in this episode">49:07</a></time>
+<p>Yeah. I mean, deploying a policy in Minecraft is pretty safe. I can't think of an example where something, like, would have gone, like, catastrophically wrong. I guess</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=49m19s" data-turbo="false" title="Jump to 49:19 in this episode">49:19</a></time>
+<p>how how you treat the dragon probably really matters. And</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=49m22s" data-turbo="false" title="Jump to 49:22 in this episode">49:22</a></time>
+<p>Right. Yeah. I mean, it never made it to the dragon. So that's also another thing people you know, after Dreamer three already, people said, oh, Minecraft is done now as a benchmark, and then we released v four. And if you'll say, oh, you're still doing Minecraft.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=49m37s" data-turbo="false" title="Jump to 49:37 in this episode">49:37</a></time>
+<p>Is Minecraft done now? And Minecraft is very far from being done for AI. There is so much more you can do. Getting diamonds is only a small part of the game, and you need to touch maybe, like, on the order of 10 items to get to diamonds, but there are 500 plus items in Minecraft, and there are hundreds of achievements that are really hard for humans to accomplish. I just recently came across, some YouTuber who has been trying to get all the achievements in Minecraft, and I just saw, you know, there's, like, 20 streams already uploaded to his channel.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=50m15s" data-turbo="false" title="Jump to 50:15 in this episode">50:15</a></time>
+<p>They're all, like, six hour videos, and he's, like, you know, maybe three quarters through. So Minecraft is a really, really challenging test bed, for humans and and even more so for AI, and I think we can actually it's actually quite ideal for for testing AI agents, and it will be for the next coming years.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=50m36s" data-turbo="false" title="Jump to 50:36 in this episode">50:36</a></time>
+<p>Now a while back, I guess, and this is ICLR twenty twenty two, you had Crafter, which was kind of a similar to Minecraft open world game. Is that still relevant to you, or do you feel like we're you you move beyond that now?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=50m50s" data-turbo="false" title="Jump to 50:50 in this episode">50:50</a></time>
+<p>Crafter was actually meant as a test bed for Minecraft because I wanted to do Minecraft research, and I knew the Minecraft simulator is quite slow. Especially rendering on CPU with higher resolutions gets very slow. It gets slower than real time. So I wanted something to iterate on quickly, but that replicates a lot of the challenges that would be posed to the algorithm Mhmm. When learning on Minecraft.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=51m18s" data-turbo="false" title="Jump to 51:18 in this episode">51:18</a></time>
+<p>There's a stepping stone. Yeah. Exactly. It's not just that it sort of looks like a simplified two d version of Minecraft, but there are also all these different items, all these different, you know, steps towards getting diamonds, really long horizons. Every episode has a totally random randomly generated terrain, so you can't really overfit to remembering where certain resources are placed.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=51m47s" data-turbo="false" title="Jump to 51:47 in this episode">51:47</a></time>
+<p>You have to defend yourself. There's monsters and so on. So, you know, I think for any new algorithm, you always wanna train it. You always wanna get it to work on something where you can iterate as quickly as possible on. And so I'm still using, you know, simple toy tasks.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=52m9s" data-turbo="false" title="Jump to 52:09 in this episode">52:09</a></time>
+<p>I don't think necessarily publishing results on, let's say, Atari and these type of, like, Aural tasks and maybe even Crafter makes that much sense in itself anymore because I wouldn't be unless it's, like, a really significant improvement, of course. If you can get, you know, human performance with 10 times less data, that's still really interesting. But if you're getting, like, a 30%, 20% relative improvement over state of the art, it's, like, quite possible that that wouldn't actually transfer to a large scale scenario and in whatever's environment. So so it's useful for debugging and unit testing. Very useful for that, but not in terms of pushing the frontier.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=53m3s" data-turbo="false" title="Jump to 53:03 in this episode">53:03</a></time>
+<p>Mhmm. I I think I remember reading that that David Silver started with with much smaller Go boards, like very small boards, and then just worked its way up. So</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=53m13s" data-turbo="false" title="Jump to 53:13 in this episode">53:13</a></time>
+<p>Yeah. Pretty similar. For Go, you yeah. There's different sizes of the board and, yeah, makes the game easier and faster to play and so on.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=53m21s" data-turbo="false" title="Jump to 53:21 in this episode">53:21</a></time>
+<p>What are the some of the main innovations in the Efficient Transformer? And, especially, I wanna understand spatial versus temporal components being treated differently in this in this transformer.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=53m32s" data-turbo="false" title="Jump to 53:32 in this episode">53:32</a></time>
+<p>We yeah. We start with sort of pretty standard transformer that, you know, uses RMS norm and prelayer norm yeah. Prelayer norm and and swiggle activations. So, yeah, pretty standard initial setup, and then we applied various architectural architectural changes to that to make it more efficient for video data. And so in general, for video, you have a lot of tokens because each frame already will be, you know, probably at least 64 tokens up to, like, maybe a thousand tokens or so, depending on your tokenizer and the, like, fidelity you need.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=54m18s" data-turbo="false" title="Jump to 54:18 in this episode">54:18</a></time>
+<p>And and so then if you have a high control for or a high frame rate of 20 frames per second, you know, even just one second of video, you know, could could easily be, like, you know, like, 16,000 activations or 16,000 tokens, let's say. Whereas for a language model, 16,000 tokens is, like, pretty decent for training. Like, you can you can fit, like, decent documents into that context. But for video, that's only one second of video. And the challenge is even harder for us because we wanted frame level generation.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=55m0s" data-turbo="false" title="Jump to 55:00 in this episode">55:00</a></time>
+<p>We didn't wanna do any like, we didn't wanna cluster multiple frames together into video chunks because that would then force us to give up, how fine grained the actions can be. And so then the policy wouldn't be able to make as fast paced decisions. So so there's a lot of tokens. And then the question is how do you build an architecture that can process them all, in a way that's relatively efficient, but at the same time, it still maintains really high model capacity. And so, yeah, those are, of course, like, pre it's a pretty direct trade off.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=55m42s" data-turbo="false" title="Jump to 55:42 in this episode">55:42</a></time>
+<p>And so there are a couple of improvements that all work together to make this possible, and it's sort of they don't perfectly stack in terms of the speed ups they get. But, yeah, one of them is to you know? So let's say you have a batch length of, like, one twenty eight frames, right, which is, like, six seconds of video. And each time step, you have, let's say, two fifty six spatial tokens. So that's an overall context length of 32,000 tokens for each entry in the batch.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=56m27s" data-turbo="false" title="Jump to 56:27 in this episode">56:27</a></time>
+<p>And so if you just did dense attention, you know, it'd be it'd be, like, quite expensive, especially during generation. Right? Because to generate one more frame, you have to attend to all the past you know, each token in this new frame would have to attend to all the past 32,000 tokens. And, yeah, of course, attention has, like, quadratic complexity, and and also just loading the KV cache into memory is a bottleneck during inference. So very easy thing.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=57m5s" data-turbo="false" title="Jump to 57:05 in this episode">57:05</a></time>
+<p>I guess at a very high level, it was quite surprising that you can get away with not that many temporal connections. Right? So a big thing we do is to factorize the attention into you know, some layers only do spatial attention. So each of the two fifty six tokens within the same frame only attends to the other, you know, two fifty five tokens or, I guess, itself too. So two fifty six tokens at that same frame, but not to any other time step.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=57m38s" data-turbo="false" title="Jump to 57:38 in this episode">57:38</a></time>
+<p>So it's only local processing within the current frame. And three out of four layers three out of every four layers in the transformer are only spatial. Right? And so that really speeds things up both during training, but also during generation, especially because you don't have to attend into this really long KV cache memory for most of your layers. And but since there's a lot of local processing to do for video generation, that actually barely hurts performance at all.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=58m13s" data-turbo="false" title="Jump to 58:13 in this episode">58:13</a></time>
+<p>And so especially if you compensate for you know, the training gets a lot cheaper as well. And so you can then, in the same amount of wall clock time, using the same amount of compute, you can train the model longer. And so you end up with a better model from making that change already.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=58m33s" data-turbo="false" title="Jump to 58:33 in this episode">58:33</a></time>
+<p>That is so interesting. Where did that idea come from?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=58m36s" data-turbo="false" title="Jump to 58:36 in this episode">58:36</a></time>
+<p>There's a couple of models that, like, recently I think people have been doing this for a while, but Oh. Even publicly, I guess there are a couple models now that do that. I think I think Llama was, like, the one that actually sort of published this openly. Llama four?</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=58m53s" data-turbo="false" title="Jump to 58:53 in this episode">58:53</a></time>
+<p>Oh, in a in a text model.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=58m55s" data-turbo="false" title="Jump to 58:55 in this episode">58:55</a></time>
+<p>Yeah. Yeah. I mean, the architecture</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=58m57s" data-turbo="false" title="Jump to 58:57 in this episode">58:57</a></time>
+<p>is space still in a text model?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=58m59s" data-turbo="false" title="Jump to 58:59 in this episode">58:59</a></time>
+<p>Oh, sorry. So what people the the analog of that in text models would be to have alternating context lengths. So have a couple of layers with very short local context. Mhmm. And then every now and then, you have a a layer that has,</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=59m17s" data-turbo="false" title="Jump to 59:17 in this episode">59:17</a></time>
+<p>like Oh, interesting. Okay.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=59m18s" data-turbo="false" title="Jump to 59:18 in this episode">59:18</a></time>
+<p>Context. Right? And it's very similar, I guess, in the video case. You could always think of the video to operate on a two d grid where this is spatial and a temporal dimension. But you could also just flatten that, and it gets sort of quite similar to, like, a sliding window attention where the spatial attention now means you attend to, like, the last two fifty six tokens, and the temporal attention means I guess, either you tend to all the pass tokens if it's dense, or if it's axial, like in our case, you tend only to every pass two fifty sixth token.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h0m0s" data-turbo="false" title="Jump to 01:00:00 in this episode">01:00:00</a></time>
+<p>Right? So the, let's say, top left corner of the image only attends to top left corner of the previous frame and the frame before that.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h0m7s" data-turbo="false" title="Jump to 01:00:07 in this episode">01:00:07</a></time>
+<p>I see. The this issue comes up once in a while of, like, the pixel problem. You know, in an Atari game maybe it's not so true in Minecraft, but in an Atari game, you know, you could have just one pixel that's a bullet that's coming through, and and it's so small when you have a reconstruction objective, it might not be picked up or not much emphasis given to that that pixel, but it has a lot of it has a lot more importance to the agent than a random pixel. Does that does that come up at all when you're using reconstruction?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h0m38s" data-turbo="false" title="Jump to 01:00:38 in this episode">01:00:38</a></time>
+<p>Yeah. It can come up. So we initially had some challenges similar to that for inventory predictions where our tokenizer was too compressed, and so it wouldn't be able to reconstruct the inventory, like, the item count, precisely. And so maybe you have eight planks, but in the reconstruction, you have, like, seven planks suddenly. And so increasing the bottleneck in the tokenizer helped or basically giving it more spatial tokens.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h1m15s" data-turbo="false" title="Jump to 01:01:15 in this episode">01:01:15</a></time>
+<p>Yeah. It's a latent tokenizer where you have image patches, and then you also have some learned tokens. You encode everything together, and then you use the learned tokens to read out a representation that gets projected to a smaller channel dimension. There is a 10 bottleneck, so very simple, just a 10 activation to bound the representations between minus one and one. And then the same architecture mirrored for the decoder.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h1m42s" data-turbo="false" title="Jump to 01:01:42 in this episode">01:01:42</a></time>
+<p>So you take the representations, project them up to the model dimension, and then you concatenate, like, 900 or so learned embeddings from which then you run the transformer on the whole on the representation tokens and on the learned tokens, and from the learned tokens, you then predict the image patches back. So, yeah, there's no variational autoencoder or anything like that either. Just a ten h bottleneck. And and so, yeah, if you make the bottleneck big enough, then the model can be almost lossless, at least in terms of, like, visual perception. Like, when I look at the reconstructions, it's very hard to tell that they're not real.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h2m33s" data-turbo="false" title="Jump to 01:02:33 in this episode">01:02:33</a></time>
+<p>There's maybe, like, a little bit of maybe they're, like, a tiny bit more blurry, but as long as they get all the details in terms of, you know, like, little numbers and so on, you're good. And then the limitation just becomes how big the diffusion transformer on top of that is.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h2m49s" data-turbo="false" title="Jump to 01:02:49 in this episode">01:02:49</a></time>
+<p>Okay. But let me ask you. If you wanted to work with the environment like Minecraft except it this version had like bullet pixels in it Mhmm. Reconstruction would be challenging. Right?</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h3m5s" data-turbo="false" title="Jump to 01:03:05 in this episode">01:03:05</a></time>
+<p>Is there something you would adjust in the in your objective or something that would allow it to give more importance to modeling those?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h3m15s" data-turbo="false" title="Jump to 01:03:15 in this episode">01:03:15</a></time>
+<p>It's a really good question. It's a really good question. I think reconstruction is not the right objective for representation learning in general, and I think that's, like, relatively clear in in the field in general. There are various different objectives for learning representations out there. They have all the different trade offs, and we have played around with different ones, and we've seen different, like, benefits and downsides.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h3m48s" data-turbo="false" title="Jump to 01:03:48 in this episode">01:03:48</a></time>
+<p>I think, you know, if if you care about this from a practical perspective, you wanna solve a real problem where there's certain things about the input that matter, then I would just get some contractors to annotate that signal that matters and predict that from the representations with a readout head. And so that way, you can be certain that the representations will pay attention to that. Mhmm. If it's more like an academic pursuit and you're thinking about, you know, is there some representation like, I think in general, it's not possible for any objective to sort of know a priori what you will care about. Mhmm.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h4m33s" data-turbo="false" title="Jump to 01:04:33 in this episode">01:04:33</a></time>
+<p>So your best bet then might be to use the closest you have to, like, a task specific loss. Like, you know, maybe you're not annotating the specific aspect of the input and predicting that, but let's say you can backpropagate action, gradients for predicting actions or predicting rewards into the tokenizer. And we have also played around with that and gotten that to work, but at least for Minecraft, the benefits were not large enough to justify the complexity. I don't really know if we're thinking, like, long term for real world, let's say, you know, a robotic system that interacts with the the world, like, people's households or, like, factories and so on. I'm not sure.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h5m27s" data-turbo="false" title="Jump to 01:05:27 in this episode">01:05:27</a></time>
+<p>Like, I think it's really, like, an open question whether something really task specific will be needed, or we can get away with just general representation learning objectives. Because usually, like, individual pixels don't really matter. I mean, our retina doesn't even have pixels in that sense. Like, we we don't get, like, a stable image grid. We get very noisy firings that are async in time, and our brain reconstructs an image from that, which is already a much more stable representation.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h5m57s" data-turbo="false" title="Jump to 01:05:57 in this episode">01:05:57</a></time>
+<p>Like, I sort of agree in the sense that there's no in real life, there's rarely a a pixel that's, know, that's gonna make all the difference. But on the other hand, it's that the general principle that the size of the thing or the amount of data you have on it is not necessarily proportional to the importance of it. And how to deal with that is sometimes Yeah. A very imbalanced thing. Right?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h6m17s" data-turbo="false" title="Jump to 01:06:17 in this episode">01:06:17</a></time>
+<p>Yes. I totally agree with that. So but I think it yeah. So it's it doesn't have to be a tokenizer question. You can have a tokenizer that's very compressed and learns very semantic representations for what you specifically care about, and that can let you get away with a smaller diffusion transformer or smaller dynamics model on top or smaller policy transformer on top of that tokenizer.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h6m45s" data-turbo="false" title="Jump to 01:06:45 in this episode">01:06:45</a></time>
+<p>But the problem will be that there's, like, a chance that those representations discard information you actually need, so then you might have to back prop those downstream losses into your tokenizer. I think, actually, at some point, we'll just train all the model components end to end. There won't be, like, a phase to train your tokenizer and then freeze it. It's it's not practical because, ultimately, you want to squeeze out efficiency. Or it's practical short term, but once you wanna squeeze out more efficiency, you will just wanna train everything end to end.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h7m21s" data-turbo="false" title="Jump to 01:07:21 in this episode">01:07:21</a></time>
+<p>On the other hand, you could have a tokenizer that is pretty shallow and has pretty high dimensional representations that where you can be almost certain, like, doesn't really discard anything important. And so then you might just need a bigger model on top of that to make sense of those representations. And, yeah, and so then, you know, the, like, one pixel in the corner is clearly in the representation, but maybe your video model will actually not learn to pay attention to that pixel because there are much more important things to pay attention to to predict, like, larger objects in the next frame correctly. And so then you're at the mercy of the video model learning things in the order in which it helps it reduce pixel loss or or, I guess, diffusion loss in representation space. And so, yeah.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h8m25s" data-turbo="false" title="Jump to 01:08:25 in this episode">01:08:25</a></time>
+<p>Like, the the things that tends to learn last are things like, yeah, very small objects, but also really long range temporal correlations. So the really semantic long range correlations will be learned last, and I think that's also an open challenge. If we can prioritize those bits somehow, that would let us learn semantically correct models much faster.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h8m56s" data-turbo="false" title="Jump to 01:08:56 in this episode">01:08:56</a></time>
+<p>And maybe very stochastic things or fast moving things. Is that in that set too or no?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h9m1s" data-turbo="false" title="Jump to 01:09:01 in this episode">01:09:01</a></time>
+<p>If something is static, it's easier to predict, so we learn faster or earlier. But even things that move quickly yeah. I guess the harder it is to predict, probably, the later it takes the the longer it takes for the model to actually learn that. Almost by definition. Right?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h9m22s" data-turbo="false" title="Jump to 01:09:22 in this episode">01:09:22</a></time>
+<p>That's what it means for it to be harder to predict maybe.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h9m25s" data-turbo="false" title="Jump to 01:09:25 in this episode">01:09:25</a></time>
+<p>So can you tell us a bit about the experience of of doing the Streamer four work? You worked with some other people. This must have been a very long project. You talked about experiments that we didn't see in the paper. This might it must have been quite an epic journey.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h9m39s" data-turbo="false" title="Jump to 01:09:39 in this episode">01:09:39</a></time>
+<p>Can can you tell us a little bit about how that how that all unfolded and and what it felt like?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h9m44s" data-turbo="false" title="Jump to 01:09:44 in this episode">01:09:44</a></time>
+<p>I think, in a sense, in a way, we were quite lucky to be able to work on this slightly more long term research project at a frontier lab and get support with, you know, very good computational resources. I think we I think we probably were the team with the most chips per person at the whole company. And so, yeah, I'm really grateful that, you know, GDM supported us in that way and let us do really interesting work. So, yeah, I mean, as everything moves more towards productization, I think training embodied agents is still, like, one of the biggest open frontiers towards AGI. And so, yeah, it'll become sort of mainstream part of mainstream frontier models at some point, and that's also pretty exciting.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h10m56s" data-turbo="false" title="Jump to 01:10:56 in this episode">01:10:56</a></time>
+<p>But, yeah, for me, I guess that'll be the point when I'll start working on those models too. But, yeah, it's just incredible. And it was a good collaboration also. Wilson and I started working together at Berkeley a while back and, had very complementary skills. He had a lot of, you know, deep expertise in multimodal models and video generation.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h11m20s" data-turbo="false" title="Jump to 01:11:20 in this episode">01:11:20</a></time>
+<p>And, yeah, then my experience in model based RL and shortcut models and so on came together very well. And, yeah, it was just good for, like, a long stretch of time to just push really hard, have all the resources to do it, and get some cool stuff to work. And and then also, like, yeah, actually get the results that we've been hoping for, like, towards the end. Just like, okay. We actually finally got our diamonds.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h11m50s" data-turbo="false" title="Jump to 01:11:50 in this episode">01:11:50</a></time>
+<p>You know? There's, like, probably two months where we were, like, pretty close. I wasn't quite there yet. The model could get all the way to, like yeah. I guess, like, once the whole pipeline started working, we knew there wasn't any, like, obvious bucker.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h12m8s" data-turbo="false" title="Jump to 01:12:08 in this episode">01:12:08</a></time>
+<p>So we had these success rate plots for all the different stages towards the diamond that we have in the paper too. And every week, they just moved up a little bit. And so we didn't really know necessarily what was the next thing we should be trying at times, but we knew that at a meta level, every week, we saw the whole success rates shift further to the right. So we could almost, like, project out, you know, this is roughly when we'll get to diamonds, we can release the paper. Yeah.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h12m42s" data-turbo="false" title="Jump to 01:12:42 in this episode">01:12:42</a></time>
+<p>And then also being able to release the paper was great. Okay.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h12m45s" data-turbo="false" title="Jump to 01:12:45 in this episode">01:12:45</a></time>
+<p>So you weren't sure if that would be the case, maybe?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h12m48s" data-turbo="false" title="Jump to 01:12:48 in this episode">01:12:48</a></time>
+<p>Yeah. I mean, there's, like, a process for that. But, yeah, it took some asking around, but, ultimately, everybody was happy with us releasing it.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h12m57s" data-turbo="false" title="Jump to 01:12:57 in this episode">01:12:57</a></time>
+<p>And now with the with the old Dreamers, we have some code released. And are you expecting that with Dreamer version four?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h13m7s" data-turbo="false" title="Jump to 01:13:07 in this episode">01:13:07</a></time>
+<p>Probably not. I would love to release code and checkpoints, but I think getting the paper out was already exceptional enough in the current climate. Also, with just what models being so relevant to, you know, part of, like, frontier models that have native video integration and then also people starting to get really excited about the possibility to build general robots, it would probably be too hard to release those things.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h13m47s" data-turbo="false" title="Jump to 01:13:47 in this episode">01:13:47</a></time>
+<p>So if we just step back and look at the broader, picture in terms of robotics, can you talk about, the major challenges in robotics and and how they relate to to some of these themes?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h13m58s" data-turbo="false" title="Jump to 01:13:58 in this episode">01:13:58</a></time>
+<p>People talk a lot about AGI, and they mean different things by that. But for me, that clearly includes being able to perform tasks in the physical world. And, I mean, long term, I think there are still, like, various capabilities of the human brain that we haven't we're not even that close to replicating an AI, even though, of course, the current models we have are already way better than humans at various things too, especially in the digital domain, especially when it comes to sort of knowledge based and question answering tasks. But for robotics, I mean, there have been there has been a lot of activity recently, hardware is becoming really affordable, like general hardware, humanoids. There's so many companies building them, pushing down the price.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h14m52s" data-turbo="false" title="Jump to 01:14:52 in this episode">01:14:52</a></time>
+<p>It's, like, already significantly below, like, 10 k for for decent robot, maybe a little more with hands. So the real bottleneck at this point is just clearly building general AI to control the robot. And we can't really you know, I think people say a lot that it's data bound, and I think that's partially true. I think it's partially also just algorithm bound. Like, even if we had really diverse data or even if we just you know, somebody spent a lot of money to collect a lot of data, That alone wouldn't be enough.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h15m33s" data-turbo="false" title="Jump to 01:15:33 in this episode">01:15:33</a></time>
+<p>You actually need an algorithm that can soak up all that data. And even more so, you need really diverse data, and it's not even really clear how to collect that in the real world at scale, like generating or creating diverse scenarios even if you have humans. Like, if you if you have thousands of human operators, teleoperating robots in various scenarios, it's actually quite hard to even create the diverse scenes and then reset them and so on in a way where you think of all the ways that in which the scene could differ at, you know, deployment time. And so so, yeah, I think, you know, for one, interacting with the real world with a partially trained policy is just really hard because the robot will probably break pretty easily. This is, like, specifically, I guess, for humanoids.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h16m34s" data-turbo="false" title="Jump to 01:16:34 in this episode">01:16:34</a></time>
+<p>If you have arms mounted on a table, maybe you can get away with a bit more. But for the general case, you know, you definitely can't learn from, like, a bad policy and then refine that with Aurel directly in the real world. It would just cause too much damage. And and so yeah. Like, world models seem like the most promising path to get there because they they solve multiple problems.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h17m6s" data-turbo="false" title="Jump to 01:17:06 in this episode">01:17:06</a></time>
+<p>Like, for one, we've actually seen really good generalization of pretrained video models that have been fine tuned with action data of robots to then be able to simulate the robot in really diverse scenarios that you never collected robot data from. So they can transfer a lot of their pretraining knowledge and then simulate a robot in those scenarios. So that seems like the only way we have right now to really train robots in a diverse in a in a broad range of diverse environments or scenarios. And then the second part is, of course, you hopefully can do it purely offline or maybe only with a small round with a few rounds of corrective data collection, where, you know, most of the RL training can happen in imagination. And, of course, you know, a lot of the demos we see in robotics right now are based on representation learning and behavioral cloning, and I think that's a great starting point.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h18m16s" data-turbo="false" title="Jump to 01:18:16 in this episode">01:18:16</a></time>
+<p>And we there's even various things we can still do to further improve that, but it doesn't really yet seem like we'll get the strong generalization out of that and, you know, efficient enough policies to really produce, like, a, a general robot just that way. So I think, yeah, basically, learn good representations, learn a good behavioral cloning cloning policy, then fine tune it with RL in a Walt model in really diverse scenarios is, like, yeah, the most promising approach to get a general robot.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h19m1s" data-turbo="false" title="Jump to 01:19:01 in this episode">01:19:01</a></time>
+<p>Can you say a bit more about what kind of settings Dreamer four is most suited for? Like, what are the properties of the settings?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h19m9s" data-turbo="false" title="Jump to 01:19:09 in this episode">01:19:09</a></time>
+<p>So you definitely need good coverage. So there's a good chance that you will make you'll have to make a conscious effort to collect data, right, whether it's robotics or some medical decision making problem. Maybe you you know, I guess I don't know when it comes to, let's say, prescribing treatments. I don't know how diverse the coverage is of those datasets. I imagine, of course, there are a lot of treatments that have never been prescribed for a certain condition because, you know, doctors just know that that would be a bad idea, and so they've never done it.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h19m52s" data-turbo="false" title="Jump to 01:19:52 in this episode">01:19:52</a></time>
+<p>And so that's not in the dataset. And and so the more coverage you have in your offline data, the more you can rely on reinforcement learning in Imagination and the less you need to rely on behavioral cloning. So your KL regularizer to the behavioral cloning policy can be turned down the better your model is and and the more coverage in your offline dataset you have. So, yeah, if you have not very good coverage, you can you know, we've seen in various examples, you can still squeeze out, like, maybe 10% improvement, but maybe not a 100% improvement.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h20m37s" data-turbo="false" title="Jump to 01:20:37 in this episode">01:20:37</a></time>
+<p>If you have a perfect wealth model, you can</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h20m38s" data-turbo="false" title="Jump to 01:20:38 in this episode">01:20:38</a></time>
+<p>get, you know, infinite improvement. You can find the optimal policy without any human priors.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h20m44s" data-turbo="false" title="Jump to 01:20:44 in this episode">01:20:44</a></time>
+<p>So I understand this version of Dreamer, Dreamer four, like the early ones, is based on your theoretical framework action and perception as divergence minimization that we saw at NeurIPS DeepRel workshop in 2020. And we talked about this AAPD framework a bit last time, but it it's just so it seems so timeless and and kind of deep, so I'm hoping we could touch on it again. For our listeners who didn't catch it, definitely check out the previous episode, episode 42 with more details. But on a high level, how do you explain what the APD really is?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h21m21s" data-turbo="false" title="Jump to 01:21:21 in this episode">01:21:21</a></time>
+<p>That was maybe midway into my PhD, And I have been working on this for a while on the side up until that point already because I wanted to answer the question of what objective functions are there for an agent to optimize. You know, it seems like a lot of progress in the field comes from finding the right objectives. There are, you know, a lot of objectives to choose from, especially when it comes from when it comes to just learning from observation, so from fixed datasets, like next token prediction and, you know, energy based objectives, diffusion models, yeah, all kinds of ways to predict something. You could have supervised learning with annotated outputs and so on. But that never really felt satisfying because I wanted to know what is the space of all the possible objectives so we don't have to just search around blindly and hope that we find a new objective that works a bit better.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h22m33s" data-turbo="false" title="Jump to 01:22:33 in this episode">01:22:33</a></time>
+<p>We can actually, you know, tell how far we are along the way. And and then, also, the whole picture gets a little more complicated when you have an agent that can interact with the world, and that opens the door for all kinds of new objectives that aren't as well understood. And so those would be things like, you know, intrinsic motivation, for example. The project or, you know, there's mathematical derivations that people can find in the paper and on in the video on my website. But at a high level, it turns out there are sort of two types of objective functions you can optimize as a learning system.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h23m17s" data-turbo="false" title="Jump to 01:23:17 in this episode">01:23:17</a></time>
+<p>And one is sort of the static type of objective, something that's inherently, you know, just preferences that are domain specific. And so that could be something like a reward in reinforcement learning. I care about this sort of outcome more than this other outcome, but there's nothing mathematically profound about that. It's just all the stuff that we can't really express very well mathematically because they're just, like, sort of pretty subjective. And so that's rewards, but also things like inductive biases in your architecture, or, like, a regularizer term in your model.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h24m1s" data-turbo="false" title="Jump to 01:24:01 in this episode">01:24:01</a></time>
+<p>Let's say you have a variational autoencoder, and there's a KL bottleneck. And so you have this KL regularizer that encourages the model to learn representations that are, shaped in a certain way, like, follow roughly a Gaussian distribution. So those are all inductive biases, subjective preferences, rewards. That's the one category. It's very hard to, like, I guess, make sense of them in a formal way because they're so inherently tied to, like, the the environment you're actually operating in.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h24m37s" data-turbo="false" title="Jump to 01:24:37 in this episode">01:24:37</a></time>
+<p>On the other hand, there are more adaptive types of objectives. And so those are the objectives that enable learning in the first place, but they also enable additional drives when it comes to agents. And so those are objectives like predicting all your data, you know, predicting part of your data or even predicting all your data. And so these terms all they all maximize some sort of bound on information, so they help the learning system extract more knowledge in one way or another. And so, you know, you could predict, let's say, actions from video, and you'd extract a little bit of information.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h25m27s" data-turbo="false" title="Jump to 01:25:27 in this episode">01:25:27</a></time>
+<p>But you extract a lot more information if you do the general thing, which is predict everything. You have a dataset of trajectories. Just model the whole trajectories with a diffusion model or a next token prediction or anything like that. Right? That way, you will extract the most knowledge out of the data you have.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h25m47s" data-turbo="false" title="Jump to 01:25:47 in this episode">01:25:47</a></time>
+<p>And so that is basically what a world model does. Right? You're predicting dynamics. In a way, you're learning way more than maybe necessary for a certain task, but learning so much sets you up really well because it gives you understanding of the world and the ability to very quickly adapt to a new task that you weren't really prepared for. You're way more prepared now because you already understand the interactions of objects and so on.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h26m18s" data-turbo="false" title="Jump to 01:26:18 in this episode">01:26:18</a></time>
+<p>You've extracted as much knowledge as you could out of the data you have.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h26m22s" data-turbo="false" title="Jump to 01:26:22 in this episode">01:26:22</a></time>
+<p>This this relates to Yan Lakun's cake. Right? He's been talking about the cake for a long time.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h26m26s" data-turbo="false" title="Jump to 01:26:26 in this episode">01:26:26</a></time>
+<p>Yes. That's just unsupervised learning. So, yeah, the adaptive objectives are unsupervised, and then there are the, like, supervised static ones. But it goes a little beyond that because, I guess, in Yan's cake, the unsupervised objectives are used for learning from fixed data and at least the way it was, you know, originally framed. I'd be curious if he has more thoughts on that today.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h26m59s" data-turbo="false" title="Jump to 01:26:59 in this episode">01:26:59</a></time>
+<p>But, and then the AREL part, I guess, you would assume you have given you have been given some reward function. So that is also, sort of, like, a supervised signal, but you can't just predict the targets directly. You don't have targets. You only have rewards to maximize. So you need to use RL for that.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h27m20s" data-turbo="false" title="Jump to 01:27:20 in this episode">01:27:20</a></time>
+<p>But there's actually a whole class of additional unsupervised objective functions that agents can optimize with respect to their actions, not just with respect to their parameters. So not just something they can learn from the past, but also there are unsupervised objectives to be achieved through control. And so APT really gives you an exhaustive perspective on what the space of these objective functions is. And if you try to roughly, like, cluster them, you for for agent objectives besides learning from past data, in the future, you have learning from rewards, which is just standard reinforcement learning. And then in terms of future unsupervised objectives, you have things like exploration and learning to control the environment, learning to achieve certain states, which could be, like, a goal reaching policy or some, I guess, latent skill learning algorithm, something like that.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h28m33s" data-turbo="false" title="Jump to 01:28:33 in this episode">01:28:33</a></time>
+<p>And so if you think about it, learning from the past through unsupervised learning, you're extracting information. You're maximizing the information between the past data and your model parameters. And when you're trying to explore, then you're maximizing the expected information between your parameters and the future data. You know, I'm trying to get data that will tell me as much about the optimal parameters as possible. So you're also maximizing information or more precisely expected information because the future data has not been achieved yet, and you can optimize that with respect to actions.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h29m14s" data-turbo="false" title="Jump to 01:29:14 in this episode">01:29:14</a></time>
+<p>You know, go to parts of the world where you'll find something interesting that'll tell you a lot about the parameters that best describe the world you're in. And then for the control, empowerment, goal reaching category, it's about injecting information into the world. So maximize the mutual information between your actions and your future data. And so, you know, that means you should try to reach a lot of different states, visit a lot of different states in the world, but the states you visit, they should all be determined pretty well based on the actions you chose. So, you know, I the agent tries to be purposeful in reaching different parts of the world and learning how to bring the world into different states.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h30m7s" data-turbo="false" title="Jump to 01:30:07 in this episode">01:30:07</a></time>
+<p>And so that's maximizing the mutual information between its actions and its future inputs conditioned on the past, and it's, you know, known as empowerment, although there's slightly, like, multiple definitions for that, but one of them would be that, goal reaching and so on. And yeah. So those are additional drives for unsupervised agents that I think in the really long term on the road map towards AGI, we can get a lot of useful learning signal out of that. You know, of course, you you know, I think we're not quite there yet in terms of the ordering of when it makes sense to, like, really build those things at scale. But, yeah, of course, you know, the trajectory has always been start with handcrafted things.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h31m8s" data-turbo="false" title="Jump to 01:31:08 in this episode">01:31:08</a></time>
+<p>And then supervised learning doesn't need a lot of model capacity because it doesn't learn that much, but can get the job done. Just doesn't generalize as well. And so then unsupervised learning comes after that. You need more compute. You need a bigger model, but you get a much better result and a much more general system.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h31m28s" data-turbo="false" title="Jump to 01:31:28 in this episode">01:31:28</a></time>
+<p>And I think people talk a lot about that for the evolution of, just like prediction tasks. Maybe in computer vision, people used to hard code the, conf features, and then they started learning them through supervised learning. And then, eventually, they started just learning them through unsupervised objectives, get way better models. But my point is that the same logic applies to agent objectives as well, where, you know, the first phase is to just train models on the data you have and then just use their predictions and have a human turn that into an action in the world somehow, you know, just how you would talk to ChatGPT, and then use the the answers you get to make decisions in your life. But then the next step would be through narrow signals like rewards to train the system with reinforcement learning.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h32m29s" data-turbo="false" title="Jump to 01:32:29 in this episode">01:32:29</a></time>
+<p>And that has already begun with RLHF and, you know, browser agents and so on. And then past that, we'll get to a point where we will actually get way better edge agents if we train them to autonomously explore and autonomously learn how to change things about the world and follow their own goals. And so then we can afterwards fine tune them with a specific reward just how you would fine tune, like, a pretrained dino representation with a classifier loss.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h33m9s" data-turbo="false" title="Jump to 01:33:09 in this episode">01:33:09</a></time>
+<p>Okay. So you're saying if I understand what you're saying, this framework can be pushed a lot further past the current tech and and bear fruit down the road. Is is the is the framework is it done? Is it, like, a complete thing, or is it a work in progress?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h33m28s" data-turbo="false" title="Jump to 01:33:28 in this episode">01:33:28</a></time>
+<p>Yeah. The framework is done from a mathematical perspective, and it shows us that those are exactly the categories of objectives that I've mentioned. It's not done in terms of the practical realization of these systems. Mhmm. It's a it's a mathematical framework.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h33m45s" data-turbo="false" title="Jump to 01:33:45 in this episode">01:33:45</a></time>
+<p>It doesn't tell you all the practical details to actually implement these systems. You know, when I talk about expected information between parameters and future inputs, like, yes, that's the right objective for seeking out informative data at an abstract level, but then, you know, that's an intractable equation in general. So you have to then find an algorithm to actually implement that and and approximate that, and there are better approximations and worse approximations and details to be figured out and hyperparameters to be tuned and so on. We actually tried out small versions of this. For exploration, there's a paper called plan to explore.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h34m34s" data-turbo="false" title="Jump to 01:34:34 in this episode">01:34:34</a></time>
+<p>And then for the empowerment aspect, there's a paper called latent skill planning and also the director paper that combines exploration and goal reaching and also temporal abstraction together. So there are small instances of that in simulated environments where this stuff is all working. But, yeah, just in terms of the timeline of, you know, affecting the affecting the world in terms of real frontier models, it's a bit too early for some of those things. And I actually think people have abandoned a lot of old ideas in the field, and I think I think they most of them will actually play a role unless there's a good reason for why something is a bad idea, even though people maybe thought it was a good idea. I think a lot of them will become relevant, but they were just way too early in the in terms of the efficient timeline or the efficient ordering for implementing those things.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h35m46s" data-turbo="false" title="Jump to 01:35:46 in this episode">01:35:46</a></time>
+<p>So I think that's true for, like, exploration. And, yeah, I guess, there's, like, you know, things that came before the transformer, like neural cheering machines and associative memories and so on. I think a lot of the stuff will probably have, an important role to play at some point.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h36m7s" data-turbo="false" title="Jump to 01:36:07 in this episode">01:36:07</a></time>
+<p>I understand there's a close connection here to active inference, and you have as one of your coauthors, Carl Furstin, who is a major name in that area, and also free energy. Can you talk about the what is what is different here from active inference, or what's what's this what's the gap?</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h36m27s" data-turbo="false" title="Jump to 01:36:27 in this episode">01:36:27</a></time>
+<p>Yeah. So I started working on this during my master's. That was co advised by Carl, and he's a very smart guy. I learned a lot in terms of sort of nonobvious intuitions from him. And, yeah, I think he's, like has a bit of this reputation of, you know, a lot of the stuff is hard to understand, and it's true.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h36m56s" data-turbo="false" title="Jump to 01:36:56 in this episode">01:36:56</a></time>
+<p>And it took me a really long time to understand too and to simplify things in a way that really made sense to me. Yeah. It is sort of a different perspective on his free energy principle, and maybe it developed a little bit further to connect with things like empowerment that weren't included in the original free energy principle. The ideas are you know, the inspiration is, like, clearly Carl's work, but I try to derive it in sort of the simplest possible way without talking about, you know, stochastic differential equations and and so on just from a probability perspective. And the so the APD durations start from and start from, like, pretty simple assumptions of your agent has some distribution over random variables that describe, you know, the inputs to the agent.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h37m56s" data-turbo="false" title="Jump to 01:37:56 in this episode">01:37:56</a></time>
+<p>So your past and future sensory inputs, that's like a sequence x one to capital t, which is, like, the lifetime trajectory of sensory inputs. And then there's the trajectory of actions and the, you know, parameters of the agent and maybe trajectory of random variables inside the agent if there are any. And then the assumption that the system is efficient and trying to reach some sort of target distribution over those same variables. Right? And then you can choose a divergence measure to bring those two distributions closer.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h38m30s" data-turbo="false" title="Jump to 01:38:30 in this episode">01:38:30</a></time>
+<p>And if you choose KL, you get all these Shannon information terms, plus all the inductive bias terms. And, yeah. So it's like yeah. I think free energy principle is, like, a big rabbit hole, and for people interested in it, can be quite rewarding and maybe a little frustrating along the way if things are hard to understand. But there are a lot of cool intuitions to draw from there that are relevant for AI.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h39m3s" data-turbo="false" title="Jump to 01:39:03 in this episode">01:39:03</a></time>
+<p>I I do think you're you're unique in the sense that, you know, you're doing this incredibly deep engineering work to make these things actually work in the real world at scale. And then also you're doing this theoretical stuff on the other side. And and I don't know, maybe if that's that's the reason, but you seem to be getting some incredible results consistently. I was joking, you know, with the robotics group here at UBC that's you know, sometimes I I feel like maybe Dan and Jar's already solved the core problems of of robotics overall, and you're just slowly letting us know over the years.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h39m42s" data-turbo="false" title="Jump to 01:39:42 in this episode">01:39:42</a></time>
+<p>Thank you. Thank you. Appreciate it. I yeah. I guess I feel like a lot of the yeah.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h39m50s" data-turbo="false" title="Jump to 01:39:50 in this episode">01:39:50</a></time>
+<p>I mean, doing all this theoretical work has helped sort of frame the right direction and know what or have more certainty in what I think is important to work on. And I think besides that, maybe I would encourage people to work more on things they believe in in the long term because the timelines are actually, like, getting faster and faster. And, you know, if you work for a couple years on something, you can make really significant progress. And, of course, that means you'll have to say no to a lot of, like, shorter term projects. But I think that's, like, the most rewarding thing you can do for yourself and probably the most the way in which you can contribute the most to the world too.</p>
+<cite>Speaker 2:</cite>
+<time><a href="#t=1h40m34s" data-turbo="false" title="Jump to 01:40:34 in this episode">01:40:34</a></time>
+<p>It's always so fascinating talking with you. I always learned so much. Today was no exception. Thank you, Danijar Hafner.</p>
+<cite>Speaker 1:</cite>
+<time><a href="#t=1h40m41s" data-turbo="false" title="Jump to 01:40:41 in this episode">01:40:41</a></time>
+<p>Great chatting. Thanks for having me on.</p>
+        
+      </div>
+
+      
+
+      
+        <div class="site-episode-people">
+          <h3>Creators and Guests</h3>
+
+          <div class="site-people">
+          
+            
+
+<div class="site-person">
+  <a href="/people/robin-ranjit-singh-chauhan" title="Robin Ranjit Singh Chauhan" class="site-person-avatar">
+    
+      <img src="https://img.transistorcdn.com/NV_nPUSykFnbPL0a-9H1g91QhmRUT-77e6Z6PrGjCmo/rs:fill:0:0:1/w:400/h:400/q:60/mb:500000/aHR0cHM6Ly9pbWct/dXBsb2FkLXByb2R1/Y3Rpb24udHJhbnNp/c3Rvci5mbS9wZXJz/b24vOWI4Yjg4ZWYt/YmRmZi00ZWFkLTk4/YTgtMTRkZGFlZDFh/ZTJkLzE2Njc0MjY0/MDktaW1hZ2UuanBn.webp" alt="Robin Ranjit Singh Chauhan" class="site-person-image">
+    
+    <div class="site-person-role">Host</div>
+  </a>
+
+  <div class="site-person-details">
+    <a class="site-person-name" href="/people/robin-ranjit-singh-chauhan" title="Robin Ranjit Singh Chauhan">Robin Ranjit Singh Chauhan</a>
+    
+      <div class="site-person-bio">🌱 Head of Eng @AgFunder  🧠 AI:Reinforcement Learning/ML/DL/NLP🎙️Host @TalkRLPodcast  💳 ex-@Microsoft ecomm PgmMgr 🤖 @UWaterloo CompEng 🇨🇦 🇮🇳</div>
+    
+    
+    <div class="site-person-links">
+      
+        <a href="https://x.com/robinc" title="Twitter" target="_twitter">
+          
+  <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>X</title><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+
+
+        </a>
+      
+        <a href="https://ca.linkedin.com/robinc" title="LinkedIn" target="_linkedIn">
+          
+  <svg role="img" class="icon-linkedin" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>LinkedIn</title><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+
+
+        </a>
+      
+        <a href="https://www.robinc.net/" title="Website" target="_website">
+          
+  <svg role="img" viewBox="0 0 20 20"><title>Website Link</title><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"></path></svg>
+
+
+        </a>
+      
+    </div>
+  </div>
+</div>
+
+          
+          </div>
+        </div>
+      
+    </div>
+
+    <div class="site-episode-grid-artwork">
+      <img src="https://img.transistorcdn.com/ECIeBNHzLdA86haqi5JccfJNAwLi-M8BRYtIH6yosmM/rs:fill:0:0:1/w:800/h:800/q:60/mb:500000/aHR0cHM6Ly9pbWct/dXBsb2FkLXByb2R1/Y3Rpb24udHJhbnNp/c3Rvci5mbS9jODll/MTI1MjQyNGY4MDVl/NjdmNGIwN2NmMTE0/NTE5Yi5qcGc.webp" alt="Danijar Hafner on Dreamer v4">
+    </div>
+
+    <div class="site-episode-grid-subscribe">
+      <h2 class="site-content-subheader">
+        
+  <svg role="img" class="icon-headphones" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>headphones</title><g><path d="M7,12a3,3,0,0,0-3,3v6a3,3,0,0,0,6,0V15A3,3,0,0,0,7,12Zm10,0a3,3,0,0,0-3,3v6a3,3,0,0,0,6,0V15A3,3,0,0,0,17,12ZM12,0A12,12,0,0,0,0,12v5a1,1,0,0,0,2,0V12a10,10,0,0,1,20,0v5a1,1,0,0,0,2,0V12A12,12,0,0,0,12,0Z"></path></g></svg>
+
+
+        <span>Listen Anywhere</span>
+      </h2>
+      <nav class="site-subscribe">
+        <a href="https://podcasts.apple.com/podcast/id1478198107" class="site-subscribe-link apple_podcasts" target="_apple_podcasts" title="Listen to TalkRL: The Reinforcement Learning Podcast on Apple Podcasts">
+  <svg role="img" fill="#9933CC" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Apple Podcasts</title><path d="M5.34 0A5.328 5.328 0 000 5.34v13.32A5.328 5.328 0 005.34 24h13.32A5.328 5.328 0 0024 18.66V5.34A5.328 5.328 0 0018.66 0zm6.525 2.568c2.336 0 4.448.902 6.056 2.587 1.224 1.272 1.912 2.619 2.264 4.392.12.59.12 2.2.007 2.864a8.506 8.506 0 01-3.24 5.296c-.608.46-2.096 1.261-2.336 1.261-.088 0-.096-.091-.056-.46.072-.592.144-.715.48-.856.536-.224 1.448-.874 2.008-1.435a7.644 7.644 0 002.008-3.536c.208-.824.184-2.656-.048-3.504-.728-2.696-2.928-4.792-5.624-5.352-.784-.16-2.208-.16-3 0-2.728.56-4.984 2.76-5.672 5.528-.184.752-.184 2.584 0 3.336.456 1.832 1.64 3.512 3.192 4.512.304.2.672.408.824.472.336.144.408.264.472.856.04.36.03.464-.056.464-.056 0-.464-.176-.896-.384l-.04-.03c-2.472-1.216-4.056-3.274-4.632-6.012-.144-.706-.168-2.392-.03-3.04.36-1.74 1.048-3.1 2.192-4.304 1.648-1.737 3.768-2.656 6.128-2.656zm.134 2.81c.409.004.803.04 1.106.106 2.784.62 4.76 3.408 4.376 6.174-.152 1.114-.536 2.03-1.216 2.88-.336.43-1.152 1.15-1.296 1.15-.023 0-.048-.272-.048-.603v-.605l.416-.496c1.568-1.878 1.456-4.502-.256-6.224-.664-.67-1.432-1.064-2.424-1.246-.64-.118-.776-.118-1.448-.008-1.02.167-1.81.562-2.512 1.256-1.72 1.704-1.832 4.342-.264 6.222l.413.496v.608c0 .336-.027.608-.06.608-.03 0-.264-.16-.512-.36l-.034-.011c-.832-.664-1.568-1.842-1.872-2.997-.184-.698-.184-2.024.008-2.72.504-1.878 1.888-3.335 3.808-4.019.41-.145 1.133-.22 1.814-.211zm-.13 2.99c.31 0 .62.06.844.178.488.253.888.745 1.04 1.259.464 1.578-1.208 2.96-2.72 2.254h-.015c-.712-.331-1.096-.956-1.104-1.77 0-.733.408-1.371 1.112-1.745.224-.117.534-.176.844-.176zm-.011 4.728c.988-.004 1.706.349 1.97.97.198.464.124 1.932-.218 4.302-.232 1.656-.36 2.074-.68 2.356-.44.39-1.064.498-1.656.288h-.003c-.716-.257-.87-.605-1.164-2.644-.341-2.37-.416-3.838-.218-4.302.262-.616.974-.966 1.97-.97z"/></svg>
+
+<label>
+          <span>Listen On</span>
+          <b>Apple Podcasts</b>
+        </label>
+      </a><a href="https://open.spotify.com/show/0EScvEYy1btiFTal8Nt0gk" class="site-subscribe-link spotify" target="_spotify" title="Listen to TalkRL: The Reinforcement Learning Podcast on Spotify">
+  <svg role="img" fill="#1DB954" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Spotify</title><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+
+<label>
+          <span>Listen On</span>
+          <b>Spotify</b>
+        </label>
+      </a><a href="https://overcast.fm/itunes1478198107/talkrl-reinforcement-learning-interviews" class="site-subscribe-link overcast" target="_overcast" title="Listen to TalkRL: The Reinforcement Learning Podcast on Overcast">
+  <svg role="img" fill="#FC7E0F" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Overcast</title><path d="M12 24C5.389 24.018.017 18.671 0 12.061V12C0 5.35 5.351 0 12 0s12 5.35 12 12c0 6.649-5.351 12-12 12zm0-4.751l.9-.899-.9-3.45-.9 3.45.9.899zm-1.15-.05L10.4 20.9l1.05-1.052-.6-.649zm2.3 0l-.6.601 1.05 1.051-.45-1.652zm.85 3.102L12 20.3l-2 2.001c.65.1 1.3.199 2 .199s1.35-.05 2-.199zM12 1.5C6.201 1.5 1.5 6.201 1.5 12c-.008 4.468 2.825 8.446 7.051 9.899l2.25-8.35c-.511-.372-.809-.968-.801-1.6 0-1.101.9-2.001 2-2.001s2 .9 2 2.001c0 .649-.301 1.2-.801 1.6l2.25 8.35c4.227-1.453 7.06-5.432 7.051-9.899 0-5.799-4.701-10.5-10.5-10.5zm6.85 15.7c-.255.319-.714.385-1.049.15-.313-.207-.4-.628-.194-.941.014-.021.028-.04.044-.06 0 0 1.35-1.799 1.35-4.35s-1.35-4.35-1.35-4.35c-.239-.289-.198-.719.091-.957.02-.016.039-.031.06-.044.335-.235.794-.169 1.049.15.1.101 1.65 2.15 1.65 5.2S18.949 17.1 18.85 17.2zm-3.651-1.95c-.3-.3-.249-.85.051-1.15 0 0 .75-.799.75-2.1s-.75-2.051-.75-2.1c-.3-.301-.3-.801-.051-1.15.232-.303.666-.357.969-.125.029.022.056.047.082.074C16.301 8.75 17.5 10 17.5 12s-1.199 3.25-1.25 3.301c-.301.299-.75.25-1.051-.051zm-6.398 0c-.301.301-.75.35-1.051.051C7.699 15.199 6.5 14 6.5 12s1.199-3.199 1.25-3.301c.301-.299.801-.299 1.051.051.3.3.249.85-.051 1.15 0 .049-.75.799-.75 2.1s.75 2.1.75 2.1c.3.3.351.799.051 1.15zm-2.602 2.101c-.335.234-.794.169-1.05-.15C5.051 17.1 3.5 15.05 3.5 12s1.551-5.1 1.649-5.2c.256-.319.715-.386 1.05-.15.313.206.4.628.194.941-.013.02-.028.04-.043.059C6.35 7.65 5 9.449 5 12s1.35 4.35 1.35 4.35c.25.3.15.75-.151 1.001z"/></svg>
+
+<label>
+          <span>Listen On</span>
+          <b>Overcast</b>
+        </label>
+      </a><a href="https://pca.st/itunes/1478198107" class="site-subscribe-link pocket_casts" target="_pocket_casts" title="Listen to TalkRL: The Reinforcement Learning Podcast on Pocket Casts">
+  <svg role="img" fill="#F43E37" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Pocket Casts</title><path d="M12,0C5.372,0,0,5.372,0,12c0,6.628,5.372,12,12,12c6.628,0,12-5.372,12-12 C24,5.372,18.628,0,12,0z M15.564,12c0-1.968-1.596-3.564-3.564-3.564c-1.968,0-3.564,1.595-3.564,3.564 c0,1.968,1.595,3.564,3.564,3.564V17.6c-3.093,0-5.6-2.507-5.6-5.6c0-3.093,2.507-5.6,5.6-5.6c3.093,0,5.6,2.507,5.6,5.6H15.564z M19,12c0-3.866-3.134-7-7-7c-3.866,0-7,3.134-7,7c0,3.866,3.134,7,7,7v2.333c-5.155,0-9.333-4.179-9.333-9.333 c0-5.155,4.179-9.333,9.333-9.333c5.155,0,9.333,4.179,9.333,9.333H19z"/></svg>
+
+<label>
+          <span>Listen On</span>
+          <b>Pocket Casts</b>
+        </label>
+      </a><a href="https://music.amazon.com/podcasts/f9de520f-8c9c-4913-b9f8-5b22c81ce7c1" class="site-subscribe-link amazon_music" target="_amazon_music" title="Listen to TalkRL: The Reinforcement Learning Podcast on Amazon Music">
+  <svg role="img" viewBox="2.167 .438 251.038 259.969" xmlns="http://www.w3.org/2000/svg"><title>Amazon Music</title><g fill="none" fill-rule="evenodd"><path d="m221.503 210.324c-105.235 50.083-170.545 8.18-212.352-17.271-2.587-1.604-6.984.375-3.169 4.757 13.928 16.888 59.573 57.593 119.153 57.593 59.621 0 95.09-32.532 99.527-38.207 4.407-5.627 1.294-8.731-3.16-6.872zm29.555-16.322c-2.826-3.68-17.184-4.366-26.22-3.256-9.05 1.078-22.634 6.609-21.453 9.93.606 1.244 1.843.686 8.06.127 6.234-.622 23.698-2.826 27.337 1.931 3.656 4.79-5.57 27.608-7.255 31.288-1.628 3.68.622 4.629 3.68 2.178 3.016-2.45 8.476-8.795 12.14-17.774 3.639-9.028 5.858-21.622 3.71-24.424z" fill="#4BA5DC" fill-rule="nonzero"/><path d="m150.744 108.13c0 13.141.332 24.1-6.31 35.77-5.361 9.489-13.853 15.324-23.341 15.324-12.952 0-20.495-9.868-20.495-24.432 0-28.75 25.76-33.968 50.146-33.968zm34.015 82.216c-2.23 1.992-5.456 2.135-7.97.806-11.196-9.298-13.189-13.615-19.356-22.487-18.502 18.882-31.596 24.527-55.601 24.527-28.37 0-50.478-17.506-50.478-52.565 0-27.373 14.85-46.018 35.96-55.126 18.313-8.066 43.884-9.489 63.43-11.718v-4.365c0-8.018.616-17.506-4.08-24.432-4.128-6.215-12.003-8.777-18.93-8.777-12.856 0-24.337 6.594-27.136 20.257-.57 3.037-2.799 6.026-5.835 6.168l-32.735-3.51c-2.751-.618-5.787-2.847-5.028-7.07 7.543-39.66 43.36-51.616 75.43-51.616 16.415 0 37.858 4.365 50.81 16.795 16.415 15.323 14.849 35.77 14.849 58.02v52.565c0 15.798 6.547 22.724 12.714 31.264 2.182 3.036 2.657 6.69-.095 8.966-6.879 5.74-19.119 16.415-25.855 22.393l-.095-.095" fill="#000"/><path d="m221.503 210.324c-105.235 50.083-170.545 8.18-212.352-17.271-2.587-1.604-6.984.375-3.169 4.757 13.928 16.888 59.573 57.593 119.153 57.593 59.621 0 95.09-32.532 99.527-38.207 4.407-5.627 1.294-8.731-3.16-6.872zm29.555-16.322c-2.826-3.68-17.184-4.366-26.22-3.256-9.05 1.078-22.634 6.609-21.453 9.93.606 1.244 1.843.686 8.06.127 6.234-.622 23.698-2.826 27.337 1.931 3.656 4.79-5.57 27.608-7.255 31.288-1.628 3.68.622 4.629 3.68 2.178 3.016-2.45 8.476-8.795 12.14-17.774 3.639-9.028 5.858-21.622 3.71-24.424z" fill="#4BA5DC" fill-rule="nonzero"/><path d="m150.744 108.13c0 13.141.332 24.1-6.31 35.77-5.361 9.489-13.853 15.324-23.341 15.324-12.952 0-20.495-9.868-20.495-24.432 0-28.75 25.76-33.968 50.146-33.968zm34.015 82.216c-2.23 1.992-5.456 2.135-7.97.806-11.196-9.298-13.189-13.615-19.356-22.487-18.502 18.882-31.596 24.527-55.601 24.527-28.37 0-50.478-17.506-50.478-52.565 0-27.373 14.85-46.018 35.96-55.126 18.313-8.066 43.884-9.489 63.43-11.718v-4.365c0-8.018.616-17.506-4.08-24.432-4.128-6.215-12.003-8.777-18.93-8.777-12.856 0-24.337 6.594-27.136 20.257-.57 3.037-2.799 6.026-5.835 6.168l-32.735-3.51c-2.751-.618-5.787-2.847-5.028-7.07 7.543-39.66 43.36-51.616 75.43-51.616 16.415 0 37.858 4.365 50.81 16.795 16.415 15.323 14.849 35.77 14.849 58.02v52.565c0 15.798 6.547 22.724 12.714 31.264 2.182 3.036 2.657 6.69-.095 8.966-6.879 5.74-19.119 16.415-25.855 22.393l-.095-.095" fill="#000"/></g></svg>
+
+<label>
+          <span>Listen On</span>
+          <b>Amazon Music</b>
+        </label>
+      </a><a href="https://www.youtube.com/channel/UC7EfoAO-mxULBUh8B-lEi9g" class="site-subscribe-link youtube" target="_youtube" title="Listen to TalkRL: The Reinforcement Learning Podcast on YouTube">
+  <svg role="img" fill="#FF0000" class="icon-youtube" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>YouTube</title><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+
+<label>
+          <span>Listen On</span>
+          <b>YouTube</b>
+        </label>
+      </a>
+      </nav>
+      <a href="/subscribe" class="site-simple-link">More Options &raquo;</a>
+    </div>
+  </div>
+</div>
+
+        </section>
+        <footer class="site-footer">
+          <div class="site-footer-container">
+            <div class="site-social-credits">
+              
+              
+                <nav class="site-social">
+                  
+
+
+  
+    
+      
+      <a href="https://www.youtube.com/channel/UC7EfoAO-mxULBUh8B-lEi9g" class="site-social-link site-social-youtube" target="_youtube" title="View TalkRL: The Reinforcement Learning Podcast on Youtube">
+        
+  <svg role="img" fill="#FF0000" class="icon-youtube" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>YouTube</title><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+
+
+      </a>
+    
+  
+
+  
+    
+      
+      <a href="TalkRLPodcast" class="site-social-link site-social-twitter" target="_twitter" title="View TalkRL: The Reinforcement Learning Podcast on X">
+        
+  <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>X</title><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+
+
+      </a>
+    
+  
+
+  
+    
+      <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;%74%61%6c%6b%72%6c@%70%61%74%68%77%61%79%69.%63%6f%6d" class="site-social-link site-social-email" title="Email Us">
+        
+  <svg role="img" class="icon-email" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><title>Email</title><path d="M384 32H64C28.63 32 0 60.63 0 96v320c0 35.38 28.62 64 64 64h320c35.38 0 64-28.62 64-64V96C448 60.63 419.4 32 384 32zM384 336c0 17.67-14.33 32-32 32H96c-17.67 0-32-14.33-32-32V225.9l138.5 69.27C209.3 298.5 216.6 300.2 224 300.2s14.75-1.688 21.47-5.047L384 225.9V336zM384 190.1l-152.8 76.42c-4.5 2.25-9.812 2.25-14.31 0L64 190.1V176c0-17.67 14.33-32 32-32h256c17.67 0 32 14.33 32 32V190.1z"/></svg>
+
+
+      </a>
+    
+  
+
+
+                </nav>
+              
+              <section class="site-credits">
+                
+                <span class="site-copyright"></span>
+              </section>
+            </div>
+            
+          </div>
+          <nav class="site-footer-nav">
+            
+    <a title="Home" class="" href="/">Home</a>
+    <a title="Episodes" class="current" href="/episodes">Episodes</a>
+    <a title="People" class="" href="/people">People</a>
+    <a title="About" class="" href="/about">About</a>
+    <a title="Subscribe" class="" href="/subscribe">Subscribe</a>
+
+          </nav>
+        </footer>
+      </section>
+      
+        <div class="site-powered-by">
+  <a href="https://transistor.fm" target="_transistor" title="Transistor.fm - Podcast Hosting and Analytics">
+    
+      <span>Broadcast by</span>
+    
+    
+  <svg class="transistor-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 547 144"><title>transistor logo</title><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g id="transistor-horizontal-logo" fill-rule="nonzero" fill="#FFFFFF"><g transform="translate(191.000000, 42.000000)"><polygon points="0.7 10.4 0.7 1.8 38.6 1.8 38.6 10.4 24.5 10.4 24.5 58.3 14.7 58.3 14.7 10.4"></polygon><path d="M63.3,26.2 C62.1,26 60.7,25.8 58.7,25.8 C52.4,25.8 48.7,29.9 48.7,38.2 L48.7,58.2 L39.4,58.2 L39.4,18.6 L48.5,18.6 L48.5,24.2 L48.7,24.2 C50.5,20.8 54.5,17.3 59.8,17.3 C61.3,17.3 62.3,17.4 63.3,17.5 L63.3,26.2 L63.3,26.2 Z"></path><path d="M107.8,58.2 L98.8,58.2 L98.8,53.2 L98.6,53.2 C95.9,56.6 91.6,59.7 85,59.7 C76.1,59.7 66,52.6 66,38.4 C66,25.8 74.9,17.4 85.7,17.4 C92.3,17.4 96.3,20.9 98.7,24 L98.9,24 L98.9,18.6 L107.9,18.6 L107.9,58.2 L107.8,58.2 Z M87.4,51.5 C93.5,51.5 99.2,46.2 99.2,38.6 C99.2,30.6 94,25.3 87.5,25.3 C79.3,25.3 75.4,31.9 75.4,38.4 C75.4,45 79.2,51.5 87.4,51.5 Z"></path><path d="M118.6,18.6 L127.8,18.6 L127.8,23.6 L128,23.6 C131.1,19.1 135.7,17.3 140.1,17.3 C148.3,17.3 155.5,22.7 155.5,35.4 L155.5,58.2 L146.2,58.2 L146.2,35.9 C146.2,29.1 143,25.5 137.7,25.5 C131.9,25.5 127.9,29.6 127.9,37.3 L127.9,58.3 L118.6,58.3 L118.6,18.6 L118.6,18.6 Z"></path><path d="M183.6,28.8 C183.2,25.9 181,24 178.3,24 C175.1,24 173.3,26 173.3,28.2 C173.3,30.6 174.5,32.3 181.4,34.6 C189.9,37.3 192.9,41.7 192.9,47.3 C192.9,54.6 187.4,59.7 178.3,59.7 C168.8,59.7 164.1,54.5 163.4,47.1 L172,47.1 C172.4,50.4 174.4,52.9 178.5,52.9 C182,52.9 184,50.7 184,48 C184,45 182.3,43.1 175.7,40.9 C168.3,38.5 164.5,34.8 164.5,28.6 C164.5,22.1 169.6,17.3 178,17.3 C186.5,17.3 191,22.3 192,28.8 L183.6,28.8 L183.6,28.8 Z"></path><path d="M201,0.4 L211.3,0.4 L211.3,9.8 L201,9.8 L201,0.4 Z M201.5,18.6 L210.8,18.6 L210.8,58.3 L201.5,58.3 L201.5,18.6 Z"></path><path d="M239.5,28.8 C239.1,25.9 236.9,24 234.2,24 C231,24 229.2,26 229.2,28.2 C229.2,30.6 230.4,32.3 237.3,34.6 C245.8,37.3 248.8,41.7 248.8,47.3 C248.8,54.6 243.3,59.7 234.2,59.7 C224.7,59.7 220,54.5 219.3,47.1 L227.9,47.1 C228.3,50.4 230.3,52.9 234.4,52.9 C237.9,52.9 239.9,50.7 239.9,48 C239.9,45 238.2,43.1 231.6,40.9 C224.2,38.5 220.4,34.8 220.4,28.6 C220.4,22.1 225.5,17.3 233.9,17.3 C242.4,17.3 246.9,22.3 247.9,28.8 L239.5,28.8 L239.5,28.8 Z"></path><path d="M252.8,18.6 L257.8,18.6 L257.8,5.9 L267.1,5.9 L267.1,18.6 L277,18.6 L277,26.4 L267,26.4 L267,44.1 C267,49.5 268.7,51 272.5,51 C274.1,51 275.9,50.7 277.3,50.3 L277.3,57.8 C275.2,58.4 272.6,58.7 270.3,58.7 C260.4,58.7 257.8,52.7 257.8,44.6 L257.8,26.4 L252.8,26.4 L252.8,18.6 Z"></path><path d="M302.3,17.3 C314.7,17.3 323.5,26.4 323.5,38.4 C323.5,50.1 314.6,59.7 302.3,59.7 C290.2,59.7 281.1,50.4 281.1,38.4 C281.1,26.1 290.3,17.3 302.3,17.3 Z M302.3,51.4 C309.3,51.4 314.1,45.8 314.1,38.4 C314.1,31.4 309.6,25.5 302.3,25.5 C295.2,25.5 290.5,31 290.5,38.4 C290.5,46 295.9,51.4 302.3,51.4 Z"></path><path d="M350.9,25.8 C344.6,25.8 340.9,29.9 340.9,38.2 L340.9,58.2 L331.6,58.2 L331.6,18.6 L340.7,18.6 L340.7,24.2 L340.9,24.2 C342.7,20.8 346.7,17.3 352,17.3 C353.5,17.3 354.5,17.4 355.5,17.5 L355.5,26.2 C354.3,26 352.9,25.8 350.9,25.8 Z"></path></g><g><g transform="translate(24.000000, 24.000000)"><path d="M48,95.9 C45.4,95.9 43.2,93.8 43.2,91.1 L43.2,4.9 C43.2,2.3 45.3,0.1 48,0.1 C50.6,0.1 52.8,2.2 52.8,4.9 L52.8,91.1 C52.8,93.7 50.6,95.9 48,95.9 Z"></path><path d="M28,52.8 L5,52.8 C2.4,52.8 0.2,50.7 0.2,48 C0.2,45.3 2.3,43.2 5,43.2 L28,43.2 C30.6,43.2 32.8,45.3 32.8,48 C32.8,50.7 30.6,52.8 28,52.8 Z"></path><path d="M91.1,52.8 L68,52.8 C65.4,52.8 63.2,50.7 63.2,48 C63.2,45.3 65.3,43.2 68,43.2 L91,43.2 C93.6,43.2 95.8,45.3 95.8,48 C95.8,50.7 93.7,52.8 91.1,52.8 Z"></path></g><path d="M72,144 C32.3,144 0,111.7 0,72 C0,32.3 32.3,0 72,0 C111.7,0 144,32.3 144,72 C144,111.7 111.7,144 72,144 Z M72,9.6 C37.6,9.6 9.6,37.6 9.6,72 C9.6,106.4 37.6,134.4 72,134.4 C106.4,134.4 134.4,106.4 134.4,72 C134.4,37.6 106.4,9.6 72,9.6 Z"></path></g></g></g></svg>
+
+
+  </a>
+</div>
+
+      
+    </main>
+    <span id="default-audio" data-default-audio-url="https://media.transistor.fm/e440a692/bfc0657e.mp3?src=site" data-default-audio-title="Danijar Hafner on Dreamer v4" data-default-audio-duration="6052"></span>
+<footer
+  data-turbo-permanent
+  id="site-sticky-player"
+  class="site-sticky-player"
+  aria-label="Audio Player"
+  tabindex="0"
+  x-data="transistor.audioPlayer()"
+  @play-episode.window="playEpisode($event.detail)"
+  @pause-episode.window="pause; $store.player.playing = false"
+  @timejump.window="seekToSeconds($event.detail.timestamp); active = true"
+  :class="{ 'open': active }"
+  :style="{
+    '--player-progress': `${progressPercentage()}%`,
+  }"
+>
+  <audio
+    x-ref="audio"
+    preload="none"
+    @volumechange="updateVolume"
+    @waiting="waiting"
+    @canplaythrough="canPlayThrough = true"
+    @play="play(false, true); $store.player.playing = true"
+    @pause="pause; $store.player.playing = false"
+    @ended="reset; $store.player.playing = false"
+    @loadedmetadata="init; $store.player.audio_url = $refs.audio.src"
+    @keyup.document.right="seekBySeconds(30)"
+    @keyup.document.left="seekBySeconds(-10)"
+    @keyup.document.m="toggleMute"
+    @keyup.document.s="toggleSpeed"
+  >
+  </audio>
+  <nav class="site-sticky-player-buttons">
+    <button x-show="!playing && !loading" title="Play" @click="play; $store.player.playing = true" class="player-button site-sticky-player-play">
+      
+  <svg role="img" class="icon-play" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><title>play</title><path fill-rule="evenodd" d="M8,16 C12.4183,16 16,12.4183 16,8 C16,3.58172 12.4183,0 8,0 C3.58172,0 0,3.58172 0,8 C0,12.4183 3.58172,16 8,16 Z M7.5547,5.16795 C7.24784,4.96338 6.8533,4.94431 6.52814,5.11833 C6.20298,5.29235 6,5.63121 6,6.00000106 L6,10.0000011 C6,10.3688 6.20298,10.7077 6.52814,10.8817 C6.8533,11.0557 7.24784,11.0366 7.5547,10.8321 L10.5547,8.8321 C10.8329,8.6466 11,8.3344 11,8.00000106 C11,7.66565 10.8329,7.35342 10.5547,7.16795 L7.5547,5.16795 Z"></path></svg>
+
+
+    </button>
+    <button x-show="playing && !loading" @click="pause; $store.player.playing = false" title="Pause" class="player-button site-sticky-player-pause">
+      
+  <svg role="img" class="icon-pause" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><title>pause</title><path fill-rule="evenodd" d="M16,8 C16,12.4183 12.4183,16 8,16 C3.58172,16 0,12.4183 0,8 C0,3.58172 3.58172,0 8,0 C12.4183,0 16,3.58172 16,8 Z M5,6 C5,5.44772 5.44772,5 6,5 C6.55228,5 7,5.44772 7,6 L7,10 C7,10.5523 6.55228,11 6,11 C5.44772,11 5,10.5523 5,10 L5,6 Z M10,5 C9.4477,5 9,5.44772 9,6 L9,10 C9,10.5523 9.4477,11 10,11 C10.5523,11 11,10.5523 11,10 L11,6 C11,5.44772 10.5523,5 10,5 Z"></path></svg>
+
+
+    </button>
+    <span x-show="loading" class="site-sticky-player-loading">
+      <svg class="site-sticky-player-spinner-background" fill="currentColor" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8,16 C12.4183,16 16,12.4183 16,8 C16,3.58172 12.4183,0 8,0 C3.58172,0 0,3.58172 0,8 C0,12.4183 3.58172,16 8,16 Z"></path></svg>
+      <span class="site-sticky-player-spinner">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </span>
+    </span>
+  </nav>
+
+  <div class="site-sticky-player-progress-controls">
+    <div class="site-sticky-player-currently-playing">
+      <div class="site-sticky-player-title" x-text="title"></div>
+    </div>
+
+    <div class="site-sticky-player-progress" :class="{ 'seeking-by-touch': seekingByTouch }" role="progressbar" >
+      <div title="Seek within Episode" role="button" class="site-sticky-player-progress-bar" @click="seekTo" @mousemove="hoverSeekTo" @touchmove.prevent="touchDragSeekTo" @touchend="touchDragEnd">
+        <span></span>
+      </div>
+      <t class="seek-tooltip" x-text="formatTime(duration * seekHoverPercent)" :style="`left: ${seekHoverPercent * 100}%`"></t>
+    </div>
+
+    <div class="site-sticky-player-controls-duration">
+      <div class="site-sticky-player-controls">
+        <button @click="seekBySeconds(-10)" title="Rewind 10 seconds" class="site-sticky-player-rewind">
+          
+  <svg role="img" class="icon-rewind" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>rewind</title><path d="M19.419962,2.57 L20.789962,1.21 L20.789962,1.20999999 C21.066111,0.931608989 21.064293,0.482064989 20.7859019,0.205919989 C20.6539209,0.0750019893 20.4758579,0.00106998926 20.2899619,2.98926377e-06 L14.9999619,2.98926377e-06 L14.9999619,5.29000299 L14.9999619,5.2900038 C15.0022111,5.6821198 15.3219069,5.9981688 15.7140229,5.9959198 C15.8999189,5.99485348 16.0779819,5.9209207 16.2099629,5.7900028 L17.9999629,4.00000299 L17.9999633,4.00000299 C22.4115033,7.32267305 23.2942133,13.5924931 19.9715433,18.0040031 C16.6488733,22.4155431 10.3790533,23.2982531 5.96754326,19.9755831 C1.55600326,16.6529131 0.67329326,10.3830931 3.99596326,5.97158305 C5.50733326,3.96493305 7.71859326,2.60063305 10.1899933,2.15000305 L10.1899934,2.15000303 C10.7422784,2.05059173 11.1094044,1.52228803 11.0099934,0.970003035 C10.9105821,0.417718035 10.3822784,0.0505920346 9.82999335,0.150003035 L9.82999275,0.150003146 C3.31278275,1.35360315 -0.994707248,7.61255315 0.208852752,14.1298031 C1.41245275,20.6470131 7.67140275,24.9545031 14.1886528,23.7509431 C20.7058628,22.5473431 25.0133528,16.2883931 23.8097928,9.77114315 C23.2799238,6.90203315 21.7229128,4.32424315 19.4300328,2.52000315 L19.419962,2.57 Z M8.99996191,16 L8.99996191,16 C9.55224696,16 9.99996191,15.552285 9.99996191,15 L9.99996191,8 L6.99996191,8 L6.99996191,8 C6.44767691,8 5.99996191,8.447715 5.99996191,9 C5.99996191,9.552285 6.44767691,10 6.99996191,10 L7.99996191,10 L7.99996191,15 L7.99996191,15 C7.99996191,15.5522848 8.44767691,16 8.99996191,16 C8.99996191,16 8.99996191,16 8.99996191,16 L8.99996191,16 Z M13.9999619,16 L13.9999619,16 C15.6568119,16 16.9999619,14.65685 16.9999619,13 L16.9999619,11 L16.9999619,11 C16.9999619,9.34315 15.6568119,8 13.9999619,8 C12.3431119,8 10.9999619,9.34315 10.9999619,11 L10.9999619,13 L10.9999619,13 C10.9999619,14.6568505 12.3431119,16 13.9999619,16 C13.9999619,16 13.9999619,16 13.9999619,16 L13.9999619,16 Z M12.999962,11.0000002 L12.999962,11.0000002 C12.999962,10.4477152 13.447677,10.0000002 13.999962,10.0000002 C14.552247,10.0000002 14.999962,10.4477152 14.999962,11.0000002 C14.999962,11.0000002 14.999962,11.0000002 14.999962,11.0000002 L14.999962,13.0000002 L14.999962,13.0000002 C14.999962,13.5522852 14.552247,14.0000002 13.999962,14.0000002 C13.447677,14.0000002 12.999962,13.5522852 12.999962,13.0000002 L12.999962,11.0000002 Z"></path></svg>
+
+
+        </button>
+        <button @click="toggleSpeed" title="Change Playback Speed" class="site-sticky-player-speed" x-text="`${displaySpeed}x`"></button>
+        <button @click="seekBySeconds(30)" title="Fast Forward 30 seconds" class="site-sticky-player-fastforward">
+          
+  <svg role="img" class="icon-fastforward" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>fast forward</title><path d="M15.0000099,16 L15.0000099,16 C16.6568599,16 18.0000099,14.65685 18.0000099,13 L18.0000099,11 L18.0000099,11 C18.0000099,9.34315 16.6568599,8 15.0000099,8 C13.3431599,8 12.0000099,9.34315 12.0000099,11 L12.0000099,13 L12.0000099,13 C12.0000099,14.6568505 13.3431599,16 15.0000099,16 C15.0000099,16 15.0000099,16 15.0000099,16 L15.0000099,16 Z M14.00001,11.0000002 L14.00001,11.0000002 C14.00001,10.4477152 14.447725,10.0000002 15.00001,10.0000002 C15.552295,10.0000002 16.00001,10.4477152 16.00001,11.0000002 C16.00001,11.0000002 16.00001,11.0000002 16.00001,11.0000002 L16.00001,13.0000002 L16.00001,13.0000002 C16.00001,13.5522852 15.552295,14.0000002 15.00001,14.0000002 C14.447725,14.0000002 14.00001,13.5522852 14.00001,13.0000002 L14.00001,11.0000002 Z M7.00000983,7.99999762 L7.00000983,7.99999762 C6.44772496,7.99999762 6.00000983,8.447715 6.00000983,8.99999762 C6.00000983,9.552285 6.44772496,9.99999762 7.00000983,9.99999762 L8.50000983,9.99999762 L8.50000983,9.99999762 C8.77615193,9.99999762 9.00000983,10.223858 9.00000983,10.4999976 C9.00000983,10.776142 8.77615193,10.9999976 8.50000983,10.9999976 L7.00000983,10.9999976 L7.00000983,10.9999976 C6.44772489,10.9999976 6.00000983,11.447715 6.00000983,11.9999976 C6.00000983,12.552285 6.44772489,12.9999976 7.00000983,12.9999976 L8.50000983,12.9999976 L8.50000983,12.9999976 C8.77615187,12.9999976 9.00000983,13.223858 9.00000983,13.4999976 C9.00000983,13.776142 8.77615187,13.9999976 8.50000983,13.9999976 L7.00000983,13.9999976 L7.00000983,13.9999976 C6.44772483,13.9999976 6.00000983,14.447715 6.00000983,14.9999976 C6.00000983,15.552285 6.44772483,15.9999976 7.00000983,15.9999976 L8.50000983,15.9999976 L8.50000983,15.9999976 C9.88071972,15.9999976 11.0000098,14.88071 11.0000098,13.4999976 L11.0000098,13.5000078 C10.9949875,12.9583018 10.8162208,12.4325078 10.4900148,12.0000078 L10.4900147,12.0000079 C10.8162217,11.5675019 10.9949887,11.0417099 11.0000098,10.4999976 L11.0000098,10.4999976 C11.0000098,9.11928762 9.88071974,7.99999762 8.50000983,7.99999762 C8.50000983,7.99999762 8.50000983,7.99999762 8.50000983,7.99999762 L7.00000983,7.99999762 Z M14.18001,0.2 L14.1800101,0.200000017 C13.6277251,0.100588717 13.0994201,0.467715017 13.0000101,1.02000002 C12.9005988,1.57228502 13.2677251,2.10059002 13.8200101,2.20000002 L13.8200112,2.20000022 C19.2469712,3.22467022 22.8157312,8.45476022 21.7910512,13.8817002 C20.7663812,19.3086602 15.5362912,22.8774202 10.1093512,21.8527402 C4.68239119,20.8280702 1.11363119,15.5979802 2.13831119,10.1710402 C2.60451319,7.70190022 3.98319119,5.49877022 6.00003119,4.00000013 L7.79003119,5.79000022 L7.79003121,5.79000024 C8.06842221,6.06614924 8.51796621,6.06433124 8.79411121,5.78594013 C8.92502921,5.65395913 8.99896121,5.47589613 9.00002821,5.29000013 L9.00002821,1.31893483e-07 L3.71002821,1.31893483e-07 L3.71002824,1.31893483e-07 C3.31791224,0.00224888189 3.00186324,0.321944132 3.00411124,0.714060132 C3.00517734,0.899956132 3.07910994,1.07801913 3.21002824,1.21000013 L4.58002824,2.57000013 L4.58002779,2.57000049 C-0.628262215,6.66833049 -1.52806221,14.2128005 2.57026779,19.4211005 C6.66859779,24.6293905 14.2130678,25.5291905 19.4213678,21.4308605 C24.6296578,17.3325305 25.5294578,9.78806049 21.4311278,4.57976049 C19.6268878,2.28688049 17.0490978,0.729870486 14.1799878,0.200000486 L14.18001,0.2 Z"></path></svg>
+
+
+        </button>
+      </div>
+      <div class="site-sticky-player-duration">
+        <div x-text="formatTime(currentTime)"></div>
+        <div>|</div>
+        <div :datetime="formatTime(duration)" x-text="formatTime(duration)"></div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

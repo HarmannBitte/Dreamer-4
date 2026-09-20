@@ -1,0 +1,687 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "torch",
+#     "tqdm",
+#     "ninja",
+#     "dreamer4",
+#     "fire",
+#     "pillow",
+#     "wandb",
+#     "gymnasium[mujoco]",
+#     "env-ssl-wrapper>=0.0.2"
+# ]
+# [tool.uv.sources]
+# dreamer4 = { path = "." }
+# ///
+
+import fire
+from collections import deque
+from functools import partial
+
+import wandb
+
+import gymnasium as gym
+
+from pathlib import Path
+from typing import Literal
+import shutil
+from torchvision.utils import save_image
+
+from tqdm import tqdm
+import numpy as np
+from PIL import Image
+
+import torch
+from torch import nn, stack, tensor, is_tensor, zeros
+import torch.nn.functional as F
+from torch.nn.utils.rnn import pad_sequence
+from torch.optim import AdamW
+pad_sequence = partial(pad_sequence, batch_first = True)
+
+from einops import rearrange, repeat
+from einops.layers.torch import Rearrange
+
+from torch_einops_utils import pad_at_dim
+
+from accelerate import Accelerator
+
+from dreamer4.dreamer4 import (
+    DynamicsWorldModel,
+    Experience,
+    Actions,
+    divisible_by,
+    combine_experiences,
+    exists,
+    default,
+    cast_to_tensor,
+    VideoTokenizer,
+    StateTokenizer
+)
+
+from memmap_replay_buffer import ReplayBuffer
+
+# env
+
+def make_env(seed, use_image_input = False, vectorized = False, num_envs = 8, use_continuous_actions = False):
+    env_kwargs = dict(render_mode = 'rgb_array') if use_image_input else dict()
+
+    env_name = 'InvertedPendulum-v4' if use_continuous_actions else 'CartPole-v1'
+
+    if vectorized:
+        env = gym.make_vec(env_name, num_envs = num_envs, **env_kwargs)
+        env = gym.wrappers.vector.RecordEpisodeStatistics(env)
+    else:
+        env = gym.make(env_name, **env_kwargs)
+        env = gym.wrappers.RecordEpisodeStatistics(env)
+
+    if exists(seed):
+        env.action_space.seed(seed)
+
+    if use_image_input:
+        if vectorized:
+            raise NotImplementedError('Image observation wrapper not yet implemented for vectorized environments')
+        from env_ssl_wrapper import ImageObservationWrapper
+        env = ImageObservationWrapper(env)
+
+    return env
+
+# conv encoder
+
+class SmallConvEncoder(nn.Module):
+    def __init__(self, num_latent_tokens = 4, dim_latent = 32):
+        super().__init__()
+        self.num_latent_tokens = num_latent_tokens
+        self.dim_latent = dim_latent
+
+        self.net = nn.Sequential(
+            nn.Conv2d(3, 16, 4, stride = 2, padding = 1),
+            nn.ReLU(),
+            nn.Conv2d(16, 32, 4, stride = 2, padding = 1),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, 4, stride = 2, padding = 1),
+            nn.ReLU(),
+            nn.Conv2d(64, num_latent_tokens * dim_latent, 8, stride = 1, padding = 0),
+            nn.Tanh()
+        )
+
+    def forward(self, x, return_latents = False, time_cache = None, return_time_cache = False, **kwargs):
+        is_video = x.ndim == 5
+        if is_video:
+            b, c, t, h, w = x.shape
+            x = rearrange(x, 'b c t h w -> (b t) c h w')
+
+        out = self.net(x)
+        out = rearrange(out, 'b (n d) 1 1 -> b n d', n = self.num_latent_tokens, d = self.dim_latent)
+
+        if is_video:
+            out = rearrange(out, '(b t) n d -> b t n d', b = b, t = t)
+
+        if not return_time_cache:
+            return out
+
+        return out, None
+
+# agent
+
+class TransformerPPOAgent(nn.Module):
+    def __init__(
+        self,
+        use_asym_critic = False,
+        agent_value_gradient_frac = 1.0,
+        agent_policy_gradient_frac = 1.0,
+        num_latent_tokens = 16,
+        use_image_input = False,
+        use_conv_encoder = False,
+        use_time_rnn = False,
+        use_attn_pool = False,
+        pmpo_kl_div_loss_weight = 0.05,
+        use_continuous_actions = False,
+        continuous_dist_type: Literal['gaussian', 'squashed_gaussian', 'beta'] = 'beta',
+        continuous_dist_kwargs: dict = dict(),
+        continuous_target_action_range: tuple[float, float] | None = None,
+        depth = 3,
+        actor_depth = 0,
+        critic_depth = 0,
+        spatial_pre_encoder_depth = 0,
+        action_pre_encoder_depth = 0,
+        agent_predicts_latent = False,
+        ssl_lapo = False,
+        ssl_lapo_use_fdm = True,
+        ssl_lapo_pred_actions = True,
+        ssl_tem = False,
+        latent_ar_sigreg_loss_kwargs = dict(num_slices = 256),
+        latent_ar_sigreg_num_subspaces = None,
+        mot_temporal = False,
+        actor_spr = False,
+        activation = 'silu',
+        reward_encoder_type = 'hl_gauss',
+    ):
+        super().__init__()
+        self.use_image_input = use_image_input
+
+        tokenizer = None
+        state_tokenizer = None
+        aux_image_encoder = None
+        num_combined_latents = num_latent_tokens
+
+        if use_image_input:
+            if use_conv_encoder:
+                aux_image_encoder = SmallConvEncoder(
+                    num_latent_tokens = num_latent_tokens,
+                    dim_latent = 32
+                )
+            else:
+                tokenizer = VideoTokenizer(
+                    channels = 3,
+                    patch_size = 8,
+                    dim = 64,
+                    dim_latent = 32,
+                    num_latent_tokens = num_latent_tokens,
+                    image_height = 64,
+                    image_width = 64,
+                    encoder_depth = 3,
+                    decoder_depth = 3,
+                    time_block_every = 2,
+                    use_causal_conv3d = True,
+                    use_shifted_patch_tokenization = True,
+                    use_time_rnn = use_time_rnn,
+                    use_loss_normalization = True,
+                    decoder_flow_steps = 2,
+                    lpips_loss_weight = 0.
+                )
+        else:
+            state_tokenizer = StateTokenizer(
+                dim_state = 4,
+                num_latent_tokens = num_latent_tokens,
+                dim_latent = 32,
+                dim = 128,
+                depth = 1,
+                attn_every = 1,
+                attn_heads = 4,
+                attn_dim_head = 32
+            )
+
+        self.dynamics = DynamicsWorldModel(
+            video_tokenizer = tokenizer,
+            state_tokenizer = state_tokenizer,
+            copy_video_tokenizer = False,
+            copy_state_tokenizer = False,
+            aux_image_encoder = aux_image_encoder,
+            dim = 128,
+            dim_latent = 32,
+            dim_state = None,
+            num_latent_tokens = num_combined_latents if use_image_input else num_latent_tokens,
+            num_spatial_tokens = num_combined_latents if use_image_input else num_latent_tokens,
+            num_register_tokens = 1,
+            num_discrete_actions = 0 if use_continuous_actions else 2,
+            num_continuous_actions = 1 if use_continuous_actions else 0,
+            reward_encoder_type = reward_encoder_type,
+            continuous_dist_type = continuous_dist_type,
+            continuous_dist_kwargs = continuous_dist_kwargs,
+            continuous_target_action_range = continuous_target_action_range,
+            use_time_rnn = use_time_rnn,
+            transformer_kwargs = dict(
+                use_attn_pool = use_attn_pool
+            ),
+            depth = depth,
+            actor_depth = actor_depth,
+            critic_depth = critic_depth,
+            spatial_pre_encoder_depth = spatial_pre_encoder_depth,
+            action_pre_encoder_depth = action_pre_encoder_depth,
+            time_block_every = max(depth, 1),
+            policy_head_mlp_depth = 2,
+            value_head_mlp_depth = 2,
+            gae_discount_factor = 0.99,
+            ppo_eps_clip = 0.2,
+            agent_value_gradient_frac = agent_value_gradient_frac,
+            agent_policy_gradient_frac = agent_policy_gradient_frac,
+            normalize_advantages = True,
+            use_loss_normalization = False,
+            attn_heads = 4,
+            attn_dim_head = 16,
+            reward_encoder_kwargs = dict(reward_range = (-10., 10.)),
+            value_encoder_kwargs = dict(reward_range = (-20., 150.)),
+            dim_critic_state = 4 if use_asym_critic else None,
+            pmpo_kl_div_loss_weight = pmpo_kl_div_loss_weight,
+            agent_predicts_state = agent_predicts_latent,
+            ssl_lapo = ssl_lapo,
+            lapo_use_fdm = ssl_lapo_use_fdm,
+            lapo_pred_actions = ssl_lapo_pred_actions,
+            ssl_tem = ssl_tem,
+            latent_ar_sigreg_loss_kwargs = latent_ar_sigreg_loss_kwargs,
+            latent_ar_sigreg_num_subspaces = latent_ar_sigreg_num_subspaces,
+            mot_temporal = mot_temporal,
+            actor_spr = actor_spr,
+            policy_head_mlp_activation = activation,
+            value_head_mlp_activation = activation,
+            agent_state_pred_mlp_activation = activation,
+            lapo_kwargs = dict(
+                latent_action_embed_mlp_activation = activation,
+                pred_next_state_embed_mlp_activation = activation,
+                pred_raw_latent_mlp_activation = activation
+            ),
+            tem_kwargs = dict(
+                learned_relative_encode_mlp_activation = activation,
+                init_hiddens_mlp_activation = activation,
+                sensory_encoder_mlp_activation = activation,
+                sensory_decoder_mlp_activation = activation
+            ),
+            actor_nlp_kwargs = dict(
+                spatial_pooling_mlp_activation = activation
+            ),
+            latent_ar_kwargs = dict(
+                predict_next_latent_mlp_activation = activation
+            )
+        )
+
+
+
+    @property
+    def device(self):
+        return next(self.parameters()).device
+
+# training loop
+
+def main(
+    num_episodes = 5000,
+    batch_size = 4,
+    grad_accum_every = 2,
+    update_episodes = 16,
+    update_epochs = 4,
+    ppo_replay_updates = 2,
+    max_batches_per_epoch = 800,
+    max_timesteps = 500,
+    learning_rate = 3e-4,
+    max_grad_norm = 0.5,
+    target_return = 450.0,
+    use_asym_critic = True,
+    agent_value_gradient_frac = 0.1,
+    agent_policy_gradient_frac = 1.0,
+    seed = 42,
+    use_wandb = False,
+    objective: Literal['ppo', 'pmpo', 'spo'] = 'ppo',
+    reward_encoder_type: Literal['hl_gauss', 'symexp_two_hot'] = 'hl_gauss',
+    use_image_input = False,
+    use_conv_encoder = False,
+    vectorized = False,
+    num_envs = 8,
+    cpu = False,
+    use_continuous_actions = False,
+    continuous_dist_type: Literal['gaussian', 'squashed_gaussian', 'beta'] = 'beta',
+    use_time_rnn = True,
+    ssl_every_rl_updates = 0,
+    ssl_max_epochs = 25,
+    ssl_target_recon_loss = None,
+    ssl_stop_after_episodes = 2000,
+    ssl_batch_size = 2,
+    ssl_grad_accum_every = 8,
+    ssl_max_memories = 128,
+    tokenizer_learning_rate = 1e-4,
+    use_attn_pool = False,
+    depth = 3,
+    actor_depth = 0,
+    critic_depth = 0,
+    spatial_pre_encoder_depth = 0,
+    action_pre_encoder_depth = 0,
+    agent_predicts_latent = False,
+    lapo = False,
+    lapo_use_fdm = True,
+    lapo_pred_actions = True,
+    tem = False,
+    use_delight_gating = True,
+    sigreg_num_subspaces = 1,
+    mot_temporal = False,
+    actor_spr = False,
+    activation = 'silu',
+    experiment_name = 'dreamer4',
+    run_name = None,
+):
+    torch.manual_seed(seed)
+
+    if vectorized:
+        update_episodes = max(1, update_episodes // num_envs)
+
+    assert divisible_by(update_episodes, batch_size) if not vectorized else True
+
+    if use_image_input:
+        use_asym_critic = True
+
+    if use_wandb:
+        wandb.init(project = experiment_name, name = run_name)
+
+    accelerator = Accelerator(
+        gradient_accumulation_steps = grad_accum_every,
+        cpu = cpu
+    )
+
+    device = accelerator.device
+
+    def log(msg):
+        accelerator.print(msg)
+
+    results_folder = Path(f'./results_{run_name}' if run_name else './results')
+    shutil.rmtree(results_folder, ignore_errors = True)
+    results_folder.mkdir(exist_ok = True, parents = True)
+
+    env = make_env(seed, use_image_input, vectorized = vectorized, num_envs = num_envs, use_continuous_actions = use_continuous_actions)
+
+    agent = TransformerPPOAgent(
+        use_asym_critic = use_asym_critic,
+        agent_value_gradient_frac = agent_value_gradient_frac,
+        agent_policy_gradient_frac = agent_policy_gradient_frac,
+        use_image_input = use_image_input,
+        use_conv_encoder = use_conv_encoder,
+        use_time_rnn = use_time_rnn,
+        use_attn_pool = use_attn_pool,
+        use_continuous_actions = use_continuous_actions,
+        continuous_dist_type = continuous_dist_type,
+        continuous_target_action_range = (-3.0, 3.0) if use_continuous_actions else None,
+        depth = depth,
+        actor_depth = actor_depth,
+        critic_depth = critic_depth,
+        spatial_pre_encoder_depth = spatial_pre_encoder_depth,
+        action_pre_encoder_depth = action_pre_encoder_depth,
+        agent_predicts_latent = agent_predicts_latent,
+        ssl_lapo = lapo,
+        ssl_lapo_use_fdm = lapo_use_fdm,
+        ssl_lapo_pred_actions = lapo_pred_actions,
+        ssl_tem = tem,
+        reward_encoder_type = reward_encoder_type,
+        latent_ar_sigreg_num_subspaces = sigreg_num_subspaces,
+        mot_temporal = mot_temporal,
+        actor_spr = actor_spr,
+        activation = activation,
+    ).to(device)
+
+    # optimizers
+
+    has_video_tokenizer = use_image_input and exists(agent.dynamics.video_tokenizer)
+    has_state_tokenizer = not use_image_input and exists(agent.dynamics.state_tokenizer)
+    has_tokenizer = has_video_tokenizer or has_state_tokenizer
+    should_ssl = False
+
+    if has_tokenizer and not use_conv_encoder:
+        if has_video_tokenizer:
+            should_ssl = agent.dynamics.video_tokenizer.has_flow and ssl_every_rl_updates > 0
+        else:
+            should_ssl = ssl_every_rl_updates > 0
+
+    if should_ssl and has_video_tokenizer:
+        log(f'\nReconstruction grids will be saved directly to {results_folder.absolute()}\n')
+
+    if has_tokenizer:
+        tokenizer = agent.dynamics.video_tokenizer if has_video_tokenizer else agent.dynamics.state_tokenizer
+
+        tokenizer_params = set(tokenizer.parameters())
+        agent_params = [p for p in agent.parameters() if p not in tokenizer_params]
+
+        optimizer_groups = [
+            dict(params = list(tokenizer_params), lr = tokenizer_learning_rate),
+            dict(params = agent_params, lr = learning_rate)
+        ]
+
+        optimizer = AdamW(optimizer_groups)
+
+        if should_ssl:
+            tokenizer_optim = AdamW(tokenizer.parameters(), lr = tokenizer_learning_rate)
+            tokenizer_optim = accelerator.prepare(tokenizer_optim)
+
+    else:
+        optimizer = AdamW(agent.parameters(), lr = learning_rate)
+
+    agent, optimizer = accelerator.prepare(agent, optimizer)
+
+    # rollout state
+
+    recent_returns = deque(maxlen = 20)
+
+    replay_buffer = None
+    replay_buffer_size = update_episodes * max(1, ppo_replay_updates + 1)
+
+    ssl_memories = deque(maxlen = ssl_max_memories) if should_ssl else None
+    num_ssl_updates = 0
+
+    pbar = tqdm(range(num_episodes), desc = 'episodes')
+    agent.eval()
+    num_policy_updates = 0
+
+    for episode in pbar:
+
+        # collect experience
+
+        experience = agent.dynamics.interact_with_env(
+            env = env,
+            seed = seed if episode == 0 else None,
+            max_timesteps = max_timesteps,
+            env_is_vectorized = vectorized,
+            store_agent_embed = False,
+            store_old_action_unembeds = True,
+        )
+
+        # track returns
+
+        episode_return = experience.episode_return.mean().item()
+        recent_returns.append(episode_return)
+
+        # store to replay buffers
+
+        cpu_experience = experience.cpu()
+
+        if not exists(replay_buffer):
+            replay_buffer = Experience.create_memmap_replay_buffer(
+                cpu_experience,
+                results_folder / 'replay_data',
+                max_episodes = replay_buffer_size,
+                max_timesteps = max_timesteps + 1,
+                circular = True,
+                overwrite = True
+            )
+
+        cpu_experience.add_to_memmap_buffer(replay_buffer)
+
+        if exists(ssl_memories):
+            ssl_memories.append(cpu_experience)
+
+        avg_ret = np.mean(recent_returns) if len(recent_returns) > 0 else 0.0
+
+        if avg_ret >= target_return:
+            log(f'\n✅ Target average return of {target_return} reached! (avg={avg_ret:.1f}) Stopping training.')
+            break
+
+        loss_metrics = dict(average_return = f'{avg_ret:.1f}')
+
+        # determine update schedule
+
+        is_rl_update = divisible_by(episode + 1, update_episodes)
+
+        if is_rl_update:
+            num_rl_updates = (episode + 1) // update_episodes
+            should_do_ssl_now = should_ssl and divisible_by(num_rl_updates - 1, ssl_every_rl_updates)
+        else:
+            should_do_ssl_now = False
+
+        if exists(ssl_stop_after_episodes) and episode >= ssl_stop_after_episodes:
+            should_do_ssl_now = False
+
+        # prepare ssl video from accumulated buffer (kept on cpu, batched to device)
+
+        ssl_video = None
+        ssl_lens = None
+
+        if should_do_ssl_now:
+            ssl_exp_batch = combine_experiences(list(ssl_memories))
+
+            if exists(ssl_exp_batch.video):
+                ssl_video = ssl_exp_batch.video
+                ssl_lens = ssl_exp_batch.lens if exists(ssl_exp_batch.lens) else None
+            elif exists(ssl_exp_batch.critic_state):
+                ssl_video = ssl_exp_batch.critic_state
+                ssl_lens = ssl_exp_batch.lens if exists(ssl_exp_batch.lens) else None
+
+        # rl update from most recent experiences
+
+        if is_rl_update:
+            agent.train()
+
+            epoch_policy_loss = 0.
+            epoch_value_loss = 0.
+            epoch_conv_grad_norm = 0.
+
+            for _ in range(update_epochs):
+                dataloader = replay_buffer.dataloader(
+                    batch_size = batch_size,
+                    shuffle = True,
+                    return_mask = False
+                )
+
+                num_batches = min(len(dataloader), max_batches_per_epoch)
+
+                for i, batch_dict in enumerate(dataloader):
+                    if i >= max_batches_per_epoch:
+                        break
+
+                    micro = Experience.from_buffer_dict(batch_dict).to(device)
+
+                    if agent.dynamics.has_image_encoder:
+                        micro.latents = None
+
+                    if exists(micro.rewards):
+                        time = micro.rewards.shape[1]
+
+                        if exists(micro.critic_state) and micro.critic_state.shape[1] < time:
+                            micro.critic_state = pad_at_dim(micro.critic_state, (0, time - micro.critic_state.shape[1]), dim = 1)
+
+                        if exists(micro.video) and micro.video.shape[2] < time:
+                            micro.video = pad_at_dim(micro.video, (0, time - micro.video.shape[2]), dim = 2)
+
+                    policy_loss, value_loss = agent.dynamics.learn_from_experience(
+                        experience = micro,
+                        only_learn_policy_value_heads = False,
+                        objective = objective,
+                        use_delight_gating = use_delight_gating
+                    )
+
+                    total_loss = (policy_loss + value_loss) / grad_accum_every
+                    accelerator.backward(total_loss)
+
+                    is_last_batch = (i + 1) == num_batches
+
+                    if divisible_by(i + 1, grad_accum_every) or is_last_batch:
+                        if agent.dynamics.has_image_encoder:
+                            conv_grad = nn.utils.clip_grad_norm_(agent.dynamics.image_encoder_parameters(), float('inf'))
+                            epoch_conv_grad_norm += conv_grad.item() / num_batches
+
+                        accelerator.clip_grad_norm_(agent.parameters(), max_grad_norm)
+                        optimizer.step()
+                        optimizer.zero_grad()
+
+                    epoch_policy_loss += policy_loss.item() / num_batches
+                    epoch_value_loss += value_loss.item() / num_batches
+
+            avg_policy_loss = epoch_policy_loss / update_epochs
+            avg_value_loss = epoch_value_loss / update_epochs
+            avg_conv_grad_norm = epoch_conv_grad_norm / update_epochs
+
+            loss_metrics.update(policy_loss = f'{avg_policy_loss:.3f}', value_loss = f'{avg_value_loss:.3f}')
+
+            if agent.dynamics.has_image_encoder:
+                loss_metrics.update(conv_grad = f'{avg_conv_grad_norm:.3f}')
+
+            if use_wandb:
+                wandb.log(dict(
+                    average_return = avg_ret,
+                    policy_loss = avg_policy_loss,
+                    value_loss = avg_value_loss
+                ))
+
+            num_policy_updates += 1
+
+            agent.eval()
+
+        # autoencoder ssl training
+
+        if should_do_ssl_now and exists(ssl_video):
+            agent.train()
+            torch.cuda.empty_cache()
+
+            ssl_pbar = tqdm(range(ssl_max_epochs), desc = 'ssl epochs', leave = False)
+            for epoch in ssl_pbar:
+                batches = torch.randperm(ssl_video.shape[0]).split(ssl_batch_size)
+
+                epoch_recon_loss = 0.
+
+                for i, batch_indices in enumerate(batches):
+                    is_last_batch = (i + 1) == len(batches)
+                    batch_video = ssl_video[batch_indices].to(device)
+                    batch_lens = ssl_lens[batch_indices].to(device) if exists(ssl_lens) else None
+
+                    if has_video_tokenizer:
+                        loss, (losses, recon_video) = tokenizer(
+                            batch_video,
+                            time_lens = batch_lens,
+                            update_loss_ema = True,
+                            return_intermediates = True
+                        )
+                        recon_loss = losses.recon.item()
+                    else:
+                        loss_out = tokenizer(
+                            batch_video,
+                            time_lens = batch_lens
+                        )
+                        loss = loss_out[0] if isinstance(loss_out, tuple) else loss_out
+                        recon_loss = loss.item()
+
+                    loss = loss / ssl_grad_accum_every
+                    accelerator.backward(loss)
+
+                    if divisible_by(i + 1, ssl_grad_accum_every) or is_last_batch:
+                        accelerator.clip_grad_norm_(tokenizer.parameters(), max_grad_norm)
+                        tokenizer_optim.step()
+                        tokenizer_optim.zero_grad()
+
+                    epoch_recon_loss += recon_loss / len(batches)
+
+                ssl_pbar.set_postfix(recon_loss = f'{epoch_recon_loss:.4f}')
+
+                if exists(ssl_target_recon_loss) and ssl_target_recon_loss > 0:
+                    if epoch_recon_loss <= ssl_target_recon_loss:
+                        log(f'\nSSL recon loss reached target {epoch_recon_loss:.4f} <= {ssl_target_recon_loss:.4f} at epoch {epoch + 1}! Stopping SSL early.')
+                        break
+
+            avg_recon_loss = epoch_recon_loss
+            loss_metrics.update(recon = f'{avg_recon_loss:.3f}')
+
+            num_ssl_updates += 1
+
+            if use_wandb:
+                wandb.log(dict(recon_loss = avg_recon_loss))
+
+            if has_video_tokenizer:
+                with torch.no_grad():
+                    agent.eval()
+                    sample_video = ssl_video[:1].to(device)
+                    sample_lens = ssl_lens[:1].to(device) if exists(ssl_lens) else None
+
+                    _, (_, sample_recon) = tokenizer(
+                        sample_video,
+                        time_lens = sample_lens,
+                        mask_patches = False,
+                        return_intermediates = True
+                    )
+
+                    orig = rearrange(sample_video[0], 'c t h w -> t c h w')[:8]
+                    recon = rearrange(sample_recon[0].clamp(0., 1.), 'c t h w -> t c h w')[:8]
+                    grid = torch.cat((orig, recon), dim = 0)
+                    save_image(grid, str(results_folder / f'recon_ep{episode}.png'), nrow = orig.shape[0])
+
+            agent.eval()
+            torch.cuda.empty_cache()
+
+        pbar.set_postfix(loss_metrics)
+
+    if use_wandb:
+        wandb.finish()
+
+if __name__ == '__main__':
+    fire.Fire(main)

@@ -1,0 +1,6 @@
+remote: https://github.com/vFf0621/Dreamer4-torch.git
+branch: main
+commit: 2f0d7c754e4cd0de43073634d947ae6bbdb45cd9
+date:   2026-07-27 16:56:43 +0000
+subject: Revert "Merge pull request #1 from vFf0621/claude/modality-attention-weights-jw3skz"
+fetched: 2026-09-20T13:35:05Z (shallow clone, depth 1; .git removed to save space)

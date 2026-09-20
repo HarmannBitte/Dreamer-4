@@ -1,0 +1,6 @@
+remote: https://github.com/reactor-team/open-dreamer.git
+branch: main
+commit: 829263d2089744afb311677eb4d7900dd14ebfbc
+date:   2026-07-25 16:11:38 +0200
+subject: Add All-Rights-Reserved license and Reactor logo (#2)
+fetched: 2026-09-20T13:35:05Z (shallow clone, depth 1; .git removed to save space)

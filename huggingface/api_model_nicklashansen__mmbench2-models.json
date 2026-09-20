@@ -1,0 +1,122 @@
+{
+ "_id": "6a3c26ed9331ea2a3198e895",
+ "id": "nicklashansen/mmbench2-models",
+ "private": false,
+ "pipeline_tag": "reinforcement-learning",
+ "tags": [
+  "dreamer4",
+  "world-models",
+  "reinforcement-learning",
+  "robotics",
+  "video-prediction",
+  "dreamer",
+  "arxiv:2509.24527",
+  "arxiv:2606.27326",
+  "license:mit",
+  "region:us"
+ ],
+ "downloads": 89,
+ "likes": 2,
+ "modelId": "nicklashansen/mmbench2-models",
+ "author": "nicklashansen",
+ "sha": "b7f7b222526d557f80bf3bcf84ab824cb14f94b0",
+ "lastModified": "2026-07-09T20:34:34.000Z",
+ "gated": false,
+ "disabled": false,
+ "model-index": null,
+ "config": {
+  "model_type": "dreamer4"
+ },
+ "cardData": {
+  "license": "mit",
+  "tags": [
+   "world-models",
+   "reinforcement-learning",
+   "robotics",
+   "video-prediction",
+   "dreamer"
+  ]
+ },
+ "siblings": [
+  {
+   "rfilename": ".gitattributes",
+   "blobId": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+   "size": 1519
+  },
+  {
+   "rfilename": "README.md",
+   "blobId": "068e3e88aa0c049fb6c3b2618be44a993caaa443",
+   "size": 3157
+  },
+  {
+   "rfilename": "base/dynamics.pt",
+   "blobId": "7ed9a23a1cccfc4a0d534befc304e89b5a83d13d",
+   "size": 1017872707,
+   "lfs": {
+    "sha256": "ec28ba7dd40113d1b0e0debfc37df42de0616b39f62dcb01d7ce7431c8803b59",
+    "size": 1017872707,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "base/tokenizer.pt",
+   "blobId": "9d49a7eb9c757814aeefa3e3b1af4d33a1d9bd79",
+   "size": 406957899,
+   "lfs": {
+    "sha256": "95e521d36cba21bb47b14e4df4f1d626161c3f8f9955b75443f6b9b0b08fe323",
+    "size": 406957899,
+    "pointerSize": 134
+   }
+  },
+  {
+   "rfilename": "combined/dynamics.pt",
+   "blobId": "20bbfffe802d53d811675d6df8bf4b0e0db875d2",
+   "size": 1017872835,
+   "lfs": {
+    "sha256": "46821026c1a9f8947c9ea080af0492a4eb04d201c2b7dc2b3177cc68031e7a54",
+    "size": 1017872835,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "combined/tokenizer.pt",
+   "blobId": "56829f58284257289af2351f4b408a7500708506",
+   "size": 406958091,
+   "lfs": {
+    "sha256": "e71b6eb3d26bd4b84c7ab94c68209fe69266a115754b3d14169e9fd589e81749",
+    "size": 406958091,
+    "pointerSize": 134
+   }
+  },
+  {
+   "rfilename": "config.json",
+   "blobId": "81248ce4b7da8e1b2b8b4e78b58446a6c613a128",
+   "size": 1141
+  },
+  {
+   "rfilename": "coverage_aware/dynamics.pt",
+   "blobId": "9223aa3cf5d624fa9109330a90edee4b015ed699",
+   "size": 1017872707,
+   "lfs": {
+    "sha256": "eb5316bc99476d30666c2d92068de2f040bcc3e9e8f873f3602a208ae6a1c3eb",
+    "size": 1017872707,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "coverage_aware/tokenizer.pt",
+   "blobId": "ebe16dc8b2f714d742ae211d14c2ba61d214a2ac",
+   "size": 406958027,
+   "lfs": {
+    "sha256": "a88c0ed422aa61947e17f57b639538f1c6218e67e682803db13da43996183bf2",
+    "size": 406958027,
+    "pointerSize": 134
+   }
+  }
+ ],
+ "spaces": [
+  "ffeng1017/World-Action-Verifier"
+ ],
+ "createdAt": "2026-06-24T18:50:21.000Z",
+ "usedStorage": 5699323192
+}

@@ -1,0 +1,78 @@
+{
+ "_id": "697c401418ee7fd095172f19",
+ "id": "IamCreateAI/Dreamerv4-MC",
+ "private": false,
+ "library_name": "diffusers",
+ "tags": [
+  "diffusers",
+  "safetensors",
+  "arxiv:2509.24527",
+  "arxiv:2502.03444",
+  "arxiv:2412.07772",
+  "license:apache-2.0",
+  "region:us"
+ ],
+ "downloads": 0,
+ "likes": 4,
+ "modelId": "IamCreateAI/Dreamerv4-MC",
+ "author": "IamCreateAI",
+ "sha": "a2e3bb67f3d5c012fa33ba81153eb42e0341fc69",
+ "lastModified": "2026-01-30T06:00:02.000Z",
+ "gated": false,
+ "disabled": false,
+ "model-index": null,
+ "config": {},
+ "cardData": {
+  "license": "apache-2.0"
+ },
+ "siblings": [
+  {
+   "rfilename": ".gitattributes",
+   "blobId": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+   "size": 1519
+  },
+  {
+   "rfilename": "README.md",
+   "blobId": "462170ee260cea16ba14315ea4d9a48c9647da4b",
+   "size": 5014
+  },
+  {
+   "rfilename": "dynamic/.DS_Store",
+   "blobId": "5008ddfcf53c02e82d7eee2e57c38e5672ef89f6",
+   "size": 6148
+  },
+  {
+   "rfilename": "dynamic/config.json",
+   "blobId": "5adf0285ffe5587439556abc9bdcd5bfe98d860d",
+   "size": 377
+  },
+  {
+   "rfilename": "dynamic/diffusion_pytorch_model.safetensors",
+   "blobId": "5c06a1802e4a1087bd0d6481e65111252159e311",
+   "size": 3299532026,
+   "lfs": {
+    "sha256": "2e6fb0eea13ed80a46f276de339506b8b24294ab4d71ffc2fe594375343c1187",
+    "size": 3299532026,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "tokenizer/config.json",
+   "blobId": "7c1e1b91b2134cbc1be6202a171702590007581c",
+   "size": 291
+  },
+  {
+   "rfilename": "tokenizer/diffusion_pytorch_model.safetensors",
+   "blobId": "b1af0aeeab290cc91a47c1703606a6a74760538b",
+   "size": 896261688,
+   "lfs": {
+    "sha256": "088d7932986a6d4047d17622775f863728e47aad8dd297c6ac67a1eac1ca8056",
+    "size": 896261688,
+    "pointerSize": 134
+   }
+  }
+ ],
+ "spaces": [],
+ "createdAt": "2026-01-30T05:22:28.000Z",
+ "usedStorage": 4195793714
+}

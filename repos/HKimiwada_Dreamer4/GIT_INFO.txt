@@ -1,0 +1,6 @@
+remote: https://github.com/HKimiwada/Dreamer4.git
+branch: main
+commit: 27e5837d7ab56e69cddb7ec329a71b61ed41a76a
+date:   2026-02-11 15:00:25 +0900
+subject: updated training script
+fetched: 2026-09-20T13:35:05Z (shallow clone, depth 1; .git removed to save space)

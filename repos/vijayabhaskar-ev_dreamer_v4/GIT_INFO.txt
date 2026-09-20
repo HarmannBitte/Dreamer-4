@@ -1,0 +1,6 @@
+remote: https://github.com/vijayabhaskar-ev/dreamer_v4.git
+branch: main
+commit: c6801826f4181bac3cf7fca0b7b302617099545b
+date:   2026-09-10 14:43:23 +0530
+subject: README: drop 'from-scratch' self-description; add fetch_phase1_curve.py (wandb -> per-epoch CSV behind the paper's Phase-1 figure; entity/run ids are CLI args)
+fetched: 2026-09-20T13:35:05Z (shallow clone, depth 1; .git removed to save space)

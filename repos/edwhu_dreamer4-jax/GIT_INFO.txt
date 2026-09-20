@@ -1,0 +1,6 @@
+remote: https://github.com/edwhu/dreamer4-jax.git
+branch: main
+commit: 753d650bf107f8223e5830f5b7417293cc56512d
+date:   2026-07-24 13:17:46 -0700
+subject: Merge pull request #4 from edwhu/edwhu-patch-1
+fetched: 2026-09-20T13:35:05Z (shallow clone, depth 1; .git removed to save space)

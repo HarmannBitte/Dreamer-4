@@ -1,0 +1,6 @@
+remote: https://github.com/skr3178/DreamerV4.git
+branch: pretrained_tokenizer
+commit: 3ee81d8c2ab66caa16a391af41328ab33f00f45f
+date:   2026-01-29 09:09:48 +0100
+subject: Pretokenized pipeline, cosmos config/docs, README and integration updates
+fetched: 2026-09-20T13:35:05Z (shallow clone, depth 1; .git removed to save space)

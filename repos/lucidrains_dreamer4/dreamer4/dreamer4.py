@@ -1,0 +1,8532 @@
+from __future__ import annotations
+from typing import Callable, Iterable, NamedTuple, Tuple, Literal
+
+import importlib
+from pathlib import Path
+from math import ceil, log2
+from random import random
+import numpy as np
+from loguru import logger
+from copy import deepcopy
+from functools import wraps, partial
+from contextlib import nullcontext, contextmanager
+from collections import namedtuple
+from dataclasses import dataclass, asdict, fields
+
+import torch
+import torch.nn.functional as F
+from torch.distributions import Normal, Beta, kl
+from torch.nn import Module, ModuleList, ModuleDict, Embedding, Parameter, Linear, RMSNorm
+from torch import nn, cat, stack, tensor, Tensor, is_tensor, zeros, ones, randint, rand, randn, randn_like, empty, full, linspace, arange, rand_like, ones_like, zeros_like
+from torch.utils._pytree import tree_map, tree_flatten, tree_unflatten
+
+from torch_einops_utils.nn import Identity, Sequential
+
+import torchvision
+from torchvision.models import VGG16_Weights
+
+from torch.optim import Optimizer
+from adam_atan2_pytorch import MuonAdamAtan2
+
+from x_mlps_pytorch import MLP
+from x_mlps_pytorch.ensemble import Ensemble
+from x_mlps_pytorch.normed_mlp import create_mlp
+
+from x_transformers import Decoder
+
+from vit_pytorch.vit_with_decorr import DecorrelationLoss
+from vit_pytorch.vivit_with_moss import MOSS
+
+from assoc_scan import AssocScan
+
+from h_net_dynamic_chunking import HNet
+
+from PoPE_pytorch import PoPE, AxialPoPE, flash_attn_with_pope
+
+from discrete_continuous_embed_readout import MultiCategorical, Readout
+from discrete_continuous_embed_readout.discrete_continuous_embed_readout import BetaDist, rescale
+
+from memmap_replay_buffer import ReplayBuffer
+
+from hl_gauss_pytorch import HLGaussLoss
+
+import einx
+from torch_einops_utils import (
+    maybe,
+    temp_eval,
+    align_dims_left,
+    pad_at_dim,
+    pad_left_at_dim,
+    pad_right_at_dim,
+    pad_right_at_dim_to,
+    pad_right_ndim_to,
+    lens_to_mask,
+    shift_right,
+    masked_mean,
+    repeat_interleave_to_match,
+    safe_stack,
+    safe_cat,
+    tree_flatten_with_inverse,
+    tree_map_tensor
+)
+
+from torch_einops_utils.device import move_inputs_to_module_device
+from torch_einops_utils.save_load import save_load
+
+# ein related
+
+# b - batch
+# n - sequence
+# h - attention heads
+# d - feature dimension
+# f - frequencies (rotary)
+# l - logit / predicted bins
+# y - layers of transformer
+# p - positions (3 for spacetime in this work)
+# t - time
+# na - action dimension (number of discrete and continuous actions)
+# g - groups of query heads to key heads (gqa)
+# vc - video channels
+# vh, vw - video height and width
+# mtp - multi token prediction length
+# v - video viewpoints
+
+import einx
+from einx import add, multiply, equal, logical_and
+from einops import einsum, rearrange, repeat, reduce, pack, unpack
+from einops.layers.torch import Rearrange, Reduce
+
+# flex attention - but will make sure it works if it is not available
+# may also end up crafting own custom flash attention kernel for this work
+
+flex_attention = None
+
+try:
+    from torch.nn.attention.flex_attention import flex_attention, create_block_mask
+    if torch.cuda.is_available():
+        import torch._dynamo
+        torch._dynamo.config.cache_size_limit = 256
+        flex_attention = torch.compile(flex_attention)
+except ImportError:
+    pass
+
+# constants
+
+LinearNoBias = partial(Linear, bias = False)
+LayerNormNoBias = partial(nn.LayerNorm, bias = False)
+
+def EmbeddingSmallInit(shape, eps = 1e-3):
+    return Parameter(randn(*shape) * eps)
+
+VideoTokenizerIntermediates = namedtuple('VideoTokenizerIntermediates', ('losses', 'recon'))
+
+TokenizerLosses = namedtuple('TokenizerLosses', ('recon', 'flow_recon', 'lpips', 'time_decorr', 'space_decorr', 'latent_ortho', 'latent_ar', 'latent_ar_sigreg', 'latent_consistency', 'latent_sigreg', 'h_net', 'byol'))
+
+WorldModelLosses = namedtuple('WorldModelLosses', ('flow', 'shortcut', 'agent_embed_reward', 'latent_state_reward', 'agent_embed_terminal', 'latent_state_terminal', 'discrete_actions', 'continuous_actions', 'state_pred', 'agent_state_pred', 'latent_ar', 'latent_ar_sigreg', 'lapo_action', 'lapo_fdm', 'lapo_raw_latent_fdm', 'tem', 'h_net'))
+
+AttentionIntermediates = namedtuple('AttentionIntermediates', ('next_kv_cache', 'normed_inputs'))
+
+TransformerIntermediates = namedtuple('TransformerIntermediates', ('next_kv_cache', 'normed_time_inputs', 'normed_space_inputs', 'next_rnn_hiddens', 'layer_hiddens', 'token_count', 'next_spatial_module_caches', 'h_net_loss', 'next_h_net_cache'), defaults=(None, None, None, None, None, 0, None, 0., None))
+
+DynamicsIntermediates = namedtuple('DynamicsIntermediates', ('main', 'actor', 'critic', 'spatial', 'action', 'pre_encoded_spatial', 'pre_encoded_action'), defaults=(None, None, None, None, None, None, None))
+
+Predictions = namedtuple('Predictions', ['flow', 'proprioception', 'state'])
+
+Embeds = namedtuple('Embeds', ['agent', 'state_pred', 'actor', 'critic'], defaults=(None, None))
+
+Actions = namedtuple('Actions', ['discrete', 'continuous'])
+
+MaybeTensor = Tensor | None
+
+@dataclass
+class Experience:
+    latents: Tensor
+    video: MaybeTensor = None
+    proprio: MaybeTensor = None
+    critic_state: MaybeTensor = None
+    agent_embed: MaybeTensor = None
+    actor_embed: MaybeTensor = None
+    critic_embed: MaybeTensor = None
+    rewards: Tensor | None = None
+    terminals: Tensor | None = None
+    actions: Actions | None = None
+    log_probs: Actions | None = None
+    old_action_unembeds: Actions | None = None
+    values: MaybeTensor = None
+    step_size: int | None = None
+    lens: MaybeTensor = None
+    is_truncated: MaybeTensor = None
+    agent_index: int = 0
+    is_from_world_model: bool | Tensor = True
+    episode_return: Tensor | None = None
+
+    _meta_fields = frozenset({
+        'step_size',
+        'lens',
+        'is_truncated',
+        'terminals',
+        'agent_index',
+        'is_from_world_model',
+        'episode_return'
+    })
+
+    @property
+    def payload(self):
+        return default(self.latents, self.video, self.critic_state)
+
+    # memmap replay buffer
+
+    def to_buffer_dict(self):
+        data_dict, meta_dict = {}, {}
+
+        for k, v in vars(self).items():
+            is_meta = k in self.__class__._meta_fields
+            target = meta_dict if is_meta else data_dict
+
+            if isinstance(v, Actions):
+                if exists(v.discrete):    target[f'{k}_discrete'] = v.discrete
+                if exists(v.continuous):  target[f'{k}_continuous'] = v.continuous
+            elif exists(v):
+                target[k] = v
+
+        return data_dict, meta_dict
+
+    @classmethod
+    def create_memmap_replay_buffer(cls, template_experience, *args, **kwargs):
+        from memmap_replay_buffer import ReplayBuffer
+
+        data_dict, meta_dict = template_experience.to_buffer_dict()
+
+        def infer_field(v, is_meta = False):
+            if not is_tensor(v):
+                return type(v).__name__
+
+            shape = v.shape[1:] if is_meta else v.shape[2:]
+            return (tensor_dtype_to_string(v), shape)
+
+        inferred_kwargs = dict(
+            fields = {k: infer_field(v) for k, v in data_dict.items()},
+            meta_fields = {k: infer_field(v, is_meta = True) for k, v in meta_dict.items()}
+        )
+
+        return ReplayBuffer(*args, **inferred_kwargs, **kwargs)
+
+    def add_to_memmap_buffer(self, buffer):
+        data_dict, meta_dict = self.to_buffer_dict()
+        batch_size, time_steps = self.payload.shape[:2]
+
+        meta_batch = {k: (v if is_tensor(v) else [v] * batch_size) for k, v in meta_dict.items()}
+
+        with buffer.batched_episode(batch_size = batch_size, **meta_batch):
+            for step in range(time_steps):
+                buffer.store_batch(**{k: v[:, step] for k, v in data_dict.items()})
+
+    @classmethod
+    def from_buffer_dict(cls, data_dict):
+        kwargs = {}
+
+        for f in fields(cls):
+            k = f.name
+            disc_key, cont_key = f'{k}_discrete', f'{k}_continuous'
+
+            # specially handle actions, which were flattened to discrete and continuous keys
+
+            if disc_key in data_dict or cont_key in data_dict:
+                kwargs[k] = Actions(data_dict.get(disc_key), data_dict.get(cont_key))
+                continue
+
+            # otherwise just copy over the key
+
+            if k in data_dict:
+                kwargs[k] = data_dict[k]
+
+        return cls(**kwargs)
+
+    # tensor-like methods
+
+    def cpu(self):
+        return self.to(torch.device('cpu'))
+
+    def to(self, device):
+        experience_dict = {f.name: getattr(self, f.name) for f in fields(self)}
+        experience_dict = tree_map_tensor(lambda t: t.to(device), experience_dict)
+        return Experience(**experience_dict)
+
+    def unbind(self):
+        batch, time = self.payload.shape[:2]
+        is_meta_field = lambda name: name in self.__class__._meta_fields
+
+        experiences = []
+        for b in range(batch):
+            seq_len = int(self.lens[b].item()) if exists(self.lens) else time
+
+            def slice_field(name, v):
+                if not exists(v):
+                    return None
+
+                if not is_tensor(v) and not isinstance(v, Actions):
+                    return v
+
+                is_meta = is_meta_field(name)
+
+                def slice_tensor(t):
+                    return t[b:b+1] if is_meta else t[b:b+1, :seq_len]
+
+                if isinstance(v, Actions):
+                    return Actions(
+                        discrete = slice_tensor(v.discrete) if exists(v.discrete) else None,
+                        continuous = slice_tensor(v.continuous) if exists(v.continuous) else None
+                    )
+
+                return slice_tensor(v)
+
+            kwargs = {f.name: slice_field(f.name, getattr(self, f.name)) for f in fields(self)}
+            experiences.append(self.__class__(**kwargs))
+
+        return experiences
+
+    def __iter__(self):
+        return iter(self.unbind())
+
+def combine_experiences(
+    exps: list[Experience]
+) -> Experience:
+
+    assert len(exps) > 0
+
+    # set lens if not there
+
+    for exp in exps:
+        payload = default(exp.latents, exp.video)
+        batch, time = payload.shape[:2]
+        device = payload.device
+
+        if not exists(exp.lens):
+            exp.lens = full((batch,), time, device = device)
+
+        if not exists(exp.is_truncated):
+            exp.is_truncated = full((batch,), True, device = device)
+
+        if isinstance(exp.is_from_world_model, bool):
+            exp.is_from_world_model = full((batch,), exp.is_from_world_model, device = device, dtype = torch.bool)
+
+    # convert to dictionary
+
+    exps_dict = [{f.name: getattr(exp, f.name) for f in fields(exp)} for exp in exps]
+
+    values, tree_specs = zip(*[tree_flatten(exp_dict) for exp_dict in exps_dict])
+
+    tree_spec = first(tree_specs)
+
+    all_field_values = list(zip(*values))
+
+    # an assert to make sure all fields are either all tensors, or a single matching value (for step size, agent index etc) - can change this later
+
+    for field_values in all_field_values:
+        if all([is_tensor(v) for v in field_values]):
+            continue
+
+        assert all([not is_tensor(v) for v in field_values]), 'each field must be either all tensors or all non-tensors across experiences, but got a mix for one field'
+
+        assert len(set(field_values)) == 1, 'non tensor fields must all have the same value across experiences'
+
+    concatted = []
+
+    for field_values in all_field_values:
+
+        first_value = first(field_values)
+
+        if is_tensor(first_value):
+
+            field_values = pad_tensors_at_dim_to_max_len(field_values, dims = (1, 2))
+
+            cat_or_stack = cat if first_value.ndim > 0 else stack
+
+            new_field_value = cat_or_stack(field_values)
+        else:
+            new_field_value = first(list(set(field_values)))
+
+        concatted.append(new_field_value)
+
+    # return experience
+
+    concat_exp_dict = tree_unflatten(concatted, tree_spec)
+
+    return Experience(**concat_exp_dict)
+
+# helpers
+
+def exists(v):
+    return v is not None
+
+def default(*args):
+    for arg in args:
+        if exists(arg):
+            return arg
+
+def identity(t, *args, **kwargs):
+    return t
+
+def detach(t):
+    return t.detach()
+
+def first(arr):
+    return arr[0]
+
+def xnor(x, y):
+    return x == y
+
+def has_at_least_one(*bools):
+    return sum([*map(int, bools)]) > 0
+
+def at_most_one_of(*args):
+    return sum(map(int, map(exists, args))) <= 1
+
+def narrow(start, length = 1):
+    assert start >= 0
+    return slice(start, start + length)
+
+def ensure_tuple(t):
+    return (t,) if not isinstance(t, tuple) else t
+
+def divisible_by(num, den):
+    return (num % den) == 0
+
+def is_odd(n):
+    return not divisible_by(n, 2)
+
+def sample_prob(prob):
+    return rand(1).item() < prob
+
+def is_power_two(num):
+    return log2(num).is_integer()
+
+def is_module_available(module_name):
+    return exists(importlib.util.find_spec(module_name))
+
+def check_import(module_name, error_message = None):
+    error_message = default(error_message, f"Please install {module_name}")
+    if not is_module_available(module_name):
+        raise ImportError(error_message)
+
+def cast_to_tensor(t, device, dtype = None):
+    t = t if is_tensor(t) else tensor(t)
+    t = t.to(dtype) if exists(dtype) else t
+    return t.to(device)
+
+def tensor_dtype_to_string(t: Tensor) -> str:
+    if t.dtype == torch.bool:
+        return 'bool'
+    elif t.is_floating_point():
+        return 'float'
+    else:
+        return 'int'
+
+@contextmanager
+def temp_requires_grad(
+    parameters,
+    requires_grad = False
+):
+    parameters = list(parameters)
+    orig_requires_grad = [p.requires_grad for p in parameters]
+
+    for p in parameters:
+        p.requires_grad_(requires_grad)
+
+    yield
+
+    for p, orig in zip(parameters, orig_requires_grad):
+        p.requires_grad_(orig)
+
+# tensor helpers
+
+def cosine_distance(x, y, mask = None):
+    dist = 1. - F.cosine_similarity(x, y, dim = -1)
+    return masked_mean(dist, mask)
+
+def cosine_sim_loss(x, y, reduction = 'mean'):
+    return F.mse_loss(l2norm(x), l2norm(y), reduction = reduction)
+
+def orthogonal_loss(x):
+    n, device = x.shape[-2], x.device
+    if n == 1:
+        return x.new_zeros(())
+
+    x = x - reduce(x, '... n d -> ... 1 d', 'mean')
+    x = l2norm(x)
+
+    sim = einsum(x, x, '... i d, ... j d -> ... i j')
+
+    eye = torch.eye(n, device = device).bool()
+    sim = sim.masked_fill(eye, 0.)
+
+    return reduce(sim ** 2, '... i j -> ...', 'sum').mean()
+
+def z_score(t, mask = None, eps = 1e-5):
+    if not exists(mask):
+        return (t - t.mean()) / t.var(correction = 0).clamp(min = eps).sqrt()
+
+    mean = masked_mean(t, mask)
+    var = masked_mean((t - mean).pow(2), mask)
+    return (t - mean) / var.clamp(min = eps).sqrt()
+
+def flags_to_sequence(flags, positions, seq_len):
+    seq = arange(seq_len, device = flags.device)
+    return logical_and('b t, b -> b t', equal('t, b -> b t', seq, positions), flags)
+
+def straight_through(src, tgt):
+    return tgt + src - src.detach()
+
+def frac_gradient(t, frac = 1.):
+    return t.detach().lerp(t, frac)
+
+class FracGradient(Module):
+    def __init__(self, frac = 0.):
+        super().__init__()
+        self.frac = frac
+
+    def forward(self, x):
+        return frac_gradient(x, self.frac)
+
+def with_seed(seed):
+    def decorator(fn):
+
+        # if no seed, just return the function
+
+        if not exists(seed):
+            return fn
+
+        @wraps(fn)
+        def inner(*args, **kwargs):
+
+            has_cuda = torch.cuda.is_available()
+
+            orig_torch_state = torch.get_rng_state()
+
+            orig_cuda_states = None
+            if has_cuda:
+                orig_cuda_states = torch.cuda.get_rng_state_all()
+
+            torch.manual_seed(seed)
+
+            if has_cuda:
+                torch.cuda.manual_seed_all(seed)
+
+            try:
+                out = fn(*args, **kwargs)
+
+            finally:
+                torch.set_rng_state(orig_torch_state)
+
+                if has_cuda and orig_cuda_states:
+                    torch.cuda.set_rng_state_all(orig_cuda_states)
+
+            return out
+        return inner
+
+    return decorator
+
+def is_empty(t):
+    if is_tensor(t):
+        return t.numel() == 0
+    return len(t) == 0
+
+def log(t, eps = 1e-20):
+    return t.clamp(min = eps).log()
+
+def safe_squeeze_first(t):
+    if not exists(t):
+        return None
+
+    if t.shape[0] != 1:
+        return t
+
+    return rearrange(t, '1 ... -> ...')
+
+def gumbel_noise(t):
+    noise = rand_like(t)
+    return -log(-log(noise))
+
+def gumbel_sample(
+    t,
+    temperature = 1.,
+    dim = -1,
+    keepdim = False,
+    eps = 1e-10
+):
+    noised = (t / max(temperature, eps)) + gumbel_noise(t)
+    return noised.argmax(dim = dim, keepdim = keepdim)
+
+def pack_one(t, pattern):
+    packed, packed_shape = pack([t], pattern)
+
+    def inverse(out, inv_pattern = None):
+        inv_pattern = default(inv_pattern, pattern)
+        return first(unpack(out, packed_shape, inv_pattern))
+
+    return packed, inverse
+
+def pad_tensors_at_dim_to_max_len(
+    tensors: list[Tensor],
+    dims: tuple[int, ...]
+):
+    for dim in dims:
+        if dim >= first(tensors).ndim:
+            continue
+
+        max_time = max([t.shape[dim] for t in tensors])
+        tensors = [pad_right_at_dim_to(t, max_time, dim = dim) for t in tensors]
+
+    return tensors
+
+def l2norm(t):
+    return F.normalize(t, dim = -1, p = 2)
+
+def l1norm(t, dim = -1, eps = 1e-8):
+    return F.normalize(t, p = 1, dim = dim, eps = eps)
+
+def softclamp(t, value = 50.):
+    return (t / value).tanh() * value
+
+def create_multi_token_prediction_targets(
+    t, # (b t ...)
+    steps_future,
+
+): # (b t-1 steps ...), (b t-1 steps) - targets and the mask, where mask is False for padding
+
+    batch, seq_len, device = *t.shape[:2], t.device
+
+    batch_arange = arange(batch, device = device)
+    seq_arange = arange(seq_len, device = device)
+    steps_arange = arange(steps_future, device = device)
+
+    indices = add('t, steps -> t steps', seq_arange, steps_arange)
+    mask = indices < seq_len
+
+    batch_arange = rearrange(batch_arange, 'b -> b 1 1')
+
+    indices[~mask] = 0
+    mask = repeat(mask, 't steps -> b t steps', b = batch)
+
+    out = t[batch_arange, indices]
+
+    return out, mask
+
+# activations
+
+from x_mlps_pytorch.activations import ReluSquared, SugarBSiLU
+
+Activation = str | Module
+
+ACTIVATIONS = dict(
+    silu = nn.SiLU,
+    relu_squared = ReluSquared,
+    sugar_bsilu = SugarBSiLU,
+    relu = nn.ReLU,
+    gelu = nn.GELU,
+)
+
+def register_activation(name: str, klass: Module):
+    ACTIVATIONS[name] = klass
+
+def get_activation(act: Activation) -> Module:
+    if isinstance(act, str):
+        assert act in ACTIVATIONS, f'activation {act} not found in {list(ACTIVATIONS.keys())}'
+        return ACTIVATIONS[act]()
+
+    return act
+
+# FIRE - Frobenius-Isometry Reinitialization
+# Han et al. https://arxiv.org/abs/2602.08040
+# Shrink and perturb - Ash et al. https://arxiv.org/abs/1910.08475
+
+@torch.no_grad()
+def apply_fire(
+    module,
+    num_iters = 20,
+    coefs = (1.5, -0.5),
+    shrink_perturb = False,
+    shrink_perturb_factors = (0.5, 0.01)
+):
+    a, b = coefs
+
+    for p in module.parameters():
+        if p.ndim != 2:
+            continue
+
+        t = p.data
+        t_norm = t.norm()
+
+        if t_norm == 0.:
+            continue
+
+        t = t / t_norm
+
+        dim_out, dim_in = t.shape
+        is_wide = dim_out < dim_in
+
+        if is_wide:
+            t = t.T
+
+        for _ in range(num_iters):
+            A = t.T @ t
+            t = a * t + b * (t @ A)
+
+        if is_wide:
+            t = t.T
+
+        t = t * (t_norm / t.norm())
+
+        if shrink_perturb:
+            scale, noise_scale = shrink_perturb_factors
+            noise = randn_like(t)
+
+            t = t.mul_(1. - scale).add_(noise * noise_scale)
+
+        p.data.copy_(t)
+
+# loss related
+
+class LossNormalizer(Module):
+
+    # the authors mentioned the need for loss normalization in the dynamics transformer
+
+    def __init__(
+        self,
+        num_losses = 1,
+        beta = 0.95,
+        eps = 1e-6
+    ):
+        super().__init__()
+        self.register_buffer('exp_avg_sq', ones(num_losses))
+        self.beta = beta
+        self.eps = eps
+
+    def forward(
+        self,
+        losses: Tensor | list[Tensor] | dict[str, Tensor],
+        update_ema = None
+    ):
+        exp_avg_sq, beta = self.exp_avg_sq, self.beta
+        update_ema = default(update_ema, self.training)
+
+        # get the rms value - as mentioned at the end of section 3 in the paper
+
+        rms = exp_avg_sq.sqrt()
+
+        if update_ema:
+            decay = 1. - beta
+
+            # update the ema
+
+            exp_avg_sq.lerp_(losses.detach().square(), decay)
+
+        # then normalize
+
+        assert losses.numel() == rms.numel()
+
+        normed_losses = losses / rms.clamp(min = self.eps)
+
+        return normed_losses
+
+class LPIPSLoss(Module):
+    def __init__(
+        self,
+        vgg: Module | None = None,
+        vgg_weights: VGG16_Weights = VGG16_Weights.DEFAULT,
+        sampled_frames = 1
+    ):
+        super().__init__()
+
+        if not exists(vgg):
+            vgg = torchvision.models.vgg16(weights = vgg_weights)
+            vgg.classifier = Sequential(*vgg.classifier[:-2])
+
+        vgg = vgg.eval()
+        vgg.requires_grad_(False)
+
+        self.vgg = [vgg]
+        self.sampled_frames = sampled_frames
+
+    def forward(
+        self,
+        pred,
+        data,
+        time_lens = None
+    ):
+        batch, device, is_video = pred.shape[0], pred.device, pred.ndim == 5
+
+        vgg, = self.vgg
+        vgg = vgg.to(data.device)
+
+        # take care of sampling random frames of the video
+
+        if is_video:
+            batch, channels, time = pred.shape[:3]
+
+            pred, data = tuple(rearrange(t, 'b c t ... -> (b t) c ...') for t in (pred, data))
+
+            # filter out padded frames
+
+            if exists(time_lens):
+                time_mask = lens_to_mask(time_lens, time)
+                time_mask = rearrange(time_mask, 'b t -> (b t)')
+
+                pred, data = tuple(t[time_mask] for t in (pred, data))
+
+            # sample from active frames
+
+            num_frames = pred.shape[0]
+            num_sampled = min(num_frames, batch * self.sampled_frames)
+
+            rand_indices = torch.randperm(num_frames, device = device)[:num_sampled]
+
+            pred, data = tuple(t[rand_indices] for t in (pred, data))
+
+        pred_embed, embed = tuple(vgg(t) for t in (pred, data))
+
+        return F.mse_loss(embed, pred_embed)
+
+# signature regularization
+
+def sigreg(
+    x,
+    num_slices = 1024,
+    domain = (-5, 5),
+    num_knots = 17,
+    mask = None
+):
+    # Randall Balestriero - https://arxiv.org/abs/2511.08544
+    # Sub-JEPA - https://arxiv.org/abs/2605.09241v1
+
+    dim, device = x.shape[-1], x.device
+
+    # slice sampling
+
+    rand_projs = randn((num_slices, dim), device = device)
+    rand_projs = l2norm(rand_projs)
+
+    # integration points
+
+    t = linspace(*domain, num_knots, device = device)
+
+    # theoretical CF for N(0, 1) and Gauss. window
+
+    exp_f = (-0.5 * t.square()).exp()
+
+    # empirical CF
+
+    x_t = einx.dot('k ... d, m d -> k (...) m', x, rand_projs)
+
+    x_t = multiply('k n m, t -> k n m t', x_t, t)
+    ecf = (1j * x_t).exp()
+
+    mask_1d = rearrange(mask, 'k ... -> k (...)') if exists(mask) else None
+    ecf = masked_mean(ecf, mask_1d, dim = 1)
+
+    # weighted L2 distance
+
+    err = ecf.sub(exp_f).abs().square().mul(exp_f)
+
+    return torch.trapz(err, t, dim = -1).mean()
+
+class LatentAutoregressiveLoss(Module):
+    sigreg = staticmethod(sigreg)
+
+    def __init__(
+        self,
+        dim,
+        dim_in = None,
+        use_rmsnorm = False,
+        sigreg_loss_kwargs: dict | None = None,
+        sigreg_num_subspaces = None,
+        loss_type: Literal['smooth_l1', 'cosine'] = 'smooth_l1',
+        detach_target = True,
+        predict_residual = False,
+        net: Module | None = None,
+        mlp_activation: Activation = 'silu'
+    ):
+        super().__init__()
+        dim_in = default(dim_in, dim)
+        self.predict_residual = predict_residual
+        self.sigreg_loss_kwargs = default(sigreg_loss_kwargs, dict())
+
+        assert loss_type in ('smooth_l1', 'cosine')
+        self.loss_type = loss_type
+        self.maybe_detach = detach if detach_target else identity
+
+        if not exists(net):
+            norm = RMSNorm(dim) if use_rmsnorm else Identity()
+
+            project_in = nn.Linear(dim_in, dim) if dim_in != dim else Identity()
+
+            net = nn.Sequential(
+                project_in,
+                norm,
+                create_mlp(
+                    dim * 4,
+                    depth = 1,
+                    dim_in = dim,
+                    dim_out = dim,
+                    activation = get_activation(mlp_activation),
+                )
+            )
+
+        self.net = net
+
+        # Sub-JEPA subspace gaussian regularization
+
+        self.num_subspaces = default(sigreg_num_subspaces, 1)
+
+        if self.num_subspaces > 1:
+            dim_subspace, remainder = divmod(dim, self.num_subspaces)
+            assert remainder == 0, f'dimension {dim} must be divisible by number of subspaces {self.num_subspaces}'
+
+            projs = stack([nn.init.orthogonal_(empty(dim_subspace, dim)) for _ in range(self.num_subspaces)])
+            self.register_buffer('subspace_projs', projs)
+
+    def forward(
+        self,
+        x,
+        target = None,
+        return_loss = True,
+        mask = None,
+        cond = None,
+        return_unreduced_loss = False
+    ):
+        is_same_layer = not exists(target) or x is target
+        target = default(target, x)
+
+        latents_input = x[:, :-1]
+        target_output = target[:, 1:]
+
+        pred_input = latents_input
+
+        if exists(cond):
+            pred_input = cat((pred_input, cond[:, :-1]), dim = -1)
+
+        pred = self.net(pred_input)
+
+        if self.predict_residual:
+            pred = pred + latents_input
+
+        if not return_loss:
+            return pred
+
+        target_output_loss = self.maybe_detach(target_output)
+
+        if self.loss_type == 'smooth_l1':
+            loss = F.smooth_l1_loss(pred, target_output_loss, reduction = 'none')
+        elif self.loss_type == 'cosine':
+            loss = cosine_sim_loss(pred, target_output_loss, reduction = 'none')
+        else:
+            raise ValueError(f'unknown loss_type {self.loss_type}')
+
+        if return_unreduced_loss:
+            return loss, pred
+
+        if exists(mask):
+            mask = mask[:, 1:]
+
+        loss = masked_mean(loss, mask)
+
+        if is_same_layer:
+            sigreg_input = target_output
+            sigreg_mask = mask
+        else:
+            sigreg_input = cat((x[:, :-1], target_output), dim = 0)
+            sigreg_mask = cat((mask, mask), dim = 0) if exists(mask) else None
+
+        # broadcast mask to token dims so it aligns with the collapsed sigreg inputs
+
+        sigreg_mask = maybe(pad_right_ndim_to)(sigreg_mask, sigreg_input.ndim - 1)
+        sigreg_mask = sigreg_mask.expand(sigreg_input.shape[:-1]) if exists(sigreg_mask) else None
+
+        # sub-jepa - Kai Zhao et al https://arxiv.org/abs/2605.09241v1
+
+        if self.num_subspaces > 1:
+            sigreg_input = einx.dot('... dim, k dim_subspace dim -> k ... dim_subspace', sigreg_input, self.subspace_projs)
+            if exists(sigreg_mask):
+                sigreg_mask = repeat(sigreg_mask, '... -> k ...', k = self.num_subspaces)
+        else:
+            sigreg_input = rearrange(sigreg_input, '... d -> 1 ... d')
+            if exists(sigreg_mask):
+                sigreg_mask = rearrange(sigreg_mask, '... -> 1 ...')
+
+        # sigreg for lejepa/wm
+
+        sigreg = self.sigreg(
+            sigreg_input,
+            mask = sigreg_mask,
+            **self.sigreg_loss_kwargs
+        )
+
+        return loss, sigreg, pred
+
+def ramp_weight(times, slope = 0.9, intercept = 0.1):
+    # equation (8) paper, their "ramp" loss weighting
+    return slope * times + intercept
+
+# simplicial embeddings
+# Lavoie et al - https://arxiv.org/abs/2204.00616
+
+class SEM(Module):
+    def __init__(
+        self,
+        dim,
+        dim_in = None,
+        project_in = None,
+        project_out = None,
+        temperature = 0.1,
+        dim_simplex = 8,
+        pre_layernorm = False
+    ):
+        super().__init__()
+        assert divisible_by(dim, dim_simplex), f'{dim} must be divisible by {dim_simplex}'
+
+        dim_in = default(dim_in, dim)
+        project_in = default(project_in, dim_in != dim)
+        project_out = default(project_out, dim_in != dim)
+
+        self.embedder = Linear(dim_in, dim, bias = False) if project_in else nn.Identity()
+
+        self.dim = dim
+        self.dim_simplex = dim_simplex
+        self.temperature = temperature
+
+        self.norm = nn.LayerNorm(dim, bias = False) if pre_layernorm else nn.Identity()
+
+        self.project_out = Linear(dim, dim_in, bias = False) if project_out else nn.Identity()
+
+    def forward(
+        self,
+        t
+    ):
+        t = self.embedder(t)
+        t = self.norm(t)
+        t = rearrange(t, '... (l v) -> ... l v', v = self.dim_simplex)
+        t = (t / self.temperature).softmax(dim = -1)
+        t = rearrange(t, '... l v -> ... (l v)')
+        return self.project_out(t)
+
+# reinforcement learning related
+
+# rewards
+
+class SymExpTwoHot(Module):
+    def __init__(
+        self,
+        reward_range = (-20., 20.),
+        num_bins = 255,
+        learned_embedding = False,
+        dim_embed = None,
+    ):
+        super().__init__()
+
+        min_value, max_value = reward_range
+        values = linspace(min_value, max_value, num_bins)
+        values = values.sign() * (torch.exp(values.abs()) - 1.)
+
+        self.reward_range = reward_range
+        self.num_bins = num_bins
+        self.register_buffer('bin_values', values)
+
+        # take care of a reward embedding
+        # for an improvisation where agent tokens can also see the past rewards - it makes sense that this information should not be thrown out, a la Decision Transformer
+
+        self.learned_embedding = learned_embedding
+
+        if learned_embedding:
+            assert exists(dim_embed)
+            self.bin_embeds = nn.Embedding(num_bins, dim_embed)
+
+    @property
+    def device(self):
+        return self.bin_values.device
+
+    def embed(
+        self,
+        two_hot_encoding,
+    ):
+        assert self.learned_embedding, f'can only embed if `learned_embedding` is True'
+
+        weights, bin_indices = two_hot_encoding.topk(k = 2, dim = -1)
+
+        two_embeds = self.bin_embeds(bin_indices)
+
+        return einsum(two_embeds, weights, '... two d, ... two -> ... d')
+
+    def bins_to_scalar_value(
+        self,
+        logits, # (... l)
+        normalize = True
+    ):
+        two_hot_encoding = logits.softmax(dim = -1) if normalize else logits
+        return einsum(two_hot_encoding, self.bin_values, '... l, l -> ...')
+
+    def forward(
+        self,
+        values
+    ):
+        bin_values = self.bin_values
+        min_bin_value, max_bin_value = bin_values[0], bin_values[-1]
+
+        values, inverse_pack = pack_one(values, '*')
+        num_values = values.shape[0]
+
+        values = values.clamp(min = min_bin_value, max = max_bin_value)
+
+        indices = torch.searchsorted(bin_values, values)
+
+        # fetch the closest two indices (two-hot encoding)
+
+        left_indices = (indices - 1).clamp(min = 0)
+        right_indices = (left_indices + 1).clamp(max = self.num_bins - 1)
+
+        left_indices, right_indices = tuple(rearrange(t, '... -> ... 1') for t in (left_indices, right_indices))
+
+        # fetch the left and right values for the consecutive indices
+
+        left_values = bin_values[left_indices]
+        right_values = bin_values[right_indices]
+
+        # calculate the left and right values by the distance to the left and right
+
+        values = rearrange(values, '... -> ... 1')
+        total_distance = right_values - left_values
+
+        left_logit_value = (right_values - values) / total_distance
+        right_logit_value = 1. - left_logit_value
+
+        # set the left and right values (two-hot)
+
+        encoded = zeros((num_values, self.num_bins), device = self.device)
+
+        encoded.scatter_(-1, left_indices, left_logit_value)
+        encoded.scatter_(-1, right_indices, right_logit_value)
+
+        return inverse_pack(encoded, '* l')
+
+class HLGaussRewardEncoder(Module):
+    def __init__(
+        self,
+        reward_range = (-20., 20.),
+        num_bins = 255,
+        sigma = None,
+        sigma_to_bin_ratio = 2.,
+        eps = 1e-10,
+        clamp_to_range = True,
+        min_max_value_on_bin_center = False,
+        learned_embedding = False,
+        dim_embed = None,
+    ):
+        super().__init__()
+
+        min_value, max_value = reward_range
+
+        self.reward_range = reward_range
+        self.loss = HLGaussLoss(
+            min_value,
+            max_value,
+            num_bins,
+            sigma = sigma,
+            sigma_to_bin_ratio = sigma_to_bin_ratio,
+            eps = eps,
+            clamp_to_range = clamp_to_range,
+            min_max_value_on_bin_center = min_max_value_on_bin_center,
+        )
+
+        self.num_bins = self.loss.num_bins
+        self.learned_embedding = learned_embedding
+
+        if learned_embedding:
+            assert exists(dim_embed)
+            self.bin_embeds = nn.Embedding(self.num_bins, dim_embed)
+
+    @property
+    def device(self):
+        return self.loss.support.device
+
+    def embed(
+        self,
+        probs,
+    ):
+        assert self.learned_embedding, f'can only embed if `learned_embedding` is True'
+        return einsum(probs, self.bin_embeds.weight, '... l, l d -> ... d')
+
+    def bins_to_scalar_value(
+        self,
+        logits,
+        normalize = True
+    ):
+        if normalize:
+            return self.loss.transform_from_logits(logits)
+
+        return self.loss.transform_from_probs(logits)
+
+    def forward(
+        self,
+        values
+    ):
+        if values.numel() == 0:
+            return values.new_empty((*values.shape, self.num_bins))
+
+        return self.loss.transform_to_probs(values)
+
+REWARD_ENCODERS = dict(
+    symexp_two_hot = SymExpTwoHot,
+    hl_gauss = HLGaussRewardEncoder,
+)
+
+def register_reward_encoder(name: str, klass: Module):
+    REWARD_ENCODERS[name] = klass
+
+def get_reward_encoder_klass(name: str) -> Module:
+    assert name in REWARD_ENCODERS, f'unknown reward encoder type {name}'
+    return REWARD_ENCODERS[name]
+
+# action related
+
+ActionEmbeds = namedtuple('ActionEmbed', ('discrete', 'continuous'))
+
+class ActionEmbedder(Module):
+    def __init__(
+        self,
+        dim,
+        *,
+        num_discrete_actions: int | tuple[int, ...] = 0,
+        num_continuous_actions  = 0,
+        continuous_norm_stats: tuple[tuple[float, float], ...] | None = None,
+        continuous_dist_type: Literal['gaussian', 'squashed_gaussian', 'beta'] = 'beta',
+        continuous_dist_kwargs: dict = dict(),
+        continuous_target_action_range: tuple[float, float] | None = None,
+        beta_log_prob_eps = 1e-5,
+        can_unembed = False,
+        unembed_dim = None,
+        num_unembed_preds = 1,
+        squeeze_unembed_preds = True, # will auto-squeeze if prediction is just 1
+    ):
+        super().__init__()
+
+        self.beta_log_prob_eps = beta_log_prob_eps
+
+        self.register_buffer('dummy', tensor(0), persistent = False)
+
+        # handle discrete actions
+
+        num_discrete_actions = tensor(ensure_tuple(num_discrete_actions), dtype = torch.long)
+        num_discrete_actions = num_discrete_actions[num_discrete_actions > 0]
+
+        self.num_discrete_action_types = num_discrete_actions.numel()
+        has_discrete = self.num_discrete_action_types > 0
+        total_discrete_actions = num_discrete_actions.sum().item() if has_discrete else 0
+
+        self.discrete_action_embed = Embedding(total_discrete_actions, dim)
+
+        self.register_buffer('num_discrete_actions', num_discrete_actions, persistent = False)
+
+        # continuous actions
+
+        self.num_continuous_action_types = num_continuous_actions
+        self.continuous_action_embed = Embedding(num_continuous_actions, dim)
+
+        self.continuous_need_norm = exists(continuous_norm_stats)
+
+        if self.continuous_need_norm:
+            self.register_buffer('continuous_norm_stats', tensor(continuous_norm_stats))
+
+        self.continuous_dist_type = continuous_dist_type
+
+        continuous_dist_kwargs = dict(continuous_dist_kwargs)
+        if continuous_dist_type == 'beta':
+            continuous_dist_kwargs = dict(unimodal = True, **continuous_dist_kwargs)
+
+        # only bounded distributions (beta, squashed_gaussian) can be rescaled to a target action range
+
+        is_bounded = continuous_dist_type in ('beta', 'squashed_gaussian')
+
+        if is_bounded and not exists(continuous_target_action_range):
+            continuous_target_action_range = (-1., 1.)
+
+        self.continuous_target_action_range = continuous_target_action_range if is_bounded else None
+
+        readout_squashed = continuous_dist_type == 'squashed_gaussian'
+        readout_dist_type = 'gaussian' if readout_squashed else continuous_dist_type
+
+        self.continuous_readout = None
+        if self.num_continuous_action_types > 0:
+            self.continuous_readout = Readout(
+                dim = None,
+                num_continuous = num_continuous_actions,
+                continuous_mean_std = tensor(continuous_norm_stats) if self.continuous_need_norm else None,
+                continuous_dist_type = readout_dist_type,
+                continuous_dist_kwargs = continuous_dist_kwargs,
+                continuous_squashed = readout_squashed,
+                eps = self.beta_log_prob_eps
+            )
+
+        # defaults
+
+        self.register_buffer('default_discrete_action_types', arange(self.num_discrete_action_types), persistent = False)
+        self.register_buffer('default_continuous_action_types', arange(self.num_continuous_action_types), persistent = False)
+
+        # calculate offsets
+
+        offsets = None
+
+        if self.has_discrete_actions:
+            offsets = F.pad(num_discrete_actions.cumsum(dim = -1), (1, -1), value = 0)
+
+        self.register_buffer('discrete_action_offsets', offsets, persistent = False)
+
+        # unembedding
+
+        self.can_unembed = can_unembed
+
+        self.num_unembed_preds = num_unembed_preds
+        self.squeeze_unembed_preds = squeeze_unembed_preds
+
+        if not can_unembed:
+            return
+
+        unembed_dim = default(unembed_dim, dim)
+
+        # discrete action unembed
+
+        self.discrete_action_unembed = EmbeddingSmallInit((total_discrete_actions, num_unembed_preds, unembed_dim,))
+
+        if self.has_discrete_actions:
+
+            discrete_action_index = arange(total_discrete_actions)
+
+            padded_num_discrete_actions = F.pad(num_discrete_actions, (1, 0), value = 0)
+            exclusive_cumsum = padded_num_discrete_actions.cumsum(dim = -1)
+
+            discrete_action_mask = (
+                einx.greater_equal('j, i -> i j', discrete_action_index, exclusive_cumsum[:-1]) &
+                einx.less('j, i -> i j', discrete_action_index, exclusive_cumsum[1:])
+            )
+
+            self.register_buffer('discrete_action_mask', discrete_action_mask, persistent = False)
+
+        # continuous action unembed
+
+        self.continuous_action_unembed = EmbeddingSmallInit((num_continuous_actions, num_unembed_preds, unembed_dim, 2,))
+
+    def embed_parameters(self):
+        return set([*self.discrete_action_embed.parameters(), *self.continuous_action_embed.parameters()])
+
+    def unembed_parameters(self):
+        return set([self.discrete_action_unembed, self.continuous_action_unembed])
+
+    @property
+    def has_discrete_actions(self):
+        return self.num_discrete_action_types > 0
+
+    @property
+    def has_continuous_actions(self):
+        return self.num_continuous_action_types > 0
+
+    @property
+    def device(self):
+        return self.dummy.device
+
+    @property
+    def has_actions(self):
+        return self.num_discrete_action_types > 0 or self.num_continuous_action_types > 0
+
+    def cast_action_types(
+        self,
+        action_types = None
+    ):
+        if exists(action_types) and not is_tensor(action_types):
+            if isinstance(action_types, int):
+                action_types = (action_types,)
+
+            action_types = tensor(action_types, device = self.device)
+
+        return action_types
+
+    def unembed(
+        self,
+        embeds,                          # (... d)
+        discrete_action_types = None,    # (na)
+        continuous_action_types = None,  # (na)
+        return_split_discrete = False,
+        pred_head_index: int | Tensor | None = None
+
+    ):  # (... discrete_na), (... continuous_na 2)
+
+        device = embeds.device
+
+        assert self.can_unembed, 'can only unembed for predicted discrete and continuous actions if `can_unembed = True` is set on init'
+
+        # handle only one prediction head during inference
+
+        if exists(pred_head_index) and isinstance(pred_head_index, int):
+            pred_head_index = tensor(pred_head_index, device = device)
+
+        # if pred_head_index given as a solo int, just assume we want to squeeze out the prediction head dimension
+
+        squeeze_one_pred_head = exists(pred_head_index) and pred_head_index.ndim == 0
+
+        # get action types
+
+        discrete_action_types, continuous_action_types = tuple(self.cast_action_types(t) for t in (discrete_action_types, continuous_action_types))
+
+        # discrete actions
+
+        discrete_action_logits = None
+
+        if self.num_discrete_action_types > 0:
+
+            discrete_action_unembed = self.discrete_action_unembed
+
+            if exists(discrete_action_types):
+                discrete_action_mask = self.discrete_action_mask[discrete_action_types].any(dim = 0)
+
+                discrete_action_unembed = discrete_action_unembed[discrete_action_mask]
+
+            if exists(pred_head_index):
+                discrete_action_unembed = discrete_action_unembed.index_select(1, pred_head_index)
+
+            discrete_action_logits = einsum(embeds, discrete_action_unembed, '... d, na mtp d -> mtp ... na')
+
+            if self.squeeze_unembed_preds or squeeze_one_pred_head:
+                discrete_action_logits = safe_squeeze_first(discrete_action_logits)
+
+        # whether to split the discrete action logits by the number of actions per action type
+
+        if exists(discrete_action_logits) and return_split_discrete:
+
+            split_sizes = self.num_discrete_actions[discrete_action_types] if exists(discrete_action_types) else self.num_discrete_actions
+
+            discrete_action_logits = discrete_action_logits.split(split_sizes.tolist(), dim = -1)
+
+        # continuous actions
+
+        continuous_action_mean_log_var = None
+
+        if self.num_continuous_action_types > 0:
+
+            continuous_action_unembed = self.continuous_action_unembed
+
+            if exists(continuous_action_types):
+                continuous_action_unembed = continuous_action_unembed[continuous_action_types]
+
+            if exists(pred_head_index):
+                continuous_action_unembed = continuous_action_unembed.index_select(1, pred_head_index)
+
+            continuous_action_mean_log_var = einsum(embeds, continuous_action_unembed, '... d, na mtp d two -> mtp ... na two')
+
+            if self.squeeze_unembed_preds or squeeze_one_pred_head:
+                continuous_action_mean_log_var = safe_squeeze_first(continuous_action_mean_log_var)
+
+        return discrete_action_logits, continuous_action_mean_log_var
+
+    def sample(
+        self,
+        embed,
+        discrete_temperature = 1.,
+        continuous_temperature = 1.,
+        inverse_norm_continuous = None,
+        pred_head_index: int | Tensor | None = None,
+        parallel_discrete_calc = True,
+        squeeze = True,
+        **kwargs
+    ):
+        inverse_norm_continuous = default(inverse_norm_continuous, self.continuous_need_norm)
+
+        discrete_logits, continuous_mean_log_var = self.unembed(embed, return_split_discrete = True, pred_head_index = pred_head_index, **kwargs)
+
+        sampled_discrete = sampled_continuous = None
+
+        if exists(discrete_logits):
+            dist = MultiCategorical(discrete_logits, use_parallel_multi_discrete = parallel_discrete_calc)
+            sampled_discrete = dist.sample(temperature = discrete_temperature)
+
+        if exists(continuous_mean_log_var):
+            sampled_continuous = self.continuous_readout.sample_continuous(
+                continuous_mean_log_var,
+                selector = self.continuous_readout.get_selector(),
+                temperature = continuous_temperature
+            )
+
+        return sampled_discrete, sampled_continuous
+
+    def rescale_for_env(self, actions):
+        """ rescale actions from native distribution range to target environment range """
+        return self.continuous_readout.rescale_from_native(actions, self.continuous_target_action_range)
+
+    def log_probs(
+        self,
+        embeds,                          # (... d)
+        discrete_targets = None,         # (... na)
+        continuous_targets = None,       # (... na)
+        discrete_action_types = None,    # (na)
+        continuous_action_types = None,  # (na)
+        pred_head_index: int | Tensor | None = None,
+        parallel_discrete_calc = None,
+        return_entropies = False,
+        soft_validate_range = False
+    ):
+        discrete_action_logits, continuous_action_mean_log_var = self.unembed(
+            embeds,
+            pred_head_index = pred_head_index,
+            discrete_action_types = discrete_action_types,
+            continuous_action_types = continuous_action_types,
+            return_split_discrete = True
+        )
+
+        # discrete
+
+        discrete_log_probs = None
+        discrete_entropies = None
+
+        if exists(discrete_targets):
+            if not exists(pred_head_index) and self.num_unembed_preds > 1:
+                # if multiple heads and no index, broadcast targets to mtp dim
+                if discrete_targets.ndim == (discrete_action_logits[0].ndim - 1):
+                    discrete_targets = rearrange(discrete_targets, '... -> 1 ...')
+
+            dist = MultiCategorical(discrete_action_logits, use_parallel_multi_discrete = parallel_discrete_calc)
+            discrete_log_probs = dist.log_prob(discrete_targets)
+
+            if return_entropies:
+                discrete_entropies = dist.entropy()
+
+        # continuous
+
+        continuous_log_probs = None
+        continuous_entropies = None
+
+        if exists(continuous_targets) and exists(continuous_action_mean_log_var):
+            if not exists(pred_head_index) and self.num_unembed_preds > 1:
+                # if multiple heads and no index, broadcast targets to mtp dim
+                if continuous_targets.ndim == (continuous_action_mean_log_var.ndim - 2):
+                    continuous_targets = rearrange(continuous_targets, '... -> 1 ...')
+
+            # only clamp for beta distribution, and do it after any normalization
+            # (in the readout) - clamping before normalization would silently corrupt
+            # raw targets that are outside of (0, 1) but normalize into the valid range
+
+            continuous_log_probs = self.continuous_readout.log_prob_continuous(
+                continuous_action_mean_log_var,
+                continuous_targets,
+                selector = self.continuous_readout.get_selector(),
+                soft_validate_range = soft_validate_range and self.continuous_dist_type == 'beta'
+            )
+
+            if return_entropies:
+                continuous_entropies = self.continuous_readout.entropy_continuous(
+                    continuous_action_mean_log_var,
+                    selector = self.continuous_readout.get_selector()
+                )
+
+        log_probs = (discrete_log_probs, continuous_log_probs)
+
+        if not return_entropies:
+            return log_probs
+
+        entropies = (discrete_entropies, continuous_entropies)
+
+        return log_probs, entropies
+
+    def kl_div(
+        self,
+        src: tuple[MaybeTensor, MaybeTensor],
+        tgt: tuple[MaybeTensor, MaybeTensor],
+        reduce_across_num_actions = True
+    ) -> tuple[MaybeTensor, MaybeTensor]:
+
+        src_logits, src_params = src
+        tgt_logits, tgt_params = tgt
+
+        # discrete kl
+
+        discrete_kl = None
+
+        if exists(src_logits) and exists(tgt_logits):
+            src_dist = MultiCategorical(src_logits, use_parallel_multi_discrete = True)
+            tgt_dist = MultiCategorical(tgt_logits, use_parallel_multi_discrete = True)
+
+            discrete_kl = src_dist.kl_div(tgt_dist, keep_num_actions_dim = True)
+
+            if reduce_across_num_actions:
+                discrete_kl = discrete_kl.sum(dim = -1)
+
+        # continuous kl
+
+        continuous_kl = None
+
+        if exists(src_params) and exists(tgt_params):
+            src_distr = self.continuous_readout.continuous_dist.dist(src_params)
+            tgt_distr = self.continuous_readout.continuous_dist.dist(tgt_params)
+
+            continuous_kl = kl.kl_divergence(src_distr, tgt_distr)
+
+            if reduce_across_num_actions:
+                continuous_kl = continuous_kl.sum(dim = -1)
+
+        return discrete_kl, continuous_kl
+
+    def forward(
+        self,
+        *,
+        discrete_actions = None,         # (... na)
+        continuous_actions = None,       # (... na)
+        discrete_action_types = None,    # (na)
+        continuous_action_types = None,  # (na)
+        return_sum_pooled_embeds = True
+    ):
+        discrete_embeds = continuous_embeds = None
+
+        if exists(discrete_actions) and discrete_actions.shape[-1] > 0:
+
+            discrete_action_types = default(discrete_action_types, self.default_discrete_action_types)
+
+            discrete_action_types = self.cast_action_types(discrete_action_types)
+
+            offsets = self.discrete_action_offsets[discrete_action_types]
+
+            assert offsets.shape[-1] == discrete_actions.shape[-1], 'mismatched number of discrete actions'
+
+            # offset the discrete actions based on the action types passed in (by default all discrete actions) and the calculated offset
+
+            discrete_actions_offsetted = add('... na, na', discrete_actions, offsets)
+            discrete_embeds = self.discrete_action_embed(discrete_actions_offsetted)
+
+        if exists(continuous_actions) and continuous_actions.shape[-1] > 0:
+            continuous_action_types = default(continuous_action_types, self.default_continuous_action_types)
+
+            continuous_action_types = self.cast_action_types(continuous_action_types)
+
+            assert continuous_action_types.shape[-1] == continuous_actions.shape[-1], 'mismatched number of continuous actions'
+
+            continuous_action_embed = self.continuous_action_embed(continuous_action_types)
+
+            # maybe normalization
+
+            if self.continuous_need_norm:
+                norm_mean, norm_std = self.continuous_norm_stats.unbind(dim = -1)
+                continuous_actions = (continuous_actions - norm_mean) / norm_std.clamp(min = 1e-6)
+
+            # continuous embed is just the selected continuous action type with the scale
+
+            continuous_embeds = multiply('na d, ... na -> ... na d', continuous_action_embed, continuous_actions)
+
+        # return not pooled
+
+        if not return_sum_pooled_embeds:
+            return ActionEmbeds(discrete_embeds, continuous_embeds)
+
+        # handle sum pooling, which is what they did in the paper for all the actions
+
+        pooled = 0.
+
+        if exists(discrete_embeds):
+            pooled = pooled + reduce(discrete_embeds, '... na d -> ... d', 'sum')
+
+        if exists(continuous_embeds):
+            pooled = pooled + reduce(continuous_embeds, '... na d -> ... d', 'sum')
+
+        return pooled
+
+# generalized advantage estimate
+
+@torch.no_grad()
+def calc_gae(
+    rewards,
+    values,
+    masks = None,
+    learn_masks = None,
+    gamma = 0.99,
+    lam = 0.95,
+    use_accelerated = None
+):
+    assert values.shape[-1] == rewards.shape[-1]
+    use_accelerated = default(use_accelerated, rewards.is_cuda)
+
+    if not exists(masks):
+        masks = ones_like(values)
+
+    masks = masks.float()
+
+    values = F.pad(values, (0, 1), value = 0.)
+    values, values_next = values[..., :-1], values[..., 1:]
+
+    delta = rewards + gamma * values_next * masks - values
+
+    if exists(learn_masks):
+        delta = delta.masked_fill(~learn_masks, 0.)
+
+    gates = gamma * lam * masks
+
+    scan = AssocScan(reverse = True, use_accelerated = use_accelerated)
+
+    gae = scan(gates, delta)
+
+    returns = gae + values
+
+    return returns
+
+# rotary embeddings for time
+
+class Rotary1D(Module):
+    def __init__(
+        self,
+        dim_head,
+        theta = 10000.
+    ):
+        super().__init__()
+        inv_freq = 1.0 / (theta ** (arange(0, dim_head, 2).float() / dim_head))
+        self.register_buffer('inv_freq', inv_freq)
+
+    def forward(
+        self,
+        seq_len,
+        offset = 0
+    ):
+        device, dtype = self.inv_freq.device, self.inv_freq.dtype
+
+        t = arange(seq_len, device = device).type(dtype) + offset
+        freqs = einsum(t, self.inv_freq, 'i, j -> i j')
+
+        return cat((freqs, freqs), dim = -1)
+
+def apply_rotations(
+    rotations, # (h n d) | (n d)
+    t          # (b h n d)
+):
+
+    heads, seq_len, dtype = *t.shape[1:3], t.dtype
+
+    rotations_seq_len = rotations.shape[-2]
+
+    # handle kv caching with rotations
+
+    if rotations_seq_len > seq_len:
+        rotations = rotations[-seq_len:]
+
+    # precision
+
+    t = t.float()
+
+    # handle gqa for rotary
+
+    if rotations.ndim == 3 and rotations.shape[0] < heads:
+        rotary_heads = rotations.shape[0]
+
+        assert divisible_by(heads, rotary_heads)
+        groups = heads // rotary_heads
+        rotations = repeat(rotations, 'h ... -> (h g) ...', g = groups)
+
+    x1, x2 = t.chunk(2, dim = -1)
+    rotated_half_t = cat((-x2, x1), dim = -1)
+
+    # rotate in the positions
+
+    rotated = t * rotations.cos() + rotated_half_t * rotations.sin()
+    return rotated.type(dtype)
+
+# multi-head rmsnorm
+
+class MultiHeadRMSNorm(Module):
+    def __init__(
+        self,
+        dim_head,
+        heads = 8
+    ):
+        super().__init__()
+        self.scale = dim_head ** 0.5
+        self.gamma = Parameter(zeros(heads, dim_head)) # weight decay friendly
+
+    def forward(
+        self,
+        x # (b h n d)
+    ):
+        normed = l2norm(x)
+        scale = (self.gamma + 1.) * self.scale
+        return multiply('... h n d, h d', normed, scale)
+
+# naive attend
+
+def naive_attend(
+    q, k, v,
+    softclamp_value = None,
+    scale = None,
+    causal = False,
+    causal_block_size = 1,
+    mask = None
+):
+    groups = q.shape[-3] // k.shape[-3]
+    is_gqa = groups > 1
+
+    can_use_sdpa = not exists(softclamp_value) and not exists(mask) and causal_block_size == 1
+
+    if can_use_sdpa:
+        if is_gqa:
+            k = repeat(k, '... h n d -> ... (h g) n d', g = groups)
+            v = repeat(v, '... h n d -> ... (h g) n d', g = groups)
+
+        return F.scaled_dot_product_attention(q, k, v, is_causal = causal, scale = scale)
+
+    if not exists(scale):
+        scale = q.shape[-1] ** -0.5
+
+    # grouped query attention
+
+    q = rearrange(q, 'b (h g) ... -> b h g ...', g = groups)
+
+    # similarity
+
+    sim = einsum(q, k, 'b h g i d, b h j d -> b h g i j')
+
+    # scale and attention
+
+    sim = sim * scale
+
+    # softclamping a la gemma 3
+
+    if exists(softclamp_value):
+        sim = softclamp(sim, softclamp_value)
+
+    # masking
+
+    mask_value = -torch.finfo(sim.dtype).max
+
+    if exists(mask):
+        sim = sim.masked_fill(~mask, mask_value)
+
+    if causal:
+        is_blocked_causal = causal_block_size > 1
+        i, j = sim.shape[-2:]
+
+        if is_blocked_causal:
+          i = ceil(i / causal_block_size)
+          j = ceil(j / causal_block_size)
+
+        causal_mask = ones((i, j), dtype = torch.bool, device = sim.device).triu(j - i + 1)
+
+        if causal_block_size > 1:
+            causal_mask = repeat(causal_mask, 'i j -> (i b1) (j b2)', b1 = causal_block_size, b2 = causal_block_size)
+            causal_mask = causal_mask[:sim.shape[-2], :sim.shape[-1]]
+
+        sim = sim.masked_fill(causal_mask, mask_value)
+
+    # attend
+
+    attn = sim.softmax(dim = -1)
+
+    # aggregate
+
+    out = einsum(attn, v, 'b h g i j, b h j d -> b h g i d')
+
+    # merge the groups
+
+    return rearrange(out, 'b h g i d -> b (h g) i d')
+
+# flex attention related and factory function for attend depending on whether on cuda + flex attention available
+
+def block_mask_causal(block_size):
+
+    def inner(b, h, q, k):
+        bq = q // block_size
+        bk = k // block_size
+        return bq >= bk
+
+    return inner
+
+def special_token_mask(q, k, seq_len, num_tokens, special_attend_only_itself = False):
+    bq = q % seq_len
+    bk = k % seq_len
+
+    is_special_start_index = seq_len - num_tokens
+
+    q_is_special = bq >= is_special_start_index
+    k_is_special = bk >= is_special_start_index
+
+    if special_attend_only_itself:
+        out = ~(q_is_special & ~k_is_special) # modality attends to everything, but latent can only attend to itself (proposed attention pattern for encoder of video tokenizer)
+    else:
+        out = ~(~q_is_special & k_is_special) # modality cannot attend to agent tokens
+
+    return out
+
+def block_mask_special_tokens_right(
+    seq_len,
+    num_tokens,
+    special_attend_only_itself = False
+):
+    def inner(b, h, q, k):
+        return special_token_mask(q, k, seq_len, num_tokens, special_attend_only_itself)
+    return inner
+
+def compose_mask(mask1, mask2):
+    def inner(b, h, q, k):
+        return mask1(b, h, q, k) & mask2(b, h, q, k)
+
+    return inner
+
+def eval_decorator(fn):
+    def inner(self, *args, **kwargs):
+        was_training = self.training
+        self.eval()
+        out = fn(self, *args, **kwargs)
+        self.train(was_training)
+        return out
+    return inner
+
+def block_mask_noop(b, h, q, k):
+    return b >= 0
+
+def score_mod_softclamp(value):
+    def inner(sim, b, h, q, k):
+        if not exists(value):
+           return sim
+
+        sim = sim / value
+        sim = torch.tanh(sim)
+        sim = sim * value
+        return sim
+
+    return inner
+
+# factory for attend function
+
+def get_attend_fn(
+    use_flex,
+    seq_len,
+    k_seq_len,
+    causal = False,
+    causal_block_size = 1,
+    softclamp_value = 50.,
+    num_special_tokens = 0,             # special tokens are latents / agents
+    block_size_per_special = None,      # defaults to k_seq_len
+    special_attend_only_itself = False, # by default, modality only attends to itself while special sees everything, but if turned True, will be the inverse - special can only attend to itself but modality can attend everything
+    device = None
+):
+    block_size_per_special = default(block_size_per_special, k_seq_len)
+
+    if use_flex:
+        # flex pathway
+
+        block_mask_fn = block_mask_causal(causal_block_size) if causal else block_mask_noop
+
+        if num_special_tokens > 0:
+            special_block_mask = block_mask_special_tokens_right(block_size_per_special, num_special_tokens, special_attend_only_itself)
+            block_mask_fn = compose_mask(block_mask_fn, special_block_mask)
+
+        block_mask = create_block_mask(block_mask_fn, B = None, H = None, Q_LEN = seq_len, KV_LEN = k_seq_len)
+
+        score_mod = score_mod_softclamp(softclamp_value)
+        attend_fn = partial(flex_attention, block_mask = block_mask, score_mod = score_mod, enable_gqa = True)
+    else:
+        # naive pathway
+
+        mask = None
+        if num_special_tokens > 0:
+            q_seq = arange(seq_len, device = device)[:, None]
+            k_seq = arange(k_seq_len, device = device)[None, :]
+
+            mask = special_token_mask(q_seq, k_seq, block_size_per_special, num_special_tokens, special_attend_only_itself)
+
+        attend_fn = partial(naive_attend, causal = causal, causal_block_size = causal_block_size, mask = mask, softclamp_value = softclamp_value)
+
+    return attend_fn
+
+# residual wrapper
+
+class Residual(Module):
+    def __init__(self, fn):
+        super().__init__()
+        self.fn = fn
+
+    def forward(
+        self,
+        x,
+        *args,
+        **kwargs
+    ):
+        out = self.fn(x, *args, **kwargs)
+        (out, *rest), inverse = tree_flatten_with_inverse(out)
+        out = out + x
+        return inverse((out, *rest))
+
+# attention
+
+class Attention(Module):
+    def __init__(
+        self,
+        dim,
+        dim_head = 64,
+        dim_kv_input = None,
+        query_heads = None,
+        heads = 8,
+        pre_rmsnorm = True,
+        pre_context_rmsnorm = False,
+        gate_values = True,
+        rmsnorm_query = False, # a paper claims that it is better to just norm only the keys https://openreview.net/forum?id=HkztQWZfl2
+        rmsnorm_key = True,
+        value_residual = True,
+        belief_attn = True
+    ):
+        super().__init__()
+        dim_kv_input = default(dim_kv_input, dim)
+
+        self.norm = RMSNorm(dim) if pre_rmsnorm else Identity()
+        self.norm_context = RMSNorm(dim_kv_input) if pre_context_rmsnorm else Identity()
+
+        # setup grouped query attention
+
+        query_heads = default(query_heads, heads)
+        assert query_heads >= heads and divisible_by(query_heads, heads)
+
+        # scaling, splitting and merging of heads
+
+        self.split_heads = Rearrange('b n (h d) -> b h n d', d = dim_head)
+        self.merge_heads = Rearrange('b h n d -> b n (h d)')
+
+        dim_q_inner = dim_head * query_heads
+        dim_kv_inner = dim_head * heads
+
+        self.to_q = LinearNoBias(dim, dim_q_inner)
+        self.to_k = LinearNoBias(dim_kv_input, dim_kv_inner)
+        self.to_v = LinearNoBias(dim_kv_input, dim_kv_inner)
+        self.to_out = LinearNoBias(dim_q_inner, dim)
+
+        # alphafold gating per head, for attending to nothing
+
+        self.to_gates = None
+
+        if gate_values:
+            self.to_gates = Sequential(
+                LinearNoBias(dim, query_heads),
+                Rearrange('b n h -> b h n 1'),
+                nn.Sigmoid()
+            )
+
+        # stability related
+
+        self.q_heads_rmsnorm = MultiHeadRMSNorm(dim_head, heads = query_heads) if rmsnorm_query else nn.Identity()
+        self.k_heads_rmsnorm = MultiHeadRMSNorm(dim_head, heads = heads) if rmsnorm_key else nn.Identity()
+
+        # value residual
+
+        self.to_learned_value_residual_mix = nn.Sequential(
+            nn.Linear(dim, heads),
+            Rearrange('b n h -> b h n 1'),
+            nn.Sigmoid()
+        ) if value_residual else None
+
+        # beliefformer
+
+        self.belief_attn = belief_attn
+        self.head_repeat = Identity()
+
+        if query_heads > heads:
+            groups = query_heads // heads
+            self.head_repeat = Reduce('b h n d -> b (h g) n d', 'repeat', g = groups)
+
+    def muon_parameters(self):
+        # omit the queries and keys for now given what we learned from kimi 2 paper
+
+        return [
+            *self.to_v.parameters(),
+            *self.to_out.parameters(),
+        ]
+
+    def forward(
+        self,
+        tokens, # (b n d)
+        context = None,
+        kv_cache = None,
+        return_intermediates = False,
+        rotary_pos_emb = None,
+        pope_pos_emb = None,
+        pope_pos_emb_indices = None,
+        causal = False,
+        residual_values = None,  # (b n h d)
+        attend_fn: Callable | None = None
+    ):
+        seq_len = tokens.shape[-2]
+
+        tokens, inverse_packed_batch = pack_one(tokens, '* n d')
+
+        tokens = self.norm(tokens)
+
+        q = self.to_q(tokens)
+
+        # handle maybe context
+
+        has_context = exists(context)
+
+        if has_context:
+            context, _ = pack_one(context, '* n d')
+            context = self.norm_context(context)
+        else:
+            context = tokens
+
+        k, v = self.to_k(context), self.to_v(context)
+
+        # split heads
+
+        q, k, v = map(self.split_heads, (q, k, v))
+
+        # handle maybe value residual
+
+        if exists(residual_values):
+            residual_values = rearrange(residual_values, '... n h d -> (...) h n d')
+
+            assert exists(self.to_learned_value_residual_mix)
+
+            learned_mix = self.to_learned_value_residual_mix(tokens)
+
+            v = v.lerp(residual_values, learned_mix)
+
+        # qk rmsnorm
+
+        q = self.q_heads_rmsnorm(q)
+        k = self.k_heads_rmsnorm(k)
+
+        # rotary
+
+        if exists(rotary_pos_emb):
+            q = apply_rotations(rotary_pos_emb, q)
+            k = apply_rotations(rotary_pos_emb, k)
+
+        # save values for calculating parallel component to output
+
+        if self.belief_attn and not has_context:
+            v_for_belief = v
+
+        # caching
+
+        if exists(kv_cache):
+            ck, cv = kv_cache
+            k = cat((ck, k), dim = -2)
+            v = cat((cv, v), dim = -2)
+
+        # attention
+
+        is_causal = causal and seq_len > 1
+
+        if exists(pope_pos_emb):
+            out = flash_attn_with_pope(q, k, v, pos_emb = pope_pos_emb, pope_pos_emb_indices = pope_pos_emb_indices, causal = is_causal, head_dimension_at_first = True)
+        else:
+            attend_fn = default(attend_fn, naive_attend)
+            out = attend_fn(q, k, v, causal = is_causal)
+
+        # "beliefformer"
+        # orthogonal outputs wrt values
+        # Guoqiang Zhang - https://openreview.net/forum?id=Ard2QzPAUK
+
+        if self.belief_attn and not has_context:
+            v_normed = l2norm(v_for_belief)
+            v_normed = self.head_repeat(v_normed)
+
+            parallel = (out * v_normed).sum(dim = -1, keepdim = True) * v_normed
+            out = out - parallel
+
+        # gate values
+
+        if exists(self.to_gates):
+            gates = self.to_gates(tokens)
+            out = out * gates
+
+        # merge heads
+
+        out = self.merge_heads(out)
+
+        # combine heads
+
+        out = self.to_out(out)
+
+        out = inverse_packed_batch(out)
+
+        if not return_intermediates:
+            return out
+
+        return out, AttentionIntermediates(stack((k, v)), tokens)
+
+# feedforward
+
+class FeedForward(Module):
+    def __init__(
+        self,
+        dim,
+        expansion_factor = 4,
+        pre_rmsnorm = True,
+        activation: Activation = 'silu',
+        use_glu: bool | None = None
+    ):
+        super().__init__()
+        self.norm = RMSNorm(dim) if pre_rmsnorm else Identity()
+
+        self.activation = get_activation(activation)
+
+        self.use_glu = default(use_glu, activation in {'silu', 'gelu'})
+        dim_inner = int(dim * expansion_factor * (2 / 3 if self.use_glu else 1))
+
+        self.proj_in = Linear(dim, dim_inner * (2 if self.use_glu else 1))
+        self.proj_out = Linear(dim_inner, dim)
+
+    def muon_parameters(self):
+        return [
+            self.proj_in.weight,
+            self.proj_out.weight,
+        ]
+
+    def forward(self, x):
+        x = self.norm(x)
+
+        x = self.proj_in(x)
+
+        if self.use_glu:
+            x, gates = x.chunk(2, dim = -1)
+            x = x * self.activation(gates)
+        else:
+            x = self.activation(x)
+
+        return self.proj_out(x)
+
+# rnn
+
+class GRULayer(Module):
+    def __init__(
+        self,
+        dim,
+        dim_out
+    ):
+        super().__init__()
+        self.norm = nn.RMSNorm(dim)
+        self.gru = nn.GRU(dim, dim_out, batch_first = True)
+
+    def forward(
+        self,
+        x,
+        prev_hiddens = None
+    ):
+        x = self.norm(x)
+
+        x, hiddens = self.gru(x, prev_hiddens)
+
+        return x, hiddens
+
+# attention pooling
+
+class AttentionPool(Module):
+    def __init__(
+        self,
+        dim,
+        heads = 4,
+        dim_head = 64,
+        **kwargs
+    ):
+        super().__init__()
+        self.attn = Attention(
+            dim = dim,
+            heads = heads,
+            dim_head = dim_head,
+            gate_values = True,
+            value_residual = False,
+            belief_attn = False,
+            pre_rmsnorm = True,
+            pre_context_rmsnorm = True,
+            **kwargs
+        )
+
+    def forward(
+        self,
+        x,
+        hiddens: list[Tensor] | None = None,
+        **kwargs
+    ):
+        assert exists(hiddens), 'hiddens must be passed to AttentionPool'
+
+        context = stack(hiddens, dim = -2)
+        queries = rearrange(x, '... d -> ... 1 d')
+
+        out = self.attn(queries, context = context)
+
+        return rearrange(out, '... 1 d -> ... d')
+
+class LearnedQueriesAttentionPool(Module):
+    def __init__(
+        self,
+        num_queries,
+        dim,
+        dim_kv_input = None,
+        heads = 8,
+        dim_head = 64
+    ):
+        super().__init__()
+        self.queries = EmbeddingSmallInit((num_queries, dim,))
+
+        self.attn = Attention(
+            dim = dim,
+            dim_kv_input = dim_kv_input,
+            heads = heads,
+            dim_head = dim_head,
+            gate_values = True,
+            value_residual = False,
+            belief_attn = False,
+            pre_rmsnorm = True,
+            pre_context_rmsnorm = True
+        )
+
+    def forward(self, x):
+        context, inverse_pack = pack_one(x, '* n d')
+
+        queries = repeat(self.queries, 'n d -> b n d', b = context.shape[0])
+
+        out = self.attn(queries, context = context)
+
+        return inverse_pack(out)
+
+# ssl
+
+# self predictive representation (next latent prediction methods) for actor
+
+class ActorSPRWrapper(Module):
+    def __init__(
+        self,
+        action_embedder,
+        *,
+        dim,
+        num_rollouts = 1,
+        spr_loss_weight = 1.0,
+        kl_loss_weight = 1.0,
+        dynamics_hidden_dim = None,
+        dynamics_num_layers = 3,
+        sigreg_loss_weight = 0.,
+        sigreg_loss_kwargs: dict = dict(),
+        dynamics_mlp_activation: Activation = 'silu'
+    ):
+        super().__init__()
+        self.action_embedder = action_embedder
+        self.num_rollouts = num_rollouts
+
+        self.norm = RMSNorm(dim)
+
+        self.spr_loss_weight = spr_loss_weight
+        self.kl_loss_weight = kl_loss_weight
+
+        self.sigreg_loss_weight = sigreg_loss_weight
+        self.sigreg_loss_kwargs = dict(num_slices = 1024, domain = (-5, 5), num_knots = 17)
+        self.sigreg_loss_kwargs.update(sigreg_loss_kwargs)
+
+        self.has_spr_loss = spr_loss_weight > 0.
+        self.has_kl_loss = kl_loss_weight > 0.
+        self.has_sigreg = sigreg_loss_weight > 0.
+
+        rollout_weights = tensor([1.] * num_rollouts)
+        self.register_buffer('rollout_loss_weights', rollout_weights / rollout_weights.sum(), persistent = False)
+
+        dynamics_hidden_dim = default(dynamics_hidden_dim, dim)
+        action_embed_dim = action_embedder.discrete_action_embed.embedding_dim if action_embedder.has_discrete_actions else action_embedder.continuous_action_embed.embedding_dim
+
+        self.dynamics_mlp = create_mlp(
+            dynamics_hidden_dim,
+            dynamics_num_layers,
+            dim_in = dim + action_embed_dim,
+            dim_out = dim
+        )
+
+        self.dynamics_norm = RMSNorm(dim + action_embed_dim)
+
+        self.register_buffer('zero', tensor(0.), persistent = False)
+
+    def forward(
+        self,
+        policy_embed,
+        discrete_actions = None,
+        continuous_actions = None,
+        discrete_action_types = None,
+        continuous_action_types = None,
+        mask = None
+    ):
+        num_rollouts = self.num_rollouts
+        seq = policy_embed.shape[1]
+
+        policy_embed = self.norm(policy_embed)
+
+        if not (self.has_spr_loss or self.has_kl_loss or self.has_sigreg):
+            return self.zero, self.zero
+
+        if not exists(mask):
+            mask = ones(policy_embed.shape[:2], device = policy_embed.device, dtype = torch.bool)
+
+        action_embeds = self.action_embedder(
+            discrete_actions = discrete_actions,
+            continuous_actions = continuous_actions,
+            discrete_action_types = discrete_action_types,
+            continuous_action_types = continuous_action_types,
+            return_sum_pooled_embeds = True
+        )
+
+        assert seq > num_rollouts
+
+        pad_amt = num_rollouts - 1
+        padded_target_embeds = pad_right_at_dim(policy_embed, pad_amt, dim = 1, value = 0.)
+        padded_mask = pad_right_at_dim(mask, pad_amt, dim = 1, value = False)
+        padded_action_embeds = pad_right_at_dim(action_embeds, pad_amt, dim = 1, value = 0.)
+
+        step_targets = rearrange(padded_target_embeds[:, 1:].unfold(1, seq - 1, 1), 'b r d n -> r b n d')
+        step_masks = rearrange(padded_mask[:, 1:].unfold(1, seq - 1, 1), 'b r n -> r b n')
+        step_actions = rearrange(padded_action_embeds[:, :-1].unfold(1, seq - 1, 1), 'b r d n -> r b n d')
+
+        if self.has_kl_loss:
+            frozen_action_embedder = deepcopy(self.action_embedder)
+            for p in frozen_action_embedder.parameters():
+                p.requires_grad_(False)
+
+        # rollout and gather next latent pred losses
+
+        pred_loss_inputs = []
+        pred = policy_embed[:, :-1]
+
+        for step in range(num_rollouts):
+            step_action_embeds = step_actions[step].detach()
+            dynamics_input = self.dynamics_norm(cat((pred, step_action_embeds), dim = -1))
+            pred = pred + self.dynamics_mlp(dynamics_input)
+            pred_loss_inputs.append(pred)
+
+        pred_loss_inputs = stack(pred_loss_inputs)
+
+        spr_loss = kl_loss = sigreg_loss = self.zero
+        weights = self.rollout_loss_weights[:num_rollouts]
+
+        if self.has_spr_loss:
+            step_smooth_l1 = F.smooth_l1_loss(pred_loss_inputs, step_targets.detach(), reduction = 'none')
+            step_smooth_l1 = einx.multiply('r b n d, r -> r b n d', step_smooth_l1, weights)
+            spr_loss = masked_mean(step_smooth_l1, rearrange(step_masks, '... -> ... 1'), dim = (1, 2, 3)).sum()
+
+        # kl loss
+
+        if self.has_kl_loss:
+            with torch.no_grad():
+                target_discrete_logits, target_cont_params = frozen_action_embedder.unembed(
+                    step_targets.detach(),
+                    pred_head_index = 0,
+                    discrete_action_types = discrete_action_types,
+                    continuous_action_types = continuous_action_types,
+                    return_split_discrete = True
+                )
+
+            pred_discrete_logits, pred_cont_params = frozen_action_embedder.unembed(
+                pred_loss_inputs,
+                pred_head_index = 0,
+                discrete_action_types = discrete_action_types,
+                continuous_action_types = continuous_action_types,
+                return_split_discrete = True
+            )
+
+            discrete_kl, cont_kl = frozen_action_embedder.kl_div(
+                (target_discrete_logits, target_cont_params),
+                (pred_discrete_logits, pred_cont_params)
+            )
+
+            step_kl = self.zero
+
+            if exists(discrete_kl):
+                step_kl = step_kl + discrete_kl
+
+            if exists(cont_kl):
+                step_kl = step_kl + cont_kl
+
+            step_kl = einx.multiply('r b n, r -> r b n', step_kl, weights)
+            kl_loss = masked_mean(step_kl, step_masks, dim = (1, 2)).sum()
+
+        if self.has_sigreg:
+            sigreg_loss = sigreg(policy_embed[mask], **self.sigreg_loss_kwargs)
+
+        total_loss = (
+            spr_loss * self.spr_loss_weight +
+            kl_loss * self.kl_loss_weight +
+            sigreg_loss * self.sigreg_loss_weight
+        )
+
+        return total_loss, (spr_loss, kl_loss, sigreg_loss)
+
+# Dominik Schmidt https://arxiv.org/abs/2312.10812
+
+class LAPO(Module):
+    def __init__(
+        self,
+        dim_embed,
+        dim_latent_action,
+        dim_project = None,
+        dim_raw_latent = None,
+        num_raw_latent_tokens = None,
+        num_discrete_actions = 0,
+        num_continuous_actions = 0,
+        sem_dim_simplex = 4,
+        sem_temperature = 0.1,
+        expansion_factor = 4,
+        pred_actions = True,
+        use_fdm = True,
+        latent_action_embed_mlp_activation: Activation = 'silu',
+        pred_next_state_embed_mlp_activation: Activation = 'silu',
+        pred_raw_latent_mlp_activation: Activation = 'silu'
+    ):
+        super().__init__()
+        assert num_discrete_actions > 0 or num_continuous_actions > 0
+        assert pred_actions or use_fdm, 'LAPO must have at least one of action prediction or forward dynamics'
+
+        dim_project = default(dim_project, dim_embed)
+        dim_mlp_hidden = int(dim_embed * expansion_factor)
+
+        # state + next state projected embeddings -> latent action - IDM
+
+        self.state_norm = RMSNorm(dim_embed)
+        self.to_latent_action_embed = MLP(dim_embed * 2, dim_mlp_hidden, dim_latent_action, activation = get_activation(latent_action_embed_mlp_activation))
+
+        # simplicial embed for action bottleneck
+
+        assert divisible_by(dim_latent_action, sem_dim_simplex)
+        self.sem = SEM(dim_latent_action, temperature = sem_temperature, dim_simplex = sem_dim_simplex)
+
+        # action prediction loss
+
+        self.pred_actions = pred_actions
+        self.action_readout = Readout(dim_latent_action, num_discrete = num_discrete_actions, num_continuous = num_continuous_actions, auto_squeeze_single_output = False) if pred_actions else None
+
+        # forward dynamics model - projected space
+
+        self.use_fdm = use_fdm
+        self.to_pred_next_state_embed = MLP(dim_embed + dim_latent_action, dim_mlp_hidden, dim_project, activation = get_activation(pred_next_state_embed_mlp_activation)) if use_fdm else None
+
+        # forward dynamics model - raw latent space
+
+        self.has_raw_latent_fdm = use_fdm and exists(dim_raw_latent) and exists(num_raw_latent_tokens)
+        self.to_pred_raw_latent = None
+
+        if self.has_raw_latent_fdm:
+            dim_raw_latent_concat = dim_raw_latent * num_raw_latent_tokens
+            self.to_pred_raw_latent = MLP(dim_embed + dim_latent_action, dim_mlp_hidden, dim_mlp_hidden, dim_raw_latent_concat, activation = get_activation(pred_raw_latent_mlp_activation))
+            self.num_raw_latent_tokens = num_raw_latent_tokens
+            self.dim_raw_latent = dim_raw_latent
+
+        self.register_buffer('zero', tensor(0.), persistent = False)
+
+    def forward(
+        self,
+        space_tokens,
+        actions = None,
+        raw_latents = None,
+    ):
+        # pool spatial tokens
+
+        state_embed = reduce(space_tokens, 'b t ... d -> b t d', 'mean')
+
+        # consecutive state pairs
+
+        state, next_state = state_embed[:, :-1], state_embed[:, 1:]
+
+        state = self.state_norm(state)
+        next_state = self.state_norm(next_state)
+
+        # inverse dynamics model
+
+        latent_action = self.sem(self.to_latent_action_embed(cat((state, next_state), dim = -1)))
+
+        # action prediction loss
+
+        pred_action_loss = self.zero
+
+        if self.pred_actions and exists(actions):
+            seq_len = latent_action.shape[1]
+            maybe_slice = maybe(lambda t: t[:, :seq_len])
+
+            discrete_targets = maybe_slice(actions.discrete)
+            continuous_targets = maybe_slice(actions.continuous)
+
+            targets = safe_cat([t for t in (discrete_targets, continuous_targets) if exists(t)], dim = -1)
+
+            pred_action_loss = self.action_readout(latent_action, targets = targets, return_loss = True)
+
+        # forward dynamics model - projected space
+
+        fdm_loss = self.zero
+
+        if self.use_fdm:
+            pred_next_state = self.to_pred_next_state_embed(cat((state, latent_action), dim = -1))
+            fdm_loss = F.mse_loss(l2norm(pred_next_state), l2norm(next_state).detach())
+
+        # forward dynamics model - raw latent space
+
+        raw_latent_fdm_loss = self.zero
+
+        if self.has_raw_latent_fdm and exists(raw_latents):
+            raw_latents, _ = pack_one(raw_latents, 'b t * d')
+            raw_latent_concat = rearrange(raw_latents, 'b t n d -> b t (n d)')
+            target_raw = raw_latent_concat[:, 1:]
+
+            pred_raw = self.to_pred_raw_latent(cat((state, latent_action), dim = -1))
+            raw_latent_fdm_loss = F.mse_loss(pred_raw, target_raw.detach())
+
+        return pred_action_loss, fdm_loss, raw_latent_fdm_loss
+
+# James Whittington - https://arxiv.org/abs/2112.04035
+
+class TEM(Module):
+    def __init__(
+        self,
+        dim_action_embed,
+        dim_raw_latent,
+        num_raw_latent_tokens,
+        dim_structure = None,
+        dim_encoded_sensory = None,
+        heads = 8,
+        dim_head = 64,
+        talking_heads = True,
+        first_state_as_init_hidden = True,
+        learn_relative_actions = False,
+        learned_relative_encode_mlp_activation: Activation = 'silu',
+        init_hiddens_mlp_activation: Activation = 'silu',
+        sensory_encoder_mlp_activation: Activation = 'silu',
+        sensory_decoder_mlp_activation: Activation = 'silu'
+    ):
+        super().__init__()
+
+        dim_structure = default(dim_structure, dim_action_embed)
+        dim_encoded_sensory = default(dim_encoded_sensory, dim_structure)
+
+        # path integration
+
+        self.gru = nn.GRU(dim_action_embed, dim_structure, batch_first = True)
+        self.first_state_as_init_hidden = first_state_as_init_hidden
+        self.learn_relative_actions = learn_relative_actions
+
+        self.learned_relative_encode = MLP(
+            dim_action_embed * 2,
+            dim_action_embed * 2,
+            dim_action_embed,
+            activation = get_activation(learned_relative_encode_mlp_activation)
+        ) if learn_relative_actions else None
+
+        if first_state_as_init_hidden:
+            self.to_init_hiddens = MLP(
+                dim_encoded_sensory,
+                dim_structure,
+                dim_structure,
+                activation = get_activation(init_hiddens_mlp_activation)
+            )
+        else:
+            self.init_hiddens = EmbeddingSmallInit((1, 1, dim_structure,))
+
+        # sensory encoder
+
+        self.sensory_encoder = MLP(
+            dim_raw_latent,
+            dim_structure,
+            dim_encoded_sensory,
+            activation = get_activation(sensory_encoder_mlp_activation)
+        )
+
+        self.structural_norm = RMSNorm(dim_structure)
+        self.sensory_norm = RMSNorm(dim_encoded_sensory)
+
+        # implicit mlp memory (depth 2)
+
+        self.heads = heads
+        dim_inner = heads * dim_head
+
+        self.split_heads = Rearrange('b t (h d) -> b h t d', h = heads)
+        self.merge_heads = Rearrange('b h t d -> b t (h d)')
+
+        self.to_q = LinearNoBias(dim_structure, dim_inner)
+
+        # layer 1: structural -> hidden
+
+        self.to_k1 = LinearNoBias(dim_structure, dim_inner)
+        self.to_v1 = LinearNoBias(dim_encoded_sensory, dim_inner)
+
+        # layer 2: hidden -> sensory
+
+        self.to_k2 = LinearNoBias(dim_encoded_sensory, dim_inner)
+        self.to_v2 = LinearNoBias(dim_encoded_sensory, dim_inner)
+
+        self.talking_heads = nn.Conv2d(heads, heads, 1, bias = False) if talking_heads else nn.Identity()
+
+        if talking_heads:
+            nn.init.dirac_(self.talking_heads.weight)
+
+        self.activation = nn.SiLU()
+
+        # dummy tokens for shifted attention to mask diagonal
+
+        self.dummy_k1 = EmbeddingSmallInit((1, 1, dim_inner,))
+        self.dummy_v1 = EmbeddingSmallInit((1, 1, dim_inner,))
+
+        self.dummy_k2 = EmbeddingSmallInit((1, 1, dim_inner,))
+        self.dummy_v2 = EmbeddingSmallInit((1, 1, dim_inner,))
+
+        self.to_out = LinearNoBias(dim_inner, dim_structure)
+
+        self.to_gates = Sequential(
+            LinearNoBias(dim_structure, heads),
+            Rearrange('b t h -> b h t 1'),
+            nn.Sigmoid()
+        )
+
+        # sensory decoder
+
+        self.sensory_decoder = MLP(
+            dim_structure,
+            dim_structure,
+            dim_raw_latent * num_raw_latent_tokens,
+            activation = get_activation(sensory_decoder_mlp_activation)
+        )
+
+        self.register_buffer('zero', tensor(0.), persistent = False)
+
+    def forward(
+        self,
+        next_action_tokens,
+        raw_latents,
+        return_preds = False
+    ):
+        raw_latents, _ = pack_one(raw_latents, 'b t * d')
+
+        # pool and encode spatial latents
+
+        pooled_latents = reduce(raw_latents, 'b t ... d -> b t d', 'mean')
+        encoded_sensory = self.sensory_encoder(pooled_latents)
+
+        # path integration
+
+        batch, time, _ = encoded_sensory.shape
+
+        if self.first_state_as_init_hidden:
+            init_hiddens = self.to_init_hiddens(encoded_sensory[:, 0])
+            init_hiddens_gru = rearrange(init_hiddens, 'b d -> 1 b d')
+            structural_codes_init = rearrange(init_hiddens, 'b d -> b 1 d')
+        else:
+            init_hiddens_gru = repeat(self.init_hiddens, '1 1 d -> 1 b d', b = batch)
+            structural_codes_init = repeat(self.init_hiddens, '1 1 d -> b 1 d', b = batch)
+
+        # path integration over actions
+
+        actions = next_action_tokens[:, :(time - 1)] # each action predicts the next state
+
+        if actions.ndim == 4:
+            assert actions.shape[2] == 1, 'TEM is only supported for single agent'
+            actions = rearrange(actions, 'b t 1 d -> b t d')
+
+        has_actions = actions.shape[1] > 0
+
+        if self.learn_relative_actions and has_actions:
+            past_actions = shift_right(actions, amount = 1, dim = 1)
+            actions_with_past = cat((actions, past_actions), dim = -1)
+            actions = self.learned_relative_encode(actions_with_past)
+
+        if has_actions:
+            gru_out, _ = self.gru(actions, init_hiddens_gru)
+            structural_codes = cat((structural_codes_init, gru_out), dim = 1)
+        else:
+            structural_codes = structural_codes_init
+
+        # rmsnorm both
+
+        structural_codes = self.structural_norm(structural_codes)
+        encoded_sensory = self.sensory_norm(encoded_sensory)
+
+        # implicit mlp memory (depth 2)
+
+        q = self.to_q(structural_codes)
+
+        k1 = self.to_k1(structural_codes)
+        v1 = self.to_v1(encoded_sensory)
+
+        k2 = self.to_k2(encoded_sensory)
+        v2 = self.to_v2(encoded_sensory)
+
+        # prepend dummy tokens and shift to mask diagonal
+
+        def shift_kv(k, v, dummy_k, dummy_v):
+            dk = repeat(dummy_k, '1 1 d -> b 1 d', b = batch)
+            dv = repeat(dummy_v, '1 1 d -> b 1 d', b = batch)
+            k_shifted = cat((dk, k[:, :-1]), dim = 1)
+            v_shifted = cat((dv, v[:, :-1]), dim = 1)
+            return k_shifted, v_shifted
+
+        k1, v1 = shift_kv(k1, v1, self.dummy_k1, self.dummy_v1)
+        k2, v2 = shift_kv(k2, v2, self.dummy_k2, self.dummy_v2)
+
+        # split heads
+
+        q, k1, v1, k2, v2 = map(self.split_heads, (q, k1, v1, k2, v2))
+
+        # layer 1
+
+        out = F.scaled_dot_product_attention(q, k1, v1, is_causal = True)
+
+        out = self.talking_heads(out)
+        out = self.activation(out)
+
+        # layer 2
+
+        out = F.scaled_dot_product_attention(out, k2, v2, is_causal = True)
+
+        # gate aggregated values
+
+        out = out * self.to_gates(structural_codes)
+
+        # merge heads
+
+        out = self.merge_heads(out)
+        out = self.to_out(out)
+
+        # decode and loss
+
+        pred_raw = self.sensory_decoder(out)
+
+        target_raw = rearrange(raw_latents, 'b t n d -> b t (n d)')
+
+        # omit the very first token
+
+        pred_raw_sliced = pred_raw[:, 1:]
+        target_raw_sliced = target_raw[:, 1:]
+
+        has_predictions = pred_raw_sliced.shape[1] > 0
+
+        loss = self.zero
+
+        if has_predictions:
+            loss = F.mse_loss(pred_raw_sliced, target_raw_sliced.detach())
+
+        if not return_preds:
+            return loss
+
+        # restore predictions to raw latents shape for external use
+
+        _, _, n, d = raw_latents.shape
+        pred_raw_latents = rearrange(pred_raw, 'b t (n d) -> b t n d', n = n, d = d)
+
+        return loss, pred_raw_latents
+
+# hierarchical temporal transformer with dynamic chunking
+
+class HierarchicalTemporalTransformer(Module):
+    def __init__(
+        self,
+        dim,
+        depth = 2,
+        heads = 4,
+        dim_head = 32,
+        **kwargs
+    ):
+        super().__init__()
+
+        self.h_net = HNet(
+            dim = dim,
+            encoder = Identity(),
+            decoder = Identity(),
+            network = Decoder(dim = dim, depth = depth, heads = heads, attn_dim_head = dim_head, rotary_pos_emb = True),
+            **kwargs
+        )
+
+    def forward(self, x, lens = None, cache = None, return_hiddens = False):
+        x, loss, _, next_cache = self.h_net(x, lens = lens, cache = cache, return_hiddens = return_hiddens)
+        return x, loss, next_cache
+
+# axial space time transformer - with optional mixture of transformer blocks for temporal (space tbd)
+
+class AxialSpaceTimeTransformer(Module):
+    def __init__(
+        self,
+        dim,
+        depth,
+        attn_heads = 8,
+        attn_dim_head = 64,
+        attn_softclamp_value = 50.,
+        time_block_every = 4,
+        attn_kwargs: dict = dict(),
+        ff_kwargs: dict = dict(),
+        attn_residual_kwargs: dict = dict(),
+        num_special_tokens = 1,
+        special_attend_only_itself = False,  # this is set to True for the video tokenizer decoder (latents can only attend to itself while spatial modalities attend to the latents and everything)
+        full_spatial_attn = False,
+        spatial_modules: dict | None = None,
+        space_height: int | None = None,
+        space_width: int | None = None,
+        final_norm = True,
+        value_residual = True,               # https://arxiv.org/abs/2410.17897 - but with learned mixing from OSS
+        rnn_time = False,
+        time_attention_use_pope = False,
+        space_attention_use_pope = False,
+        use_attn_pool = True,
+        mot_temporal = False,
+        h_net_layer: int | None = None,
+        h_net_kwargs: dict | None = None
+    ):
+        super().__init__()
+        self.full_spatial_attn = full_spatial_attn
+
+        # attention
+
+        self.attn_softclamp_value = attn_softclamp_value
+
+        # attention masking
+
+        self.special_attend_only_itself = special_attend_only_itself
+
+        # time rotary embedding
+
+        query_heads = attn_kwargs.get('query_heads', attn_heads)
+
+        self.time_attention_use_pope = time_attention_use_pope
+        self.time_rotary = PoPE(attn_dim_head, heads = query_heads) if time_attention_use_pope else Rotary1D(attn_dim_head)
+
+        self.space_attention_use_pope = space_attention_use_pope
+
+        self.space_rotary = None
+        if space_attention_use_pope:
+            self.space_rotary = AxialPoPE(attn_dim_head, heads = query_heads, axial_dims = (attn_dim_head // 2, attn_dim_head // 2))
+
+        # project initial for value residuals
+
+        self.value_residual = value_residual
+
+        if value_residual:
+            dim_inner = attn_dim_head * attn_heads
+
+            self.to_value_residual = nn.Sequential(
+                nn.RMSNorm(dim),
+                nn.Linear(dim, dim_inner, bias = False),
+                Rearrange('... (h d) -> ... h d', h = attn_heads)
+            )
+
+        # a gru layer across time
+
+        self.rnn_time = rnn_time
+        rnn_layers = []
+
+        # transformer
+
+        self.mot_temporal = mot_temporal
+
+        is_time = []
+
+        layers = []
+        attn_pools = []
+
+        for i in range(depth):
+            layer_index = i + 1
+            is_last = i == (depth - 1)
+
+            is_time_block = divisible_by(layer_index, time_block_every)
+            is_time.append(is_time_block)
+
+            rearrange_to_attend = Rearrange('b t s ... -> b s t ...') if is_time_block else Identity()
+            rearrange_from_attend = Rearrange('b s t ... -> b t s ...') if is_time_block else Identity()
+
+            attn_block = Residual(Attention(dim = dim, heads = attn_heads, dim_head = attn_dim_head, value_residual = value_residual, **attn_kwargs))
+            ff_block = Residual(FeedForward(dim = dim, **ff_kwargs))
+
+            mot_block = None
+            if is_time_block and self.mot_temporal:
+                special_attn_block = Residual(Attention(dim = dim, heads = attn_heads, dim_head = attn_dim_head, **attn_kwargs))
+                special_ff_block = Residual(FeedForward(dim = dim, **ff_kwargs))
+                mot_block = ModuleList([special_attn_block, special_ff_block])
+
+            layers.append(ModuleList([
+                rearrange_to_attend,
+                rearrange_from_attend,
+                attn_block,
+                ff_block,
+                mot_block
+            ]))
+
+            rnn_layers.append(Residual(GRULayer(dim, dim)) if is_time_block and rnn_time else None)
+
+            # maybe attention pool
+            # post-norm + attention residual https://arxiv.org/abs/2603.15031
+
+            maybe_attn_pool = None
+
+            if use_attn_pool and not is_last:
+                maybe_attn_pool = Residual(AttentionPool(dim, **attn_residual_kwargs))
+
+            attn_pools.append(maybe_attn_pool)
+
+        self.layers = ModuleList(layers)
+        self.rnn_layers = ModuleList(rnn_layers)
+        self.attn_pools = ModuleList(attn_pools)
+
+        self.is_time = is_time
+
+        self.use_attn_pool = use_attn_pool
+        self.final_attn_pool = Residual(AttentionPool(dim, **attn_residual_kwargs)) if use_attn_pool else Identity()
+
+        self.spatial_modules = spatial_modules
+
+        self.space_height = space_height
+        self.space_width = space_width
+
+        # final norm
+
+        self.final_norm = nn.RMSNorm(dim) if final_norm else nn.Identity()
+
+        # special tokens
+
+        self.num_special_tokens = num_special_tokens
+        self.should_special_cross_attend = num_special_tokens > 0 and not special_attend_only_itself and not full_spatial_attn
+
+        self.final_special_cross_attn = self.final_special_ff = None
+
+        if self.should_special_cross_attend:
+            self.final_special_cross_attn = Residual(Attention(dim = dim, heads = attn_heads, dim_head = attn_dim_head, pre_context_rmsnorm = True, **attn_kwargs))
+            self.final_special_ff = Residual(FeedForward(dim = dim, **ff_kwargs))
+
+        # hierarchical temporal transformer
+
+        self.h_net_layer = h_net_layer
+        self.h_net = HierarchicalTemporalTransformer(dim = dim, **h_net_kwargs) if exists(h_net_kwargs) else None
+
+        # dummy loss
+
+        self.register_buffer('zero', tensor(0.), persistent = False)
+
+    def muon_parameters(self):
+        muon_params = []
+
+        for m in self.modules():
+            if isinstance(m, (Attention, FeedForward)):
+                muon_params.extend(m.muon_parameters())
+
+        return muon_params
+
+    def forward(
+        self,
+        tokens, # (b t s d)
+        time_lens = None,
+        cache: TransformerIntermediates | None = None,
+        return_intermediates = False,
+        space_height = None,
+        space_width = None
+    ): # (b t s d) | (y 2 b h t d)
+
+        tokens, inverse_pack = pack_one(tokens, 'b t * d')
+
+        batch, time, space_seq_len, _, device = *tokens.shape, tokens.device
+
+        assert tokens.ndim == 4
+
+        # destruct intermediates to cache for attention and rnn respectively
+
+        kv_cache = rnn_prev_hiddens = None
+
+        token_count = 0
+
+        if exists(cache):
+            kv_cache = cache.next_kv_cache
+            rnn_prev_hiddens = cache.next_rnn_hiddens
+            token_count = cache.token_count
+
+        # maybe excise past tokens if continuing from cache, and redefine time as the number of tokens to process
+
+        has_kv_cache = exists(kv_cache)
+
+        past_tokens = tokens[:, :0]
+
+        if has_kv_cache and time > 1:
+            past_tokens, tokens = tokens[:, :-1], tokens[:, -1:]
+
+        time = tokens.shape[1]
+
+        # attention function related
+
+        use_flex = exists(flex_attention) and tokens.is_cuda and not has_kv_cache # KV cache shape breaks flex attention TODO: Fix
+
+        attend_kwargs = dict(softclamp_value = self.attn_softclamp_value, special_attend_only_itself = self.special_attend_only_itself, device = device)
+
+        num_spatial_special = 0 if self.full_spatial_attn else self.num_special_tokens
+
+        space_attend = get_attend_fn(**attend_kwargs, causal = False, seq_len = space_seq_len, k_seq_len = space_seq_len, num_special_tokens = num_spatial_special, use_flex = use_flex and not self.full_spatial_attn)
+
+        time_attend = get_attend_fn(**attend_kwargs, causal = True, seq_len = time, k_seq_len = time + token_count, use_flex = use_flex)
+
+        # prepare cache
+
+        time_attn_kv_caches = []
+        rnn_hiddens = []
+
+        kv_cache = default(kv_cache, (None,))
+
+        iter_kv_cache = iter(kv_cache)
+
+        rnn_prev_hiddens = default(rnn_prev_hiddens, (None,))
+
+        iter_rnn_prev_hiddens = iter(rnn_prev_hiddens)
+
+        has_spatial_modules = exists(self.spatial_modules)
+        space_height = default(space_height, self.space_height)
+        space_width = default(space_width, self.space_width)
+
+        spatial_module_caches = dict()
+        next_spatial_module_caches = dict()
+
+        if has_spatial_modules:
+            assert exists(space_height) and exists(space_width), 'space_height and space_width must be passed into forward if you have spatial modules (or set on init)'
+
+            spatial_packed_shape = [[space_seq_len - num_spatial_special], [num_spatial_special]]
+
+            if exists(cache) and exists(cache.next_spatial_module_caches):
+                spatial_module_caches = cache.next_spatial_module_caches
+
+        h_net_cache = cache.next_h_net_cache if exists(cache) else None
+        next_h_net_cache = None
+
+        # positional embs
+
+        time_pos_emb = self.time_rotary(time, offset = token_count)
+
+        space_pos_emb = None
+        space_pope_pos_emb_indices = None
+
+        if self.space_attention_use_pope:
+            assert exists(space_height) and exists(space_width), 'space_height and space_width must be known to use space AxialPoPE'
+            space_pos_emb = self.space_rotary((space_height, space_width))
+
+            if self.num_special_tokens > 0:
+                space_pope_pos_emb_indices = arange(space_height * space_width, device = device)
+
+        # value residual
+
+        residual_values = None
+
+        if self.value_residual:
+            residual_values = self.to_value_residual(tokens)
+
+        # normed attention inputs
+
+        normed_time_attn_inputs = []
+        normed_space_attn_inputs = []
+
+        # h-net ratio loss
+
+        h_net_loss = self.zero
+
+        # attention
+
+        layer_hiddens = [tokens]
+        hiddens = []
+
+        for layer_index, (
+            layer_modules,
+            maybe_rnn,
+            layer_is_time,
+            maybe_attn_pool
+         ) in enumerate(zip(self.layers, self.rnn_layers, self.is_time, self.attn_pools)):
+
+            pre_attn_rearrange, post_attn_rearrange, attn, ff, mot_block = layer_modules
+
+            is_mot_layer = exists(mot_block)
+            if is_mot_layer:
+                special_attn, special_ff = mot_block
+                mot_packed_shape = [(space_seq_len - self.num_special_tokens,), (self.num_special_tokens,)]
+
+            # rnn block
+
+            if layer_is_time and exists(maybe_rnn):
+
+                tokens = pre_attn_rearrange(tokens)
+
+                tokens, inverse_pack_batch = pack_one(tokens, '* t d')
+
+                tokens_out, layer_rnn_hiddens = maybe_rnn(tokens, next(iter_rnn_prev_hiddens, None)) # todo, handle rnn cache
+
+                tokens = inverse_pack_batch(tokens_out)
+
+                rnn_hiddens.append(layer_rnn_hiddens)
+
+                tokens = post_attn_rearrange(tokens)
+
+                layer_hiddens.append(tokens)
+
+            # attention block
+
+            tokens = pre_attn_rearrange(tokens)
+
+            attend_fn = time_attend if layer_is_time else space_attend
+
+            is_time_pope = layer_is_time and self.time_attention_use_pope
+            is_space_pope = not layer_is_time and self.space_attention_use_pope
+
+            layer_rotary_pos_emb = time_pos_emb if layer_is_time and not is_time_pope else None
+
+            layer_pope_pos_emb = None
+            layer_pope_pos_emb_indices = None
+
+            if is_time_pope:
+                layer_pope_pos_emb = time_pos_emb
+
+            if is_space_pope:
+                layer_pope_pos_emb = space_pos_emb
+                layer_pope_pos_emb_indices = space_pope_pos_emb_indices
+
+            # maybe past kv cache
+
+            maybe_kv_cache = next(iter_kv_cache, None) if layer_is_time else None
+
+            # residual values
+
+            layer_residual_values = maybe(pre_attn_rearrange)(residual_values)
+
+            # attention layer
+
+            attn_kwargs = dict(
+                rotary_pos_emb = layer_rotary_pos_emb,
+                pope_pos_emb = layer_pope_pos_emb,
+                pope_pos_emb_indices = layer_pope_pos_emb_indices,
+                causal = layer_is_time,
+                attend_fn = attend_fn,
+                kv_cache = maybe_kv_cache,
+                residual_values = layer_residual_values,
+                return_intermediates = True
+            )
+
+            if not is_mot_layer:
+                tokens_out, attn_intermediates = attn(tokens, **attn_kwargs)
+            else:
+                main_tokens, special_tokens = unpack(tokens, mot_packed_shape, 'b * t d')
+                main_kwargs, special_kwargs = {**attn_kwargs}, {**attn_kwargs}
+
+                if exists(layer_residual_values):
+                    main_kwargs['residual_values'], special_kwargs['residual_values'] = unpack(layer_residual_values, mot_packed_shape, 'b * t h d')
+
+                def split_kv(kv):
+                    kv = rearrange(kv, 'kv (b s) ... -> kv b s ...', b = batch)
+                    return tuple(rearrange(c, 'kv b s ... -> kv (b s) ...') for c in unpack(kv, mot_packed_shape, 'kv b * h t d'))
+
+                def merge_kv(m_kv, s_kv):
+                    m_kv, s_kv = (rearrange(c, 'kv (b s) ... -> kv b s ...', b = batch) for c in (m_kv, s_kv))
+                    merged, _ = pack((m_kv, s_kv), 'kv b * h t d')
+                    return rearrange(merged, 'kv b s ... -> kv (b s) ...')
+
+                if exists(maybe_kv_cache):
+                    main_kwargs['kv_cache'], special_kwargs['kv_cache'] = split_kv(maybe_kv_cache)
+
+                main_out, main_interm = attn(main_tokens, **main_kwargs)
+                special_out, special_interm = special_attn(special_tokens, **special_kwargs)
+
+                tokens_out, _ = pack((main_out, special_out), 'b * t d')
+
+                if exists(main_interm) and exists(special_interm) and exists(main_interm.next_kv_cache):
+                    merged_cache = merge_kv(main_interm.next_kv_cache, special_interm.next_kv_cache)
+                    attn_intermediates = AttentionIntermediates(merged_cache, main_interm.normed_inputs)
+                else:
+                    attn_intermediates = main_interm
+
+            tokens = post_attn_rearrange(tokens_out)
+
+            # hierarchical temporal transformer
+
+            is_h_net_layer = exists(self.h_net) and layer_index == self.h_net_layer
+
+            if is_h_net_layer:
+                tokens = rearrange(tokens, 'b t s d -> b s t d')
+                tokens, inverse_pack_hnet = pack_one(tokens, '* t d')
+
+                h_net_lens = maybe(repeat_interleave_to_match)(time_lens, tokens)
+
+                tokens, h_net_layer_loss, next_h_net_cache = self.h_net(
+                    tokens,
+                    lens = h_net_lens,
+                    cache = h_net_cache,
+                    return_hiddens = return_intermediates
+                )
+                h_net_loss = h_net_loss + h_net_layer_loss
+
+                tokens = inverse_pack_hnet(tokens)
+                tokens = rearrange(tokens, 'b s t d -> b t s d')
+
+            layer_hiddens.append(tokens)
+
+            # save kv cache if is time layer
+
+            if layer_is_time:
+                time_attn_kv_caches.append(attn_intermediates.next_kv_cache)
+
+            # save time attention inputs for decorr
+
+            space_or_time_inputs = normed_time_attn_inputs if layer_is_time else normed_space_attn_inputs
+
+            space_or_time_inputs.append(attn_intermediates.normed_inputs)
+
+            # feedforward block
+
+            if not is_mot_layer:
+                tokens = ff(tokens)
+            else:
+                main_tokens, special_tokens = unpack(tokens, mot_packed_shape, 'b t * d')
+                tokens, _ = pack((ff(main_tokens), special_ff(special_tokens)), 'b t * d')
+
+            # spatial modules (eg. MOSS)
+
+            layer_key = str(layer_index)
+
+            if has_spatial_modules and layer_key in self.spatial_modules:
+                spatial_tokens, special_tokens = unpack(tokens, spatial_packed_shape, 'b t * d')
+
+                spatial_tokens = rearrange(spatial_tokens, 'b t (h w) d -> b t h w d', h = space_height, w = space_width)
+
+                layer_spatial_module = self.spatial_modules[layer_key]
+
+                spatial_tokens, layer_spatial_cache = layer_spatial_module(
+                    spatial_tokens,
+                    cache = spatial_module_caches.get(layer_key),
+                    return_cache = True
+                )
+
+                next_spatial_module_caches[layer_key] = layer_spatial_cache
+
+                spatial_tokens = rearrange(spatial_tokens, 'b t h w d -> b t (h w) d')
+
+                tokens, _ = pack((spatial_tokens, special_tokens), 'b t * d')
+
+            layer_hiddens.append(tokens)
+
+            hiddens.append(tokens)
+
+            # attention pooling
+
+            if exists(maybe_attn_pool):
+                tokens = maybe_attn_pool(tokens, hiddens = layer_hiddens)
+
+        # cross attend one last time from special tokens to spatial tokens, so attention on spatial tokens do not go to waste
+
+        if self.should_special_cross_attend:
+            packed_shape = [[space_seq_len - self.num_special_tokens], [self.num_special_tokens]]
+            non_special_tokens, special_tokens = unpack(tokens, packed_shape, 'b t * d')
+
+            special_tokens = self.final_special_cross_attn(
+                special_tokens,
+                context = non_special_tokens
+            )
+
+            special_tokens = self.final_special_ff(special_tokens)
+
+            tokens, _ = pack((non_special_tokens, special_tokens), 'b t * d')
+
+        # apply maybe attention pool just before final norm
+
+        if self.use_attn_pool:
+            tokens = self.final_attn_pool(tokens, layer_hiddens)
+
+        # final norm
+
+        out = self.final_norm(tokens)
+
+        if has_kv_cache:
+            out = cat((past_tokens, out), dim = 1)
+
+        if not return_intermediates:
+            return inverse_pack(out)
+
+        intermediates = TransformerIntermediates(
+            safe_stack(time_attn_kv_caches),
+            safe_stack(normed_time_attn_inputs),
+            safe_stack(normed_space_attn_inputs),
+            safe_stack(rnn_hiddens),
+            hiddens,
+            token_count + time,
+            next_spatial_module_caches,
+            h_net_loss,
+            next_h_net_cache
+        )
+
+        return inverse_pack(out), intermediates
+
+class CausalDepthwiseConv3d(Module):
+    def __init__(
+        self,
+        dim,
+        kernel_size = 3,
+        activation: Activation = 'silu'
+    ):
+        super().__init__()
+        assert is_odd(kernel_size), 'kernel size must be odd'
+        self.kernel_size = kernel_size
+        self.causal_pad = kernel_size - 1
+        self.padding = kernel_size // 2
+
+        self.norm = RMSNorm(dim)
+
+        self.conv = nn.Conv3d(
+            dim, dim,
+            kernel_size = kernel_size,
+            padding = (0, self.padding, self.padding),
+            groups = dim
+        )
+
+        self.act = get_activation(activation)
+        self.proj = Linear(dim, dim)
+
+    def forward(
+        self,
+        x, # (b, t, h, w, c)
+        time_cache = None,
+        return_time_cache = False
+    ):
+        causal_pad = self.causal_pad
+
+        res = x
+
+        x = self.norm(x)
+        x = rearrange(x, 'b t h w c -> b c t h w')
+
+        # handle cache or causal pad
+
+        if exists(time_cache):
+            x = cat((time_cache, x), dim = 2)
+        else:
+            x = pad_at_dim(x, (causal_pad, 0), dim = 2)
+
+        next_time_cache = x[:, :, -causal_pad:]
+
+        # conv
+
+        x = self.conv(x)
+
+        x = rearrange(x, 'b c t h w -> b t h w c')
+
+        x = self.act(x)
+        x = self.proj(x)
+
+        out = x + res
+
+        if return_time_cache:
+            return out, next_time_cache
+
+        return out
+
+# shifted patch tokenization
+
+class ShiftedPatchTokenization(Module):
+    def __init__(
+        self,
+        dim,
+        patch_size,
+        channels = 3,
+        temporal_shift = True
+    ):
+        super().__init__()
+        self.patch_size = patch_size
+        self.temporal_shift = temporal_shift
+
+        num_segments = 6 if temporal_shift else 5
+        patch_dim = (patch_size ** 2) * num_segments * channels
+
+        self.to_patch_tokens = Sequential(
+            Rearrange('... c p1 p2 -> ... (c p1 p2)'),
+            Linear(patch_dim, dim),
+            LayerNormNoBias(dim)
+        )
+
+    def forward(
+        self,
+        x,
+        time_cache = None,
+        return_time_cache = False
+    ):
+        p1 = p2 = self.patch_size
+
+        x = rearrange(x, 'b c t (h p1) (w p2) -> b t h w c p1 p2', p1 = p1, p2 = p2)
+
+        spatial_shifts = tuple(pad_at_dim(x, pad, dim = d) for d in (-1, -2) for pad in ((1, -1), (-1, 1)))
+
+        shifts = spatial_shifts
+
+        next_time_cache = None
+
+        if self.temporal_shift:
+            if exists(time_cache):
+                x_time_padded = cat((time_cache, x), dim = 1)
+            else:
+                x_time_padded = pad_at_dim(x, (1, 0), dim = 1)
+
+            next_time_cache = x_time_padded[:, -1:]
+            time_shift = x_time_padded[:, :-1]
+            shifts = (*shifts, time_shift)
+
+        out = self.to_patch_tokens(cat((x, *shifts), dim = -3))
+
+        if not return_time_cache:
+            return out
+
+        return out, next_time_cache
+
+# slot attention - https://arxiv.org/abs/2006.15055
+# inverted attention - https://openreview.net/forum?id=3H8j14mA3X
+
+class InvertedCrossAttention(Module):
+    def __init__(
+        self,
+        dim,
+        dim_context = None,
+        heads = 8,
+        dim_head = 64,
+        inverted_attention = True,
+        pre_rmsnorm = True
+    ):
+        super().__init__()
+        dim_context = default(dim_context, dim)
+        self.norm = RMSNorm(dim) if pre_rmsnorm else Identity()
+        self.inverted_attention = inverted_attention
+
+        inner_dim = heads * dim_head
+        self.scale = dim_head ** -0.5
+
+        self.to_qg = LinearNoBias(dim, inner_dim * 2)
+        self.to_kv = LinearNoBias(dim_context, inner_dim * 2)
+        self.to_out = LinearNoBias(inner_dim, dim)
+
+        self.split_heads = Rearrange('b n (h d) -> b h n d', h = heads)
+        self.merge_heads = Rearrange('b h n d -> b n (h d)', h = heads)
+
+    def forward(self, x, context):
+        x = self.norm(x)
+
+        q, gate = self.to_qg(x).chunk(2, dim = -1)
+        k, v = self.to_kv(context).chunk(2, dim = -1)
+
+        q, gate, k, v = [self.split_heads(t) for t in (q, gate, k, v)]
+
+        sim = einsum(q, k, 'b h i d, b h j d -> b h i j') * self.scale
+
+        attn_dim = -2 if self.inverted_attention else -1
+
+        attn = sim.softmax(dim = attn_dim)
+
+        if self.inverted_attention:
+            attn = l1norm(attn)
+
+        out = einsum(attn, v, 'b h i j, b h j d -> b h i d')
+
+        out = out * gate.sigmoid()
+
+        return self.to_out(self.merge_heads(out))
+
+class SlotAttention(Module):
+    def __init__(
+        self,
+        dim,
+        dim_context = None,
+        iters = 2,
+        ff_mult = 4,
+        num_slots = None,
+        spatial_mix = False,
+        spatial_mixer_activation: Activation = 'silu',
+        **kwargs
+    ):
+        super().__init__()
+        self.iters = iters
+        self.spatial_mix = spatial_mix
+
+        self.attn = InvertedCrossAttention(dim = dim, dim_context = dim_context, pre_rmsnorm = True, **kwargs)
+
+        if spatial_mix:
+            assert exists(num_slots), 'num_slots must be passed in if spatial_mix is True'
+            hidden_slots = max(1, int(num_slots * 0.5))
+            self.spatial_mixer = Sequential(
+                RMSNorm(dim),
+                nn.Conv1d(num_slots, hidden_slots, 1),
+                get_activation(spatial_mixer_activation),
+                nn.Conv1d(hidden_slots, num_slots, 1)
+            )
+
+        self.ff = FeedForward(
+            dim = dim,
+            expansion_factor = ff_mult,
+            pre_rmsnorm = True
+        )
+
+    def forward(self, latents, context):
+        latents, inverse_pack = pack_one(latents, '* n d')
+        context, _ = pack_one(context, '* n d')
+
+        for _ in range(self.iters):
+            latents = self.attn(latents, context) + latents
+
+            if self.spatial_mix:
+                latents = self.spatial_mixer(latents) + latents
+
+            latents = self.ff(latents) + latents
+
+        return inverse_pack(latents)
+
+# video tokenizer
+
+@save_load
+class VideoDecoderNetwork(Module):
+    def __init__(
+        self,
+        dim,
+        dim_latent,
+        num_latent_tokens,
+        patch_size,
+        channels,
+        depth,
+        time_block_every,
+        attn_dim_head,
+        attn_heads,
+        num_spatial_tokens,
+        decoder_slot_attention_initted_spatial_tokens,
+        decoder_slot_attention_iters,
+        slot_attention_inverted,
+        decoder_slot_spatial_mix,
+        use_causal_conv3d,
+        causal_conv3d_kernel_size,
+        has_aug_conditioning,
+        moss_kwargs,
+        decoder_moss_layers,
+        time_attention_use_pope,
+        space_attention_use_pope,
+        full_spatial_attn = False,
+        special_attend_only_itself = True,
+        decoder_pos_emb_mlp_activation: Activation = 'silu',
+        decoder_pos_mlp_depth = 2,
+        image_height = None,
+        image_width = None
+    ):
+        super().__init__()
+        self.image_height = image_height
+        self.image_width = image_width
+        self.patch_size = patch_size
+
+        # pos emb
+
+        self.to_decoder_pos_emb = create_mlp(
+            dim_in = 2,
+            dim = dim * 2,
+            dim_out = dim,
+            depth = decoder_pos_mlp_depth,
+            activation = get_activation(decoder_pos_emb_mlp_activation),
+        )
+
+        # slot attention
+
+        self.decoder_slot_attention_initted_spatial_tokens = decoder_slot_attention_initted_spatial_tokens
+        self.num_spatial_tokens = num_spatial_tokens
+
+        if decoder_slot_attention_initted_spatial_tokens:
+            self.decoder_slot_attention = SlotAttention(
+                dim = dim,
+                iters = decoder_slot_attention_iters,
+                heads = attn_heads,
+                dim_head = attn_dim_head,
+                inverted_attention = slot_attention_inverted,
+                num_slots = self.num_spatial_tokens,
+                spatial_mix = decoder_slot_spatial_mix
+            )
+
+        # patch out
+
+        dim_patch = channels * patch_size ** 2
+
+        self.tokens_to_patch = Sequential(
+            Linear(dim, dim_patch),
+            Rearrange('b t h w (p1 p2 c) -> b c t (h p1) (w p2)', p1 = patch_size, p2 = patch_size),
+        )
+
+        # aug cond
+
+        self.has_aug_conditioning = has_aug_conditioning
+        if has_aug_conditioning:
+            self.aug_cond_embedding = Embedding(3, dim)
+
+        # causal convs
+
+        self.use_causal_conv3d = use_causal_conv3d
+        if use_causal_conv3d:
+            self.decoder_pre_causal_conv3d = CausalDepthwiseConv3d(dim, kernel_size = causal_conv3d_kernel_size)
+            self.decoder_post_causal_conv3d = CausalDepthwiseConv3d(dim, kernel_size = causal_conv3d_kernel_size)
+
+        # transformer
+
+        moss_modules = ModuleDict({
+            str(layer_idx): MOSS(dim, **moss_kwargs)
+            for layer_idx in decoder_moss_layers
+        }) if len(decoder_moss_layers) > 0 else None
+
+        num_patch_height = image_height // patch_size if exists(image_height) else None
+        num_patch_width = image_width // patch_size if exists(image_width) else None
+
+        self.transformer = AxialSpaceTimeTransformer(
+            dim = dim,
+            depth = depth,
+            attn_dim_head = attn_dim_head,
+            attn_heads = attn_heads,
+            time_block_every = time_block_every,
+            spatial_modules = moss_modules,
+            space_height = num_patch_height,
+            space_width = num_patch_width,
+            full_spatial_attn = full_spatial_attn,
+            num_special_tokens = num_latent_tokens + int(has_aug_conditioning),
+            special_attend_only_itself = special_attend_only_itself,
+            time_attention_use_pope = time_attention_use_pope,
+            space_attention_use_pope = space_attention_use_pope
+        )
+
+    def muon_parameters(self):
+        return self.transformer.muon_parameters()
+
+    def forward(
+        self,
+        latent_tokens,
+        noised_image_tokens = None,
+        height = None,
+        width = None,
+        aug_id = None
+    ):
+        batch, time_len, device = *latent_tokens.shape[:2], latent_tokens.device
+
+        height = default(height, self.image_height)
+        width = default(width, self.image_width)
+
+        num_patch_height = height // self.patch_size if exists(height) else None
+        num_patch_width = width // self.patch_size if exists(width) else None
+
+        # generate decoder positional embedding and concat the latent token
+
+        spatial_pos_height = linspace(-1., 1., num_patch_height, device = device)
+        spatial_pos_width = linspace(-1., 1., num_patch_width, device = device)
+
+        space_height_width_coor = stack(torch.meshgrid(spatial_pos_height, spatial_pos_width, indexing = 'ij'), dim = -1)
+
+        decoder_pos_emb = self.to_decoder_pos_emb(space_height_width_coor)
+        decoder_pos_emb = repeat(decoder_pos_emb, '... -> b t ...', b = batch, t = time_len)
+
+        spatial_tokens = decoder_pos_emb
+
+        if exists(noised_image_tokens):
+            spatial_tokens = spatial_tokens + noised_image_tokens
+
+        if self.decoder_slot_attention_initted_spatial_tokens:
+            spatial_tokens, inverse_pack_space = pack_one(spatial_tokens, 'b t * d')
+            spatial_tokens = self.decoder_slot_attention(spatial_tokens, latent_tokens)
+            spatial_tokens = inverse_pack_space(spatial_tokens)
+
+        # augmentation conditioning
+
+        if self.has_aug_conditioning:
+            aug_id = default(aug_id, 0)
+
+            if isinstance(aug_id, bool):
+                aug_id = int(aug_id) + 1
+
+            if is_tensor(aug_id) and aug_id.dtype == torch.bool:
+                aug_id = aug_id.long() + 1
+
+            if isinstance(aug_id, int):
+                aug_id = full((batch,), aug_id, device = device, dtype = torch.long)
+
+            maybe_aug_token = self.aug_cond_embedding(aug_id)
+            maybe_aug_token = repeat(maybe_aug_token, 'b d -> b t 1 d', t = time_len)
+        else:
+            maybe_aug_token = latent_tokens[:, :, 0:0]
+
+        tokens, packed_latent_shape = pack((spatial_tokens, maybe_aug_token, latent_tokens), 'b t * d')
+
+        # decoder attention
+
+        if self.use_causal_conv3d:
+            b, t, *_ = tokens.shape
+
+            unpacked = unpack(tokens, packed_latent_shape, 'b t * d')
+            spatial_tokens, maybe_aug_token, latent_tokens = unpacked
+
+            spatial_tokens = self.decoder_pre_causal_conv3d(spatial_tokens)
+
+            tokens, _ = pack((spatial_tokens, maybe_aug_token, latent_tokens), 'b t * d')
+
+        tokens = self.transformer(tokens, space_height = num_patch_height, space_width = num_patch_width)
+
+        # unpack latents
+
+        unpacked = unpack(tokens, packed_latent_shape, 'b t * d')
+        tokens, maybe_aug_token, latent_tokens = unpacked
+
+        # project to patches
+
+        if self.use_causal_conv3d:
+            tokens = self.decoder_post_causal_conv3d(tokens)
+
+        recon_video = self.tokens_to_patch(tokens)
+
+        return recon_video
+
+@save_load
+class Transformer(Module):
+    def __init__(
+        self,
+        dim,
+        depth,
+        heads = 8,
+        dim_head = 64,
+        attn_every = None,
+        use_rotary = False,
+        use_pope = False
+    ):
+        super().__init__()
+        self.layers = nn.ModuleList([])
+
+        self.pos_emb = None
+        if use_pope:
+            self.pos_emb = PoPE(dim_head, heads = heads)
+        elif use_rotary:
+            self.pos_emb = Rotary1D(dim_head)
+
+        self.use_pope = use_pope
+        self.has_attn = exists(attn_every) and attn_every > 0
+
+        for i in range(depth):
+            layer_has_attn = self.has_attn and divisible_by(i + 1, attn_every)
+
+            self.layers.append(nn.ModuleList([
+                Residual(Attention(dim, dim_head = dim_head, heads = heads)) if layer_has_attn else None,
+                Residual(FeedForward(dim))
+            ]))
+
+    def forward(
+        self,
+        x,
+        time_cache = None,
+        return_time_cache = False
+    ):
+        seq_len, device = x.shape[-2], x.device
+
+        past_len = 0
+
+        if exists(time_cache):
+            past_len, time_cache = time_cache
+
+        iter_time_cache = iter(time_cache) if exists(time_cache) else None
+        next_time_cache = [] if return_time_cache else None
+
+        rotary_pos_emb = None
+        pope_pos_emb = None
+        pope_pos_emb_indices = None
+
+        if exists(self.pos_emb):
+            seq_positions = torch.arange(seq_len, device = device) + past_len
+            pos_emb = self.pos_emb(seq_positions)
+
+            if self.use_pope:
+                pope_pos_emb = pos_emb
+                pope_pos_emb_indices = seq_positions
+            else:
+                rotary_pos_emb = pos_emb
+
+        for attn, ff in self.layers:
+            if exists(attn):
+                attn_cache = next(iter_time_cache) if exists(iter_time_cache) else None
+
+                x, intermediates = attn(
+                    x,
+                    causal = seq_len > 1,
+                    kv_cache = attn_cache,
+                    rotary_pos_emb = rotary_pos_emb,
+                    pope_pos_emb = pope_pos_emb,
+                    pope_pos_emb_indices = pope_pos_emb_indices,
+                    return_intermediates = True
+                )
+
+                if return_time_cache:
+                    next_time_cache.append(intermediates.next_kv_cache)
+
+            x = ff(x)
+
+        if not return_time_cache:
+            return x
+
+        next_len = past_len + seq_len
+        return x, (next_len, tuple(next_time_cache))
+
+# raw state tokenizer
+
+@save_load
+class StateTokenizer(Module):
+    def __init__(
+        self,
+        dim_state,
+        num_latent_tokens = 4,
+        dim_latent = 32,
+        dim = 256,
+        depth = 2,
+        attn_every = 1,
+        attn_heads = 8,
+        attn_dim_head = 64,
+        loss_fn: str | Module = 'mse',
+        mae_fraction = 0.,
+        time_attention_use_pope = False,
+    ):
+        super().__init__()
+
+        self.dim_state = dim_state
+        self.num_latent_tokens = num_latent_tokens
+        self.dim_latent = dim_latent
+
+        self.encoder_in = nn.Linear(dim_state, dim)
+
+        self.encoder_transformer = Transformer(
+            dim = dim,
+            depth = depth,
+            heads = attn_heads,
+            dim_head = attn_dim_head,
+            attn_every = attn_every,
+            use_pope = time_attention_use_pope
+        )
+
+        self.encoder_out = nn.Sequential(
+            nn.RMSNorm(dim),
+            nn.Linear(dim, num_latent_tokens * dim_latent)
+        )
+
+        self.decoder_in = nn.Linear(num_latent_tokens * dim_latent, dim)
+
+        self.decoder_transformer = Transformer(
+            dim = dim,
+            depth = depth,
+            heads = attn_heads,
+            dim_head = attn_dim_head,
+            attn_every = attn_every,
+            use_pope = time_attention_use_pope
+        )
+
+        self.decoder_out = nn.Sequential(
+            nn.RMSNorm(dim),
+            nn.Linear(dim, dim_state)
+        )
+
+        # mae fraction
+
+        self.mae_fraction = mae_fraction
+        self.has_mae = mae_fraction > 0.
+
+        assert not (self.has_mae and not self.encoder_transformer.has_attn), 'time attention must be turned on to use mae fraction'
+        self.mask_token = EmbeddingSmallInit((dim,)) if self.has_mae else None
+
+        if isinstance(loss_fn, Module):
+            self.loss_fn = loss_fn
+        elif loss_fn == 'mse':
+            self.loss_fn = F.mse_loss
+        elif loss_fn == 'smooth_l1':
+            self.loss_fn = F.smooth_l1_loss
+        elif loss_fn == 'l1':
+            self.loss_fn = F.l1_loss
+        else:
+            raise ValueError(f'unknown loss_fn {loss_fn}')
+
+    def latent_disagreement(self, latents: Tensor, **kwargs) -> Tensor:
+        raise NotImplementedError
+
+    @torch.no_grad()
+    @eval_decorator
+    def tokenize(self, state: Tensor, **kwargs) -> Tensor:
+        return self.forward(state, return_latents = True, **kwargs)
+
+    def encode(
+        self,
+        state: Tensor,
+        time_cache = None,
+        return_time_cache = False,
+        time_lens = None
+    ):
+        state, inverse_pack = pack_one(state, 'b * d')
+
+        tokens = self.encoder_in(state)
+
+        batch, time, device = *tokens.shape[:2], tokens.device
+
+        if self.has_mae and time > 1 and self.training:
+            noise = torch.rand((batch, time), device = device)
+
+            if exists(time_lens):
+                num_keep = (time_lens * (1. - self.mae_fraction)).long().clamp_min(1)
+                num_masked = rearrange(time_lens - num_keep, 'b -> b 1')
+
+                time_mask = lens_to_mask(time_lens, time)
+                noise = torch.where(time_mask, noise, float('inf'))
+            else:
+                num_keep = max(1, int(time * (1. - self.mae_fraction)))
+                num_masked = time - num_keep
+
+            ranks = noise.argsort(dim = -1).argsort(dim = -1)
+            mask = ranks < num_masked
+
+            tokens = einx.where('b t, d, b t d', mask, self.mask_token, tokens)
+
+        tokens, next_time_cache = self.encoder_transformer(tokens, time_cache = time_cache, return_time_cache = True)
+
+        latents = self.encoder_out(tokens)
+        latents = rearrange(latents, 'b t (n d) -> b t n d', n = self.num_latent_tokens)
+        latents = latents.tanh()
+
+        latents = inverse_pack(latents, 'b * n d')
+
+        if return_time_cache:
+            return latents, next_time_cache
+
+        return latents
+
+    def decode(self, latents: Tensor):
+        latents, inverse_pack = pack_one(latents, 'b * n d')
+
+        x = rearrange(latents, 'b t n d -> b t (n d)')
+        x = self.decoder_in(x)
+        x = self.decoder_transformer(x)
+        recon = self.decoder_out(x)
+
+        return inverse_pack(recon, 'b * d')
+
+    def forward(
+        self,
+        state: Tensor,
+        *,
+        return_latents = False,
+        return_recon = False,
+        time_cache = None,
+        return_time_cache = False,
+        time_lens = None
+    ):
+        encode_kwargs = dict(time_cache = time_cache, return_time_cache = return_time_cache, time_lens = time_lens)
+
+        encode_out = self.encode(state, **encode_kwargs)
+        latents = encode_out[0] if return_time_cache else encode_out
+
+        if return_latents and not return_recon:
+            return encode_out
+
+        recon = self.decode(latents)
+
+        if exists(time_lens):
+            batch, time, *_ = state.shape
+
+            if not is_tensor(time_lens):
+                time_lens = tensor(time_lens, device = state.device, dtype = torch.long)
+
+            time_mask = lens_to_mask(time_lens, time)
+            time_mask = rearrange(time_mask, 'b t -> b t 1')
+
+            loss = self.loss_fn(recon, state, reduction = 'none')
+            loss = masked_mean(loss, time_mask)
+        else:
+            loss = self.loss_fn(recon, state)
+
+        # return
+
+        ret = (loss,)
+
+        if return_recon:
+            ret = (*ret, recon, latents)
+
+        if return_time_cache:
+            ret = (*ret, encode_out[1])
+
+        return ret[0] if len(ret) == 1 else ret
+
+# video tokenizer
+
+@save_load
+class SpaceTimeTokenizer(Module):
+    def __init__(
+        self,
+        dim,
+        dim_latent,
+        patch_size,
+        latent_init_patch_size = None,
+        image_size = None,
+        image_height = None,
+        image_width = None,
+        num_latent_tokens = 64,
+        encoder_depth = 4,
+        decoder_depth = 4,
+        encoder_full_spatial_attn = False,
+        decoder_full_spatial_attn = False,
+        time_block_every = 4,
+        attn_kwargs: dict = dict(),
+        attn_dim_head = 64,
+        attn_heads = 8,
+        attn_softclamp_value = 50.,
+        ff_kwargs: dict = dict(),
+        decoder_pos_mlp_depth = 2,
+        channels = 3,
+        decoder_pos_emb_mlp_activation: Activation = 'silu',
+        per_image_patch_mask_prob = (0., 0.9), # probability of patch masking appears to be per image probabilities drawn uniformly between 0. and 0.9 - if you are a phd student and think i'm mistakened, please open an issue
+        lpips_loss_network: Module | None = None,
+        lpips_loss_weight = 0.2,
+        encoder_add_decorr_aux_loss = False,
+        time_decorr_loss_weight = 4e-3,
+        space_decorr_loss_weight = 4e-3,
+        latent_ortho_loss_weight = 0.,
+        decorr_sample_frac = 0.25,
+        use_loss_normalization = True,
+        use_causal_conv3d = False,
+        use_shifted_patch_tokenization = False,
+        spt_kwargs: dict = dict(),
+        encoder_moss_layers = tuple(),
+        decoder_moss_layers = tuple(),
+        moss_kwargs: dict = dict(),
+        use_time_rnn = False,
+        causal_conv3d_kernel_size = 3,
+        decoder_flow_steps = 1,
+        decoder_v_space_loss = True,
+        latent_receive_grad_frac: Callable | None = None,
+        latent_grad_only_at_noise = False,
+        latent_ar_loss_weight = 0.,
+        latent_ar_sigreg_loss_weight = 0.05,
+        latent_ar_placement = 'encoder',
+        latent_ar_sigreg_loss_kwargs = dict(num_slices = 256),
+        latent_ar_sigreg_num_subspaces = None,
+        latent_ar_kwargs = dict(),
+        latent_sigreg_loss_weight = 0.,
+        latent_sigreg_loss_kwargs = dict(num_slices = 256),
+        latent_consistency_loss_weight = 0.,
+        time_attention_use_pope = False,
+        space_attention_use_pope = False,
+        decoder_flow_times_beta_alpha = 1.,
+        decoder_flow_times_beta_beta = 1.,
+        h_net_layer: int | None = None,
+        h_net_kwargs: dict | None = None,
+        h_net_loss_weight = 1.,
+        slot_attention_initted_latents = False,
+        slot_attention_iters = 2,
+        encoder_slot_spatial_mix = True,
+        decoder_slot_attention_initted_spatial_tokens = False,
+        decoder_slot_attention_iters = 2,
+        decoder_slot_spatial_mix = False,
+        slot_attention_inverted = True,
+        mot_temporal = False,
+        has_aug_conditioning = False,
+        aug_cfg_dropout_prob = 0.1,
+        separate_flow_decoder = False,
+        flow_decoder_train_prob = 0.5,
+        flow_noise_std = 1.,
+        encode_temporal_diff = False,
+        has_byol = False,
+        byol_loss_weight = 1.,
+        byol_use_sem = False,
+        byol_sem_simplex_dim = 8,
+        byol_sem_temperature = 0.1
+    ):
+        super().__init__()
+
+        self.patch_size = patch_size
+        self.channels = channels
+        self.encode_temporal_diff = encode_temporal_diff
+        self.dim = dim
+        self.dim_latent = dim_latent
+
+        assert not (exists(image_height) ^ exists(image_width)), 'both image_height and image_width must be provided if one is given'
+
+        image_height = default(image_height, image_size)
+        image_width = default(image_width, image_size)
+
+        # latents
+
+        if exists(image_height) and exists(image_width) and exists(patch_size):
+            num_spatial_tokens = (image_height // patch_size) * (image_width // patch_size)
+
+            if num_latent_tokens > num_spatial_tokens:
+                logger.warning(f'number of latent tokens ({num_latent_tokens}) exceeds total spatial tokens ({num_spatial_tokens})')
+
+        self.num_latent_tokens = num_latent_tokens
+        self.latent_tokens = EmbeddingSmallInit((num_latent_tokens, dim,))
+
+        # byol - https://arxiv.org/abs/2006.07733
+
+        self.has_byol = has_byol
+        self.byol_loss_weight = byol_loss_weight
+        self.byol_predictor = None
+
+        if has_byol:
+            self.byol_predictor = create_mlp(dim_latent, depth = 3, dim_out = dim_latent)
+
+            if byol_use_sem:
+                self.byol_predictor = Sequential(
+                    SEM(dim_latent, temperature = byol_sem_temperature, dim_simplex = byol_sem_simplex_dim, pre_layernorm = True),
+                    self.byol_predictor
+                )
+
+        # mae masking - Kaiming He paper from long ago
+
+        self.per_image_patch_mask_prob = per_image_patch_mask_prob
+        self.mask_token = EmbeddingSmallInit((dim,))
+
+        # aug conditioning
+
+        self.aug_cfg_dropout_prob = aug_cfg_dropout_prob
+        self.has_aug_conditioning = has_aug_conditioning
+
+        self.aug_cond_embedding = Embedding(3, dim) if has_aug_conditioning else None
+
+        # optional slot attention init
+
+        self.slot_attention_initted_latents = slot_attention_initted_latents
+        if slot_attention_initted_latents:
+            self.slot_attention = SlotAttention(
+                dim = dim,
+                iters = slot_attention_iters,
+                heads = attn_heads,
+                dim_head = attn_dim_head,
+                inverted_attention = slot_attention_inverted,
+                num_slots = num_latent_tokens,
+                spatial_mix = encoder_slot_spatial_mix
+            )
+
+        # patch and unpatch
+
+        dim_patch = channels * patch_size ** 2
+
+        self.use_shifted_patch_tokenization = use_shifted_patch_tokenization
+
+        encoder_channels = channels * (2 if encode_temporal_diff else 1)
+
+        def patch_to_tokens_fn(p):
+            return Sequential(
+                Rearrange('b c t (h p1) (w p2) -> b t h w (p1 p2 c)', p1 = p, p2 = p),
+                Linear(encoder_channels * p ** 2, dim),
+                LayerNormNoBias(dim)
+            )
+
+        if use_shifted_patch_tokenization:
+            self.patch_to_tokens = ShiftedPatchTokenization(dim = dim, patch_size = patch_size, channels = encoder_channels, **spt_kwargs)
+        else:
+            self.patch_to_tokens = patch_to_tokens_fn(patch_size)
+
+        self.has_latent_init_patch = exists(latent_init_patch_size)
+        self.latent_init_patch_size = latent_init_patch_size
+
+        if self.has_latent_init_patch:
+            assert latent_init_patch_size <= patch_size, 'latent init patch size must be less than or equal to the base patch size'
+            assert divisible_by(patch_size, latent_init_patch_size), 'base patch size must be cleanly divisible by latent init patch size'
+
+            self.latent_init_patch_scale = patch_size // latent_init_patch_size
+            self.latent_init_patch_to_tokens = patch_to_tokens_fn(latent_init_patch_size)
+            self.latent_init_mask_token = EmbeddingSmallInit((dim,))
+
+        # optional causal depthwise 3d convs
+
+        self.use_causal_conv3d = use_causal_conv3d
+
+        if use_causal_conv3d:
+            self.encoder_pre_causal_conv3d = CausalDepthwiseConv3d(dim, kernel_size = causal_conv3d_kernel_size)
+            self.encoder_post_causal_conv3d = CausalDepthwiseConv3d(dim, kernel_size = causal_conv3d_kernel_size)
+
+        # latent conditioned flow matching decoder - inspired by RAC https://arxiv.org/abs/2412.16279 - enabled by setting flow steps > 1
+        # predicting clean, as in 'back to basics' https://arxiv.org/abs/2502.13745
+
+        self.decoder_flow_steps = decoder_flow_steps
+        self.decoder_v_space_loss = decoder_v_space_loss
+
+        self.has_flow = decoder_flow_steps > 0
+        self.flow_noise_std = flow_noise_std
+        self.has_separate_flow_decoder = separate_flow_decoder and self.has_flow
+        self.flow_decoder_train_prob = flow_decoder_train_prob
+
+        if latent_grad_only_at_noise:
+            assert not exists(latent_receive_grad_frac), 'cannot set both latent_grad_only_at_noise and latent_receive_grad_frac'
+            latent_receive_grad_frac = lambda time_frac: (time_frac == 0.).float()
+
+        if self.has_separate_flow_decoder and not exists(latent_receive_grad_frac):
+            latent_receive_grad_frac = lambda time_frac: (time_frac == 0.).float()
+
+        self.latent_receive_grad_frac = latent_receive_grad_frac
+
+        self.decoder_times_beta_distribution = None
+        if decoder_flow_times_beta_alpha != 1. or decoder_flow_times_beta_beta != 1.:
+            assert not separate_flow_decoder, 'beta distribution for flow times is incompatible with separate flow decoder'
+            self.decoder_times_beta_distribution = Beta(tensor(decoder_flow_times_beta_alpha), tensor(decoder_flow_times_beta_beta))
+
+        if self.has_flow:
+            self.time_embed = Embedding(decoder_flow_steps, dim)
+            self.noised_patch_to_tokens = Sequential(
+                Rearrange('b c t (h p1) (w p2) -> b t h w (p1 p2 c)', p1 = patch_size, p2 = patch_size),
+                Linear(dim_patch, dim),
+                LayerNormNoBias(dim)
+            )
+
+        encoder_moss_modules = ModuleDict({
+            str(layer_idx): MOSS(dim, **moss_kwargs)
+            for layer_idx in encoder_moss_layers
+        }) if not is_empty(encoder_moss_layers) else None
+
+        # encoder space / time transformer
+
+        num_patch_height = image_height // patch_size if exists(image_height) else None
+        num_patch_width = image_width // patch_size if exists(image_width) else None
+
+        self.encoder_transformer = AxialSpaceTimeTransformer(
+            dim = dim,
+            depth = encoder_depth,
+            attn_dim_head = attn_dim_head,
+            attn_heads = attn_heads,
+            attn_softclamp_value = attn_softclamp_value,
+            time_block_every = time_block_every,
+            num_special_tokens = num_latent_tokens + int(has_aug_conditioning),
+            full_spatial_attn = encoder_full_spatial_attn,
+            attn_kwargs = attn_kwargs,
+            ff_kwargs = ff_kwargs,
+            spatial_modules = encoder_moss_modules,
+            space_height = num_patch_height,
+            space_width = num_patch_width,
+            final_norm = True,
+            time_attention_use_pope = time_attention_use_pope,
+            space_attention_use_pope = space_attention_use_pope,
+            mot_temporal = mot_temporal,
+            rnn_time = use_time_rnn,
+            h_net_layer = h_net_layer,
+            h_net_kwargs = h_net_kwargs
+        )
+
+        # latents
+
+        self.encoded_to_latents = LinearNoBias(dim, dim_latent)
+
+        self.latents_to_decoder = LinearNoBias(dim_latent, dim)
+
+        # decoder
+
+        self.image_height = image_height
+        self.image_width = image_width
+
+        if exists(image_height) and exists(image_width):
+            self.num_spatial_tokens = (image_height // patch_size) * (image_width // patch_size)
+        else:
+            self.num_spatial_tokens = None
+
+        # decoder networks
+
+        decoder_kwargs = dict(
+            dim = dim,
+            dim_latent = dim_latent,
+            num_latent_tokens = num_latent_tokens,
+            patch_size = patch_size,
+            channels = channels,
+            depth = decoder_depth,
+            time_block_every = time_block_every,
+            attn_dim_head = attn_dim_head,
+            attn_heads = attn_heads,
+            num_spatial_tokens = self.num_spatial_tokens,
+            decoder_slot_attention_initted_spatial_tokens = decoder_slot_attention_initted_spatial_tokens,
+            decoder_slot_attention_iters = decoder_slot_attention_iters,
+            slot_attention_inverted = slot_attention_inverted,
+            decoder_slot_spatial_mix = decoder_slot_spatial_mix,
+            use_causal_conv3d = use_causal_conv3d,
+            causal_conv3d_kernel_size = causal_conv3d_kernel_size,
+            has_aug_conditioning = has_aug_conditioning,
+            moss_kwargs = moss_kwargs,
+            decoder_moss_layers = decoder_moss_layers,
+            decoder_pos_emb_mlp_activation = decoder_pos_emb_mlp_activation,
+            decoder_pos_mlp_depth = decoder_pos_mlp_depth,
+            time_attention_use_pope = time_attention_use_pope,
+            space_attention_use_pope = space_attention_use_pope,
+            full_spatial_attn = decoder_full_spatial_attn,
+            image_height = image_height,
+            image_width = image_width
+        )
+
+        self.decoder = VideoDecoderNetwork(**decoder_kwargs)
+
+        if self.has_separate_flow_decoder:
+            self.flow_decoder = VideoDecoderNetwork(**decoder_kwargs)
+
+        # loss related
+
+        self.register_buffer('zero', tensor(0.), persistent = False)
+
+        self.has_lpips_loss = lpips_loss_weight > 0.
+        self.lpips_loss_weight = lpips_loss_weight
+
+        if self.has_lpips_loss:
+            self.lpips = LPIPSLoss(lpips_loss_network)
+
+        # decorr aux loss
+        # https://arxiv.org/abs/2510.14657
+
+        self.encoder_add_decorr_aux_loss = encoder_add_decorr_aux_loss
+        self.time_decorr_loss_weight = time_decorr_loss_weight
+        self.space_decorr_loss_weight = space_decorr_loss_weight
+        self.latent_ortho_loss_weight = latent_ortho_loss_weight
+
+        self.decorr_loss = DecorrelationLoss(decorr_sample_frac, soft_validate_num_sampled = True) if encoder_add_decorr_aux_loss else None
+        self.has_latent_ortho_loss = latent_ortho_loss_weight > 0.
+
+        # optional latent autoregression
+
+        assert latent_ar_placement in ('encoder', 'decoder'), 'latent_ar_placement must be either "encoder" or "decoder"'
+
+        self.latent_ar_loss_weight = latent_ar_loss_weight
+        self.latent_ar_sigreg_loss_weight = latent_ar_sigreg_loss_weight
+        self.latent_ar_placement = latent_ar_placement
+
+        self.latent_ar_in_encoder = latent_ar_placement == 'encoder'
+        self.latent_ar_in_decoder = latent_ar_placement == 'decoder'
+
+        self.has_latent_ar = latent_ar_loss_weight > 0.
+
+        if self.has_latent_ar:
+            latent_ar_use_rmsnorm = self.latent_ar_in_encoder
+            latent_ar_dim = dim if self.latent_ar_in_encoder else dim_latent
+
+            self.latent_ar = LatentAutoregressiveLoss(
+                latent_ar_dim,
+                use_rmsnorm = latent_ar_use_rmsnorm,
+                sigreg_loss_kwargs = latent_ar_sigreg_loss_kwargs,
+                sigreg_num_subspaces = latent_ar_sigreg_num_subspaces,
+                predict_residual = True,
+                **latent_ar_kwargs
+            )
+
+        # loss normalizer
+
+        self.use_loss_normalization = use_loss_normalization
+
+        if use_loss_normalization:
+            self.recon_loss_normalizer = LossNormalizer()
+            self.flow_recon_loss_normalizer = LossNormalizer() if self.has_separate_flow_decoder else None
+            self.lpips_loss_normalizer = LossNormalizer() if self.has_lpips_loss else None
+            self.time_decorr_loss_normalizer = LossNormalizer() if encoder_add_decorr_aux_loss else None
+            self.space_decorr_loss_normalizer = LossNormalizer() if encoder_add_decorr_aux_loss else None
+            self.latent_ortho_loss_normalizer = LossNormalizer() if latent_ortho_loss_weight > 0. else None
+            self.latent_ar_loss_normalizer = LossNormalizer() if self.has_latent_ar else None
+            self.latent_consistency_loss_normalizer = LossNormalizer() if latent_consistency_loss_weight > 0. else None
+            self.latent_sigreg_loss_normalizer = LossNormalizer() if latent_sigreg_loss_weight > 0. else None
+
+        self.latent_consistency_loss_weight = latent_consistency_loss_weight
+        self.has_latent_consistency_loss = latent_consistency_loss_weight > 0.
+
+        self.latent_sigreg_loss_weight = latent_sigreg_loss_weight
+        self.latent_sigreg_loss_kwargs = default(latent_sigreg_loss_kwargs, dict())
+        self.has_latent_sigreg_loss = latent_sigreg_loss_weight > 0.
+
+        self.h_net_loss_weight = h_net_loss_weight
+
+    @property
+    def device(self):
+        return self.zero.device
+
+    def encoder_parameters(self):
+        params = [
+            *self.patch_to_tokens.parameters(),
+            *self.encoder_transformer.parameters(),
+            *self.encoded_to_latents.parameters(),
+            self.latent_tokens,
+            self.mask_token
+        ]
+
+        if self.slot_attention_initted_latents:
+            params.extend(self.slot_attention.parameters())
+
+        if self.use_causal_conv3d:
+            params.extend(self.encoder_pre_causal_conv3d.parameters())
+            params.extend(self.encoder_post_causal_conv3d.parameters())
+
+        return params
+
+    def decoder_parameters(self):
+        params = [
+            *self.latents_to_decoder.parameters(),
+            *self.decoder.parameters()
+        ]
+
+        if self.has_separate_flow_decoder:
+            params.extend(self.flow_decoder.parameters())
+
+        if self.has_flow:
+            params.extend(self.time_embed.parameters())
+            params.extend(self.noised_patch_to_tokens.parameters())
+
+        if self.has_aug_conditioning:
+            params.extend(self.aug_cond_embedding.parameters())
+
+        return params
+
+    def muon_parameters(self):
+        params = [
+            *self.encoder_transformer.muon_parameters(),
+            *self.decoder.muon_parameters()
+        ]
+
+        if self.has_separate_flow_decoder:
+            params.extend(self.flow_decoder.muon_parameters())
+
+        return params
+
+    @torch.no_grad()
+    def tokenize(
+        self,
+        video
+    ):
+        self.eval()
+        return self.forward(video, return_latents = True)
+
+    @torch.no_grad()
+    def latent_disagreement(
+        self,
+        latents,
+        height = None,
+        width = None,
+        clip_decoded_video: bool = False
+    ):
+        self.eval()
+        height = default(height, self.image_height)
+        width = default(width, self.image_width)
+        recon_video = self.decode_step(latents, height = height, width = width)
+
+        if clip_decoded_video:
+            recon_video = recon_video.clamp(0., 1.)
+
+        recon_latents = self.forward(recon_video, return_latents = True, mask_patches = False)
+
+        loss = F.mse_loss(recon_latents, latents, reduction = 'none')
+        loss = reduce(loss, 'b t ... -> b t', 'mean')
+        return loss
+
+    def decode_step(
+        self,
+        latents, # (b t n d)
+        noised_video = None,
+        time_indices = None,
+        height = None,
+        width = None,
+        aug_id = None,
+    ): # (b c t h w)
+
+        batch, time_len, device = *latents.shape[:2], latents.device
+
+        # to latents
+
+        latent_tokens = self.latents_to_decoder(latents)
+
+        if self.has_flow:
+            time_indices = default(time_indices, zeros(batch, device = device, dtype = torch.long))
+            time_embedding = self.time_embed(time_indices)
+            time_embedding = rearrange(time_embedding, 'b d -> b 1 1 d')
+            latent_tokens = latent_tokens + time_embedding
+
+        image_tokens = None
+        if exists(noised_video):
+            image_tokens = self.noised_patch_to_tokens(noised_video)
+
+        # decode
+
+        # use base decoder if no flow decoder, or if time_indices is all 0s
+
+        use_base_decoder = True
+
+        if self.has_separate_flow_decoder and exists(time_indices):
+            is_flow_step = time_indices > 0
+            assert not is_flow_step.any() or is_flow_step.all(), 'when using separate flow decoder, time indices must be either all 0s or all > 0s'
+            use_base_decoder = not is_flow_step.any()
+
+        decoder = self.decoder if use_base_decoder else self.flow_decoder
+
+        recon_video = decoder(
+            latent_tokens = latent_tokens,
+            noised_image_tokens = image_tokens,
+            height = height,
+            width = width,
+            aug_id = aug_id
+        )
+
+        return recon_video
+
+    @torch.no_grad()
+    def decode(
+        self,
+        latents, # (b t n d)
+        height = None,
+        width = None,
+        aug_id = None,
+        return_recons_across_steps = False
+    ): # (b c t h w)
+
+        height = default(height, self.image_height)
+        width = default(width, self.image_width)
+
+        if not self.has_flow:
+            recon = self.decode_step(latents, height = height, width = width, aug_id = aug_id)
+
+            if return_recons_across_steps:
+                return recon, [recon]
+
+            return recon
+
+        batch, time_len, device = *latents.shape[:2], latents.device
+
+        noise = randn(batch, self.channels, time_len, height, width, device=device)
+
+        steps = self.decoder_flow_steps
+        times = linspace(0., 1., steps + 1, device = device)
+
+        video = noise
+
+        delta = 1. / steps
+        all_pred_videos = []
+
+        for i, time in enumerate(times[:-1].unbind()):
+
+            time_indices = full((batch,), i, device = device, dtype = torch.long)
+
+            pred_video = self.decode_step(latents, noised_video = video, time_indices = time_indices, height = height, width = width, aug_id = aug_id)
+
+            padded_time = pad_right_ndim_to(time[None], video.ndim)
+
+            pred_flow = (pred_video - video) / (1. - padded_time)
+
+            video = video + pred_flow * delta
+
+            if return_recons_across_steps:
+                all_pred_videos.append(pred_video)
+
+        if not return_recons_across_steps:
+            return video
+
+        return video, all_pred_videos
+
+    def forward(
+        self,
+        video_or_image, # (b c t h w) | (b c h w)
+        return_latents = False,
+        mask_patches = None,
+        patch_mask = None,
+        return_intermediates = False,
+        update_loss_ema = None,
+        time_cache = None,
+        return_time_cache = False,
+        time_lens = None,
+        aug_id = None,
+        cfg_dropout_aug = None,
+        byol_target_latents = None
+    ):
+        mask_patches = default(mask_patches, self.training and not return_latents)
+
+        # handle image pretraining
+
+        is_image = video_or_image.ndim == 4
+
+        if is_image:
+            video = rearrange(video_or_image, 'b c h w -> b c 1 h w')
+        else:
+            video = video_or_image
+
+        # shapes
+
+        batch, _, time, height, width = video.shape
+        patch_size, device = self.patch_size, video.device
+
+        video_input = video
+
+        if self.encode_temporal_diff and not is_image:
+            diff = video[:, :, 1:] - video[:, :, :-1]
+            diff = pad_left_at_dim(diff, 1, dim = 2)
+            video_input = torch.cat((video, diff), dim = 1)
+
+        assert divisible_by(height, patch_size) and divisible_by(width, patch_size)
+
+        # augmentation conditioning - process once, used by both encoder and decoder
+
+        if self.has_aug_conditioning:
+            aug_id = default(aug_id, 0)
+
+            if isinstance(aug_id, bool):
+                aug_id = int(aug_id) + 1
+
+            if not is_tensor(aug_id):
+                aug_id = tensor(aug_id, device = device)
+
+            if aug_id.dtype == torch.bool:
+                aug_id = aug_id.long() + 1
+
+            aug_id = aug_id.expand(batch)
+
+            cfg_dropout_aug = default(cfg_dropout_aug, self.training)
+
+            if cfg_dropout_aug:
+                drop_mask = rand(batch, device = device) < self.aug_cfg_dropout_prob
+                aug_id = torch.where(drop_mask, 0, aug_id)
+
+        # time cache setup
+
+        if not exists(time_cache):
+            time_cache = (None,) * 4
+
+        spt_cache, pre_causal_conv_cache, transformer_cache, post_causal_conv_cache = time_cache
+        causal_conv_kwargs = dict(return_time_cache = True)
+
+        # to tokens
+
+        next_spt_cache = None
+
+        if self.use_shifted_patch_tokenization:
+            tokens, next_spt_cache = self.patch_to_tokens(video_input, time_cache = spt_cache, return_time_cache = True)
+        else:
+            tokens = self.patch_to_tokens(video_input)
+
+        if self.has_latent_init_patch:
+            latent_init_tokens = self.latent_init_patch_to_tokens(video_input)
+        else:
+            latent_init_tokens = tokens
+
+        next_pre_causal_conv_cache = None
+
+        if self.use_causal_conv3d:
+            tokens, next_pre_causal_conv_cache = self.encoder_pre_causal_conv3d(tokens, time_cache = pre_causal_conv_cache, **causal_conv_kwargs)
+
+        # get some dimensions
+
+        num_patch_height, num_patch_width, _ = tokens.shape[-3:]
+
+        # masking
+
+        if mask_patches or exists(patch_mask):
+
+            if not exists(patch_mask):
+                min_mask_prob, max_mask_prob = self.per_image_patch_mask_prob
+
+                mask_prob = empty(tokens.shape[:2], device = tokens.device).uniform_(min_mask_prob, max_mask_prob) # (b t)
+
+                mask_prob = repeat(mask_prob, 'b t -> b t vh vw', vh = tokens.shape[2], vw = tokens.shape[3])
+                patch_mask = torch.bernoulli(mask_prob) == 1.
+
+            tokens = einx.where('..., d, ... d', patch_mask, self.mask_token, tokens)
+
+            if self.has_latent_init_patch:
+                latent_init_patch_mask = patch_mask
+
+                if self.latent_init_patch_scale > 1:
+                    scale = self.latent_init_patch_scale
+                    latent_init_patch_mask = repeat(latent_init_patch_mask, 'b t h w -> b t (h s1) (w s2)', s1 = scale, s2 = scale)
+
+                latent_init_tokens = einx.where('..., d, ... d', latent_init_patch_mask, self.latent_init_mask_token, latent_init_tokens)
+
+        # pack space
+
+        tokens, inverse_pack_space = pack_one(tokens, 'b t * d')
+        latent_init_tokens, _ = pack_one(latent_init_tokens, 'b t * d')
+
+        # add the latent
+
+        latents = repeat(self.latent_tokens, 'n d -> b t n d', b = tokens.shape[0], t = tokens.shape[1])
+
+        if self.slot_attention_initted_latents:
+            latents = self.slot_attention(latents, latent_init_tokens)
+
+        if self.has_aug_conditioning:
+            maybe_aug_token = self.aug_cond_embedding(aug_id)
+            maybe_aug_token = repeat(maybe_aug_token, 'b d -> b t 1 d', t = tokens.shape[1])
+        else:
+            maybe_aug_token = latents[:, :, 0:0]
+
+        tokens, packed_latent_shape = pack((tokens, maybe_aug_token, latents), 'b t * d')
+
+        # encoder attention
+
+        tokens, intermediates = self.encoder_transformer(
+            tokens,
+            time_lens = time_lens,
+            cache = transformer_cache,
+            return_intermediates = True,
+            space_height = num_patch_height,
+            space_width = num_patch_width
+        )
+
+        _, time_attn_normed_inputs, space_attn_normed_inputs, *_ = intermediates
+        h_net_loss = intermediates.h_net_loss
+        next_transformer_cache = intermediates
+
+        next_post_causal_conv_cache = None
+
+        if self.use_causal_conv3d:
+            b, t, *_ = tokens.shape
+
+            unpacked = unpack(tokens, packed_latent_shape, 'b t * d')
+            spatial_tokens, maybe_aug_token, latent_tokens = unpacked
+            spatial_tokens = inverse_pack_space(spatial_tokens)
+
+            spatial_tokens, next_post_causal_conv_cache = self.encoder_post_causal_conv3d(spatial_tokens, time_cache = post_causal_conv_cache, **causal_conv_kwargs)
+
+            spatial_tokens, _ = pack_one(spatial_tokens, 'b t * d')
+            tokens, _ = pack((spatial_tokens, maybe_aug_token, latent_tokens), 'b t * d')
+
+        # latent bottleneck
+
+        unpacked = unpack(tokens, packed_latent_shape, 'b t * d')
+        tokens, maybe_aug_token, latents = unpacked
+
+        latent_ar_loss = latent_ar_sigreg_loss = self.zero
+
+        if self.has_latent_ar and self.latent_ar_in_encoder:
+            latent_ar_loss, latent_ar_sigreg_loss, _ = self.latent_ar(latents)
+
+        latents = self.encoded_to_latents(latents)
+
+        latent_sigreg_loss = self.zero
+        if self.has_latent_sigreg_loss:
+            latent_sigreg_loss = LatentAutoregressiveLoss.sigreg(
+                latents,
+                **self.latent_sigreg_loss_kwargs
+            )
+
+        latents = latents.tanh()
+
+        if return_latents:
+            next_time_cache = (next_spt_cache, next_pre_causal_conv_cache, next_transformer_cache, next_post_causal_conv_cache)
+
+            if not return_time_cache:
+                return latents
+
+            return latents, next_time_cache
+
+        if self.has_latent_ar and self.latent_ar_in_decoder:
+            latent_ar_loss, latent_ar_sigreg_loss, _ = self.latent_ar(latents)
+
+        time_indices = None
+
+        if self.has_flow:
+
+            if exists(self.decoder_times_beta_distribution):
+                u = self.decoder_times_beta_distribution.sample((batch,)).to(device)
+                time_indices = (u * self.decoder_flow_steps).clamp(0, self.decoder_flow_steps - 1).long()
+            elif self.has_separate_flow_decoder and self.decoder_flow_steps > 1:
+                is_flow_step = random() < self.flow_decoder_train_prob
+                low, high = (1, self.decoder_flow_steps) if is_flow_step else (0, 1)
+                time_indices = randint(low, high, (batch,), device = device)
+            else:
+                time_indices = randint(0, self.decoder_flow_steps, (batch,), device = device)
+
+            noise = randn_like(video) * self.flow_noise_std
+
+            t = time_indices.float() / self.decoder_flow_steps
+            t = pad_right_ndim_to(t, video.ndim)
+
+            noised_video = noise.lerp(video, t)
+
+            # allow for different times during decoder training to influence the latent differently
+            # say allowing for only those near timestep of 0 to shape the latents (which would come closer to RAC)
+
+            if exists(self.latent_receive_grad_frac):
+                frac = self.latent_receive_grad_frac(time_indices.float() / self.decoder_flow_steps)
+                frac = pad_right_ndim_to(frac, latents.ndim)
+                latents = frac_gradient(latents, frac)
+
+            recon_video = self.decode_step(latents, noised_video = noised_video, time_indices = time_indices, height = num_patch_height * self.patch_size, width = num_patch_width * self.patch_size, aug_id = aug_id)
+
+            if self.decoder_v_space_loss:
+                target = video - noise
+                pred = (recon_video - noised_video) / (1. - t)
+            else:
+                target = video
+                pred = recon_video
+        else:
+            recon_video = self.decode_step(latents, height = num_patch_height * self.patch_size, width = num_patch_width * self.patch_size, aug_id = aug_id)
+
+            target = video
+            pred = recon_video
+
+        # losses
+
+        if exists(time_lens):
+            if not is_tensor(time_lens):
+                time_lens = tensor(time_lens, device = device, dtype = torch.long)
+
+            time_mask = lens_to_mask(time_lens, time)
+
+        # latent consistency loss
+
+        latent_consistency_loss = self.zero
+
+        if self.has_latent_consistency_loss:
+            with temp_requires_grad(self.encoder_parameters(), False):
+                recon_latents = self.forward(
+                    recon_video,
+                    return_latents = True,
+                    mask_patches = False,
+                    patch_mask = patch_mask
+                )
+
+            if exists(time_lens):
+                latent_consistent_loss = F.mse_loss(recon_latents, latents.detach(), reduction = 'none')
+                latent_consistent_mask = pad_right_ndim_to(time_mask, latent_consistent_loss.ndim)
+                latent_consistency_loss = masked_mean(latent_consistent_loss, latent_consistent_mask)
+            else:
+                latent_consistency_loss = F.mse_loss(recon_latents, latents.detach())
+
+        # recon loss
+
+        if exists(time_lens):
+            recon_loss = F.mse_loss(pred, target, reduction = 'none')
+            mask = rearrange(time_mask, 'b t -> b 1 t 1 1')
+            recon_loss = masked_mean(recon_loss, mask)
+        else:
+            recon_loss = F.mse_loss(pred, target)
+
+        flow_recon_loss = self.zero
+        is_flow_step = self.has_separate_flow_decoder and exists(time_indices) and (time_indices > 0).any()
+
+        if is_flow_step:
+            flow_recon_loss = recon_loss
+            recon_loss = self.zero
+
+        # losses
+
+        lpips_loss = self.zero
+
+        if self.has_lpips_loss:
+            lpips_loss = self.lpips(video, recon_video, time_lens = time_lens)
+
+        time_decorr_loss = space_decorr_loss = latent_ortho_loss = self.zero
+
+        if self.encoder_add_decorr_aux_loss:
+            if exists(time_attn_normed_inputs):
+                time_decorr_loss = self.decorr_loss(time_attn_normed_inputs)
+
+            if exists(space_attn_normed_inputs):
+                space_decorr_loss = self.decorr_loss(space_attn_normed_inputs)
+
+        if self.has_latent_ortho_loss and exists(latents):
+            latent_ortho_loss = orthogonal_loss(latents)
+
+        byol_loss = self.zero
+        if self.has_byol and exists(byol_target_latents):
+            pred_latents = self.byol_predictor(latents)
+            byol_loss = F.smooth_l1_loss(pred_latents, byol_target_latents.detach())
+
+        # losses
+
+        if self.use_loss_normalization:
+            if not is_flow_step:
+                recon_loss = self.recon_loss_normalizer(recon_loss, update_ema = update_loss_ema)
+            else:
+                flow_recon_loss = self.flow_recon_loss_normalizer(flow_recon_loss, update_ema = update_loss_ema)
+
+            if self.has_latent_ar:
+                latent_ar_loss = self.latent_ar_loss_normalizer(latent_ar_loss, update_ema = update_loss_ema)
+
+            if self.has_lpips_loss:
+                lpips_loss = self.lpips_loss_normalizer(lpips_loss, update_ema = update_loss_ema)
+
+            if self.encoder_add_decorr_aux_loss:
+                time_decorr_loss = self.time_decorr_loss_normalizer(time_decorr_loss, update_ema = update_loss_ema)
+                space_decorr_loss = self.space_decorr_loss_normalizer(space_decorr_loss, update_ema = update_loss_ema)
+
+            if exists(self.latent_ortho_loss_normalizer):
+                latent_ortho_loss = self.latent_ortho_loss_normalizer(latent_ortho_loss, update_ema = update_loss_ema)
+
+            if self.has_latent_consistency_loss:
+                latent_consistency_loss = self.latent_consistency_loss_normalizer(latent_consistency_loss, update_ema = update_loss_ema)
+
+            if self.has_latent_sigreg_loss:
+                latent_sigreg_loss = self.latent_sigreg_loss_normalizer(latent_sigreg_loss, update_ema = update_loss_ema)
+
+        total_loss = (
+            recon_loss +
+            flow_recon_loss +
+            lpips_loss * self.lpips_loss_weight +
+            time_decorr_loss * self.time_decorr_loss_weight +
+            space_decorr_loss * self.space_decorr_loss_weight +
+            latent_ortho_loss * self.latent_ortho_loss_weight +
+            latent_ar_loss * self.latent_ar_loss_weight +
+            latent_ar_sigreg_loss * self.latent_ar_sigreg_loss_weight +
+            latent_consistency_loss * self.latent_consistency_loss_weight +
+            latent_sigreg_loss * self.latent_sigreg_loss_weight +
+            h_net_loss * self.h_net_loss_weight +
+            byol_loss * self.byol_loss_weight
+        )
+
+        if not return_intermediates:
+            return total_loss
+
+        losses = TokenizerLosses(recon_loss, flow_recon_loss, lpips_loss, time_decorr_loss, space_decorr_loss, latent_ortho_loss, latent_ar_loss, latent_ar_sigreg_loss, latent_consistency_loss, latent_sigreg_loss, h_net_loss, byol_loss)
+
+        # handle returning of reconstructed, and image pretraining
+
+        if is_image:
+            recon_video = rearrange(recon_video, 'b c 1 h w -> b c h w')
+
+        out = VideoTokenizerIntermediates(losses, recon_video)
+
+        return total_loss, out
+
+@save_load
+class VideoTokenizer(SpaceTimeTokenizer):
+    pass
+
+@save_load
+class AudioTokenizer(SpaceTimeTokenizer):
+    def __init__(
+        self,
+        channels = 1,
+        sample_rate = 16000,
+        n_fft = 400,
+        win_length = None,
+        hop_length = 160,
+        n_mels = 64,
+        **kwargs
+    ):
+        self.channels = channels
+        self.n_fft = n_fft
+        self.hop_length = hop_length
+        self.win_length = default(win_length, n_fft)
+        self.n_mels = n_mels
+
+        # the default lpips loss assumes 3 channel (rgb) input, which does not hold for audio - require a custom lpips network (e.g. audio lpips) if the loss is to be used
+
+        if not exists(kwargs.get('lpips_loss_network')):
+            assert kwargs.get('lpips_loss_weight', 0.) == 0., 'audio lpips requires a custom network, as the default assumes rgb input'
+            kwargs.setdefault('lpips_loss_weight', 0.)
+
+        super().__init__(channels = channels, **kwargs)
+
+        from torchaudio.transforms import MelSpectrogram, InverseMelScale, GriffinLim
+
+        self.mel_spec = MelSpectrogram(
+            sample_rate = sample_rate,
+            n_fft = n_fft,
+            win_length = win_length,
+            hop_length = hop_length,
+            n_mels = n_mels
+        )
+
+        self.inverse_mel = InverseMelScale(
+            n_stft = n_fft // 2 + 1,
+            n_mels = n_mels,
+            sample_rate = sample_rate,
+            driver = 'gelsy'
+        )
+
+        self.griffin_lim = GriffinLim(
+            n_fft = n_fft,
+            win_length = win_length,
+            hop_length = hop_length
+        )
+
+    @property
+    def mel_height(self):
+        return self.n_mels + (-self.n_mels) % self.patch_size
+
+    def num_frames(self, audio_len):
+        return audio_len // self.hop_length + 1
+
+    def _audio_to_freq_time(self, audio):
+        audio, unpack_inverse = pack_one(audio, '* samples')
+
+        # pad the samples so the mel time frames are divisible by `patch_size`
+
+        frames = self.num_frames(audio.shape[-1])
+        pad_frames = (-frames) % self.patch_size
+
+        audio = pad_right_at_dim(audio, pad_frames * self.hop_length, dim = -1)
+
+        mel = self.mel_spec(audio)
+
+        # pad the mel frequency axis so it is divisible by `patch_size` as well
+
+        pad_n_mels = self.mel_height - self.n_mels
+
+        mel = pad_right_at_dim(mel, pad_n_mels, dim = -2)
+
+        return unpack_inverse(mel, '* n_mels time_frames')
+
+    def _freq_time_to_audio(self, freq_time, audio_len = None):
+        freq_time, unpack_inverse = pack_one(freq_time, '* n_mels time_frames')
+
+        # strip mel frequency and time padding
+
+        freq_time = freq_time[..., :self.n_mels, :]
+
+        if exists(audio_len):
+            frames = self.num_frames(audio_len)
+            freq_time = freq_time[..., :frames]
+
+        stft = self.inverse_mel(freq_time)
+        audio = self.griffin_lim(stft)
+
+        # have the audio be of the exact original length if given
+
+        if exists(audio_len):
+            audio = pad_right_at_dim_to(audio[..., :audio_len], audio_len, dim = -1)
+
+        audio = unpack_inverse(audio, '* samples')
+
+        # tokenizer treats mel as an image, adding a time dimension of 1 - squeeze it back out for standalone case
+
+        if audio.ndim == 4 and audio.shape[-2] == 1:
+            audio = rearrange(audio, 'b c 1 s -> b c s')
+
+        return audio
+
+    def decode(
+        self,
+        latents,
+        height = None,
+        width = None,
+        aug_id = None,
+        return_recons_across_steps = False,
+        audio_len = None
+    ):
+        # the mel frequency axis, padded to be divisible by `patch_size`, mirroring `_audio_to_freq_time`
+
+        height = default(height, self.mel_height)
+
+        # the number of mel time frames cannot be inferred from the latents - derive it from the audio length, if given
+
+        if not exists(width):
+            assert exists(audio_len), 'width or audio_len must be provided for audio decoding, as the number of mel frames cannot be inferred from the latents'
+
+            frames = self.num_frames(audio_len)
+            width = frames + (-frames) % self.patch_size
+
+        recon = super().decode(latents, height = height, width = width, aug_id = aug_id, return_recons_across_steps = return_recons_across_steps)
+
+        if return_recons_across_steps:
+            recon, all_pred_videos = recon
+            recon = self._freq_time_to_audio(recon, audio_len = audio_len)
+            all_pred_videos = [self._freq_time_to_audio(video, audio_len = audio_len) for video in all_pred_videos]
+            return recon, all_pred_videos
+
+        return self._freq_time_to_audio(recon, audio_len = audio_len)
+
+    def forward(self, audio, *args, **kwargs):
+        return super().forward(self._audio_to_freq_time(audio), *args, **kwargs)
+
+# self-flow distillation - Chefer et al. https://arxiv.org/abs/2603.06507
+
+class SelfFlow(Module):
+    def __init__(
+        self,
+        model,
+        student_layer = -3,
+        teacher_layer = -1,
+        teacher_time_modifier_fn: Callable | None = None
+    ):
+        super().__init__()
+        depth = model.depth
+
+        to_pos = lambda l: l if l >= 0 else (depth + l)
+
+        student_layer_pos = to_pos(student_layer)
+        teacher_layer_pos = to_pos(teacher_layer)
+
+        assert 0 <= student_layer_pos < depth, f'student layer {student_layer} out of range for depth {depth}'
+        assert 0 <= teacher_layer_pos < depth, f'teacher layer {teacher_layer} out of range for depth {depth}'
+        assert student_layer_pos < teacher_layer_pos, f'student layer must be shallower than teacher layer'
+
+        self.student_layer = student_layer
+        self.teacher_layer = teacher_layer
+
+        self.teacher_time_modifier_fn = teacher_time_modifier_fn
+
+        self.student_predict_head = FeedForward(dim = model.dim)
+
+    def forward(
+        self,
+        ema_teacher_model,
+        student_intermediates,
+        batch_kwargs: dict,
+        lens = None,
+        mask = None
+    ):
+        teacher_batch_kwargs = dict(**batch_kwargs)
+
+        if exists(self.teacher_time_modifier_fn):
+            teacher_batch_kwargs['time_modifier_fn'] = self.teacher_time_modifier_fn
+
+        *_, teacher_intermediates = ema_teacher_model(**teacher_batch_kwargs)
+
+        student_hidden = student_intermediates.main.layer_hiddens[self.student_layer]
+        teacher_hidden = teacher_intermediates.main.layer_hiddens[self.teacher_layer]
+
+        if exists(lens) and not exists(mask):
+            mask = lens_to_mask(lens, student_hidden.shape[-2])
+
+        pred = self.student_predict_head(student_hidden)
+        return cosine_distance(pred, teacher_hidden, mask = mask)
+
+# dynamics model, axial space-time transformer
+
+@save_load
+class DynamicsWorldModel(Module):
+    def __init__(
+        self,
+        dim,
+        dim_latent,
+        video_tokenizer: VideoTokenizer | None = None,
+        state_tokenizer: StateTokenizer | None = None,
+        audio_tokenizer: AudioTokenizer | None = None,
+        copy_video_tokenizer = True,
+        copy_state_tokenizer = True,
+        copy_audio_tokenizer = True,
+        aux_image_encoder: Module | None = None,
+        freeze_aux_image_encoder = False,
+        max_steps = 64,                # K_max in paper
+        num_register_tokens = 8,       # they claim register tokens led to better temporal consistency
+        num_spatial_tokens = 4,        # latents projected to greater number of spatial tokens
+        num_latent_tokens = None,
+        num_agents = 1,
+        num_tasks = 0,
+        num_video_views = 1,
+        mot_temporal = False,
+        dim_proprio = None,
+        dim_state = None,
+        dim_critic_state = None,
+        reward_encoder_type: Literal['hl_gauss', 'symexp_two_hot'] = 'hl_gauss',
+        critic_state_embedder: Module | None = None,
+        reward_encoder_kwargs: dict = dict(),
+        value_encoder_kwargs: dict | None = None,
+        depth = 4,
+        spatial_pre_encoder_depth = 0,
+        action_pre_encoder_depth = 0,
+        actor_depth = 0,
+        critic_depth = 0,
+        pred_orig_latent = True,   # directly predicting the original x0 data yield better results, rather than velocity (x-space vs v-space)
+        time_block_every = 4,      # every 4th block is time
+        attn_kwargs: dict = dict(),
+        transformer_kwargs: dict = dict(),
+        attn_heads = 8,
+        attn_dim_head = 64,
+        attn_softclamp_value = 50.,
+        ff_kwargs: dict = dict(),
+        use_time_rnn = False,
+        loss_weight_fn: Callable = ramp_weight,
+        prob_shortcut_train = None,                  # probability of shortcut training, defaults to 1 - 1 / num_step_sizes
+        add_reward_embed_to_agent_token = False,
+        add_reward_embed_dropout = 0.1,
+        add_state_pred_head = False,
+        state_pred_loss_weight = 0.1,
+        state_entropy_bonus_weight = 0.,
+        agent_predicts_state = False,
+        agent_predicts_state_frac_gradient = 0.,
+        agent_state_pred_loss_weight = 0.1,
+        eps_latent_pred = 1e-6,
+        num_discrete_actions: int | tuple[int, ...] = 0,
+        num_continuous_actions = 0,
+        continuous_norm_stats = None,
+        continuous_dist_type: Literal['gaussian', 'squashed_gaussian', 'beta'] = 'beta',
+        continuous_dist_kwargs: dict = dict(),
+        continuous_target_action_range: tuple[float, float] | None = None,
+        multi_token_pred_len = 8,                   # they do multi-token prediction of 8 steps forward
+        value_head_mlp_depth = 3,
+        policy_head_mlp_depth = 3,
+        latent_flow_loss_weight = 1.,
+        shortcut_loss_weight = 1.,
+        reward_loss_weight: float | list[float] = 1.,
+        predict_terminals: bool = True,
+        predict_terminal_mlp_kwargs: dict = dict(depth = 1),
+        terminal_loss_weight: float = 1.,
+        discrete_action_loss_weight: float | list[float] = 1.,
+        continuous_action_loss_weight: float | list[float] = 1.,
+        num_latent_genes = 0,                       # for carrying out evolution within the dreams https://web3.arxiv.org/abs/2503.19037
+        keep_reward_ema_stats = False,
+        reward_ema_decay = 0.998,
+        reward_quantile_filter = (0.05, 0.95),
+        gae_discount_factor = 0.997,
+        gae_lambda = 0.95,
+        ppo_eps_clip = 0.2,
+        pmpo_pos_to_neg_weight = 0.5, # pos and neg equal weight
+        pmpo_reverse_kl = True,
+        pmpo_kl_div_loss_weight = .3,
+        use_delight_gating = True,
+        delight_temperature = 1.,
+        normalize_advantages = None,
+        value_clip = 0.4,
+        clip_values = False,
+        policy_entropy_weight = .01,
+        agent_policy_gradient_frac = 1.,
+        agent_value_gradient_frac = 1.,
+        gae_use_accelerated = False,
+        use_loss_normalization = False,
+        time_attention_use_pope = False,
+        latent_ar_layer: int | tuple[int, int] | None = None,
+        latent_ar = False,
+        latent_ar_action_conditioned = False,
+        latent_ar_loss_weight = 0.,
+        latent_ar_sigreg_loss_weight = 0.05,
+        latent_ar_sigreg_loss_kwargs = dict(num_slices = 256),
+        latent_ar_sigreg_num_subspaces = None,
+        latent_ar_kwargs = dict(),
+        identity_latents_to_spatial = False,
+        has_aug_conditioning = False,
+        aug_cfg_dropout_prob = 0.1,
+        agent_predict_sem_kwargs: dict = dict(),
+        ssl_lapo = False,
+        lapo_pred_actions = True,
+        lapo_use_fdm = True,
+        ssl_tem = False,
+        tem_first_state_as_init_hidden = True,
+        tem_learn_relative_actions = False,
+        lapo_kwargs: dict = dict(),
+        tem_kwargs: dict = dict(),
+        lapo_action_loss_weight = 1.,
+        lapo_fdm_loss_weight = 1.,
+        lapo_raw_latent_fdm_loss_weight = 1.,
+        tem_loss_weight = 1.,
+        h_net_loss_weight = 1.,
+        actor_spr = False,
+        actor_nlp_kwargs = dict(),
+        policy_head_mlp_activation: Activation = 'silu',
+        agent_state_pred_mlp_activation: Activation = 'silu',
+        state_terminal_pred_mlp_activation: Activation = 'silu',
+        value_head_mlp_activation: Activation = 'silu'
+    ):
+        super().__init__()
+        self.dim = dim
+        self.depth = depth
+
+        # tokenizers
+
+        if exists(state_tokenizer):
+            if copy_state_tokenizer:
+                state_tokenizer = deepcopy(state_tokenizer)
+                state_tokenizer.requires_grad_(False)
+            state_tokenizer = state_tokenizer.eval()
+
+        self.state_tokenizer = state_tokenizer
+
+        if exists(video_tokenizer):
+            if copy_video_tokenizer:
+                video_tokenizer = deepcopy(video_tokenizer)
+                video_tokenizer.requires_grad_(False)
+            video_tokenizer = video_tokenizer.eval()
+
+        self.video_tokenizer = video_tokenizer
+
+        if exists(audio_tokenizer):
+            if copy_audio_tokenizer:
+                audio_tokenizer = deepcopy(audio_tokenizer)
+                audio_tokenizer.requires_grad_(False)
+            audio_tokenizer = audio_tokenizer.eval()
+
+        self.audio_tokenizer = audio_tokenizer
+
+        # rest of init
+
+        self.has_latent_ar = latent_ar
+
+        self.aux_image_encoder = aux_image_encoder
+        self.has_aux_image_encoder = exists(aux_image_encoder)
+        self.freeze_aux_image_encoder = freeze_aux_image_encoder
+
+        if not exists(num_latent_tokens):
+            num_latent_tokens = sum([t.num_latent_tokens for t in (self.video_tokenizer, self.audio_tokenizer, self.state_tokenizer) if exists(t)])
+            num_latent_tokens = num_latent_tokens if num_latent_tokens > 0 else None
+
+        assert exists(num_latent_tokens), '`num_latent_tokens` must be set'
+
+        # loss normalization
+
+        self.use_loss_normalization = use_loss_normalization
+
+        # spatial
+
+        self.num_latent_tokens = num_latent_tokens
+        self.dim_latent = dim_latent
+        self.latent_shape = (num_latent_tokens, dim_latent)
+
+        is_same_len = num_spatial_tokens == num_latent_tokens
+
+        assert not identity_latents_to_spatial or dim == dim_latent, 'identity_latents_to_spatial requires dim == dim_latent'
+
+        self.latents_to_spatial_tokens = Identity()
+
+        if not is_same_len or not identity_latents_to_spatial:
+            self.latents_to_spatial_tokens = LearnedQueriesAttentionPool(
+                num_spatial_tokens,
+                dim = dim,
+                dim_kv_input = dim_latent,
+                heads = attn_heads,
+                dim_head = attn_dim_head
+            ) if not is_same_len else Linear(dim_latent, dim)
+
+        self.to_latent_pred = Sequential(
+            RMSNorm(dim),
+            LearnedQueriesAttentionPool(num_latent_tokens, dim = dim, heads = attn_heads, dim_head = attn_dim_head) if not is_same_len else Identity(),
+            LinearNoBias(dim, dim_latent)
+        )
+
+        # number of video views, for robotics, which could have third person + wrist camera at least
+
+        assert num_video_views >= 1
+        self.video_has_multi_view = num_video_views > 1
+
+        self.num_video_views = num_video_views
+
+        if self.video_has_multi_view:
+            self.view_emb = EmbeddingSmallInit((num_video_views, dim,))
+
+        # proprioception
+
+        dim_proprio = dim_proprio if dim_proprio else None
+
+        self.has_proprio = exists(dim_proprio)
+        self.dim_proprio = dim_proprio
+
+        # state
+
+        self.state_to_latents = None
+        self.dim_state = dim_state
+
+        if exists(dim_state):
+            self.state_to_latents = Sequential(
+                LinearNoBias(dim_state, num_latent_tokens * dim_latent),
+                Rearrange('... (n d) -> ... n d', n = num_latent_tokens, d = dim_latent)
+            )
+
+        # asymmetric critic state embedding
+
+        if exists(critic_state_embedder):
+            self.critic_state_embedder = critic_state_embedder
+        elif exists(dim_critic_state):
+            self.critic_state_embedder = nn.Linear(dim_critic_state, dim)
+        else:
+            self.critic_state_embedder = None
+
+        if self.has_proprio:
+            self.to_proprio_token = nn.Linear(dim_proprio, dim)
+
+            self.to_proprio_pred = Sequential(
+                RMSNorm(dim),
+                nn.Linear(dim, dim_proprio)
+            )
+
+        # register tokens
+
+        self.num_register_tokens = num_register_tokens
+        self.register_tokens = EmbeddingSmallInit((num_register_tokens, dim,))
+
+        # signal and step sizes
+
+        assert divisible_by(dim, 2)
+        dim_half = dim // 2
+
+        assert is_power_two(max_steps), '`max_steps` must be a power of 2'
+        self.max_steps = max_steps
+        self.num_step_sizes_log2 = int(log2(max_steps))
+
+        self.signal_levels_embed = nn.Embedding(max_steps, dim_half)
+        self.step_size_embed = nn.Embedding(self.num_step_sizes_log2, dim_half) # power of 2, so 1/1, 1/2, 1/4, 1/8 ... 1/Kmax
+
+        self.prob_shortcut_train = default(prob_shortcut_train, 1. - self.num_step_sizes_log2 ** -1.)
+
+        # loss related
+
+        self.pred_orig_latent = pred_orig_latent # x-space or v-space
+        self.loss_weight_fn = loss_weight_fn
+
+        # state prediction, for state entropy bonus
+
+        self.add_state_pred_head = add_state_pred_head
+        self.state_pred_loss_weight = state_pred_loss_weight
+
+        self.should_pred_state = add_state_pred_head and state_pred_loss_weight > 0.
+
+        self.eps_latent_pred = eps_latent_pred
+
+        if self.should_pred_state:
+            self.state_pred_token = EmbeddingSmallInit((dim,))
+
+            self.to_state_pred = Sequential(
+                RMSNorm(dim),
+                nn.Linear(dim, num_latent_tokens * dim_latent * 2),
+                Rearrange('... (n d two) -> ... n d two', n = num_latent_tokens, two = 2)
+            )
+
+            self.state_beta_dist = BetaDist(unimodal = True)
+
+        self.state_entropy_bonus_weight = state_entropy_bonus_weight
+        self.add_state_entropy_bonus = self.should_pred_state and state_entropy_bonus_weight > 0.
+
+        # reinforcement related
+
+        # they sum all the actions into a single token
+
+        self.num_agents = num_agents
+
+        self.agent_learned_embed = EmbeddingSmallInit((self.num_agents, dim,))
+        self.action_learned_embed = EmbeddingSmallInit((self.num_agents, dim,))
+
+        self.reward_learned_embed = EmbeddingSmallInit((self.num_agents, dim,))
+
+        self.num_tasks = num_tasks
+        self.task_embed = nn.Embedding(num_tasks, dim)
+
+        # learned set of latent genes
+
+        self.agent_has_genes = num_latent_genes > 0
+        self.num_latent_genes = num_latent_genes
+        self.latent_genes = EmbeddingSmallInit((num_latent_genes, dim,))
+
+        # policy head
+
+        self.policy_head = create_mlp(
+            dim_in = dim,
+            dim = dim * 4,
+            dim_out = dim * 4,
+            depth = policy_head_mlp_depth,
+            activation = get_activation(policy_head_mlp_activation)
+        )
+
+        # aug conditioning
+
+        self.aug_cfg_dropout_prob = aug_cfg_dropout_prob
+        self.has_aug_conditioning = has_aug_conditioning
+        self.aug_cond_embedding = Embedding(3, dim) if has_aug_conditioning else None
+
+        # action embedder
+
+        self.action_embedder = ActionEmbedder(
+            dim = dim,
+            num_discrete_actions = num_discrete_actions,
+            num_continuous_actions = num_continuous_actions,
+            continuous_norm_stats = continuous_norm_stats,
+            continuous_dist_type = continuous_dist_type,
+            continuous_dist_kwargs = continuous_dist_kwargs,
+            continuous_target_action_range = continuous_target_action_range,
+            can_unembed = True,
+            unembed_dim = dim * 4,
+            num_unembed_preds = multi_token_pred_len,
+            squeeze_unembed_preds = False
+        )
+
+        # next latent prediction for actor
+
+        self.actor_spr = actor_spr
+        self.actor_spr_predictor = None
+
+        if actor_spr:
+            self.actor_spr_predictor = ActorSPRWrapper(
+                self.action_embedder,
+                dim = dim * 4,
+                **actor_nlp_kwargs
+            )
+
+        # latent autoregressive loss with sigreg
+
+        self.latent_ar_action_conditioned = latent_ar_action_conditioned and self.action_embedder.has_actions
+
+        self.latent_ar_layer = latent_ar_layer
+        self.latent_ar_loss_weight = latent_ar_loss_weight
+        self.latent_ar_sigreg_loss_weight = latent_ar_sigreg_loss_weight
+
+        self.lapo_action_loss_weight = lapo_action_loss_weight
+        self.lapo_fdm_loss_weight = lapo_fdm_loss_weight
+        self.lapo_raw_latent_fdm_loss_weight = lapo_raw_latent_fdm_loss_weight
+        self.tem_loss_weight = tem_loss_weight
+        self.h_net_loss_weight = h_net_loss_weight
+
+        self.latent_ar = None
+
+        if self.has_latent_ar:
+            assert exists(latent_ar_layer), '`latent_ar_layer` must be specified if `latent_ar` is True'
+            latent_ar_dim_in = dim * 2 if self.latent_ar_action_conditioned else dim
+
+            self.latent_ar = LatentAutoregressiveLoss(
+                dim_in = latent_ar_dim_in,
+                dim = dim,
+                sigreg_loss_kwargs = latent_ar_sigreg_loss_kwargs,
+                sigreg_num_subspaces = latent_ar_sigreg_num_subspaces,
+                **latent_ar_kwargs
+            )
+
+        # agent predicting state
+
+        self.agent_predicts_state = agent_predicts_state
+        self.agent_predicts_state_frac_gradient = agent_predicts_state_frac_gradient
+        self.agent_state_pred_loss_weight = agent_state_pred_loss_weight
+
+        if self.agent_predicts_state:
+            dim_agent_state_in = dim * 2 if self.action_embedder.has_actions else dim
+
+            self.to_agent_state_pred = Sequential(
+                FracGradient(agent_predicts_state_frac_gradient),
+                Linear(dim_agent_state_in, dim_agent_state_in),
+                RMSNorm(dim_agent_state_in),
+                SEM(dim = dim, dim_in = dim_agent_state_in, **agent_predict_sem_kwargs),
+                Residual(FeedForward(dim_agent_state_in, activation = agent_state_pred_mlp_activation, **ff_kwargs)),
+                Residual(FeedForward(dim_agent_state_in, activation = agent_state_pred_mlp_activation, **ff_kwargs)),
+                RMSNorm(dim_agent_state_in),
+                Linear(dim_agent_state_in, num_latent_tokens * dim_latent * 2),
+                Rearrange('... (n d two) -> ... n d two', n = num_latent_tokens, two = 2)
+            )
+
+            self.agent_state_beta_dist = BetaDist(unimodal = True)
+
+        # multi token prediction length
+
+        self.multi_token_pred_len = multi_token_pred_len
+
+        # each agent token will have the reward embedding of the previous time step - but could eventually just give reward its own token
+
+        self.add_reward_embed_to_agent_token = add_reward_embed_to_agent_token
+        self.add_reward_embed_dropout = add_reward_embed_dropout
+
+        reward_encoder_klass = get_reward_encoder_klass(reward_encoder_type)
+
+        self.reward_encoder = reward_encoder_klass(
+            **reward_encoder_kwargs,
+            dim_embed = dim,
+            learned_embedding = add_reward_embed_to_agent_token
+        )
+
+        value_encoder_kwargs = default(value_encoder_kwargs, reward_encoder_kwargs)
+
+        self.value_encoder = reward_encoder_klass(
+            **value_encoder_kwargs,
+            dim_embed = dim,
+            learned_embedding = False
+        )
+
+        def create_action_embed_modules(embedder_to_copy, activation_name):
+            embedder = deepcopy(embedder_to_copy)
+            learned_embed = Parameter(torch.randn(self.num_agents, dim) * 1e-2)
+            agent_action_dim = dim * 2 if embedder.has_actions else dim
+
+            proj = Sequential(
+                RMSNorm(agent_action_dim),
+                Linear(agent_action_dim, dim),
+                get_activation(activation_name)
+            )
+
+            return embedder, learned_embed, proj
+
+        self.reward_action_embedder, self.reward_action_learned_embed, self.to_reward_action_embed = create_action_embed_modules(self.action_embedder, 'silu')
+
+        self.to_agent_embed_reward_pred = Ensemble(
+            Sequential(
+                RMSNorm(dim),
+                create_mlp(
+                    dim_in = dim,
+                    dim = dim * 4,
+                    dim_out = self.reward_encoder.num_bins,
+                    depth = 2,
+                    activation = get_activation('silu')
+                )
+            ),
+            multi_token_pred_len
+        )
+
+        self.to_latent_state_reward_pred = Sequential(
+            RMSNorm(dim_latent),
+            create_mlp(
+                dim_in = dim_latent,
+                dim = dim_latent * 4,
+                dim_out = self.reward_encoder.num_bins,
+                depth = 2,
+                activation = get_activation('silu')
+            )
+        )
+
+        # terminal prediction
+
+        self.predict_terminals = predict_terminals
+
+        if predict_terminals:
+            self.terminal_action_embedder, self.terminal_action_learned_embed, self.to_terminal_action_embed = create_action_embed_modules(self.action_embedder, 'silu')
+
+            self.to_agent_embed_terminal_pred = Ensemble(
+                Sequential(
+                    RMSNorm(dim),
+                    create_mlp(
+                        dim_in = dim,
+                        dim = dim * 4,
+                        dim_out = 1,
+                        depth = max(2, predict_terminal_mlp_kwargs.get('depth', 2)),
+                        squeeze_out = True,
+                        activation = get_activation(state_terminal_pred_mlp_activation)
+                    )
+                ),
+                multi_token_pred_len
+            )
+
+            self.to_latent_state_terminal_pred = Sequential(
+                RMSNorm(dim_latent),
+                create_mlp(
+                    dim_in = dim_latent,
+                    dim = dim_latent * 4,
+                    dim_out = 1,
+                    depth = max(2, predict_terminal_mlp_kwargs.get('depth', 2)),
+                    squeeze_out = True,
+                    activation = get_activation(state_terminal_pred_mlp_activation)
+                )
+            )
+
+        # value head
+
+        self.value_head = create_mlp(
+            dim_in = dim,
+            dim = dim * 4,
+            dim_out = self.value_encoder.num_bins,
+            depth = value_head_mlp_depth,
+            activation = get_activation(value_head_mlp_activation)
+        )
+
+        # pre encoder and ssl modules
+
+        self.spatial_pre_encoder = None
+        if spatial_pre_encoder_depth > 0:
+            self.spatial_pre_encoder = AxialSpaceTimeTransformer(
+                dim = dim,
+                depth = spatial_pre_encoder_depth,
+                attn_heads = attn_heads,
+                attn_dim_head = attn_dim_head,
+                attn_softclamp_value = attn_softclamp_value,
+                attn_kwargs = attn_kwargs,
+                ff_kwargs = ff_kwargs,
+                num_special_tokens = 0,
+                time_block_every = time_block_every,
+                final_norm = False,
+                rnn_time = use_time_rnn,
+                time_attention_use_pope = time_attention_use_pope
+            )
+
+        self.action_pre_encoder = None
+        if action_pre_encoder_depth > 0:
+            assert self.action_embedder.has_actions, 'action_pre_encoder_depth cannot be > 0 if the model does not have actions'
+
+            self.action_pre_encoder = AxialSpaceTimeTransformer(
+                dim = dim,
+                depth = action_pre_encoder_depth,
+                attn_heads = attn_heads,
+                attn_dim_head = attn_dim_head,
+                attn_softclamp_value = attn_softclamp_value,
+                attn_kwargs = attn_kwargs,
+                ff_kwargs = ff_kwargs,
+                num_special_tokens = 0,
+                time_block_every = 1,
+                final_norm = False,
+                rnn_time = use_time_rnn,
+                time_attention_use_pope = time_attention_use_pope
+            )
+
+        self.has_lapo = ssl_lapo
+        if ssl_lapo:
+            assert exists(self.spatial_pre_encoder), 'LAPO requires the spatial pre-encoder'
+            self.ssl_lapo = LAPO(
+                dim,
+                dim_latent_action = dim,
+                dim_raw_latent = dim_latent,
+                num_raw_latent_tokens = num_latent_tokens,
+                num_discrete_actions = num_discrete_actions,
+                num_continuous_actions = num_continuous_actions,
+                pred_actions = lapo_pred_actions,
+                use_fdm = lapo_use_fdm,
+                **lapo_kwargs
+            )
+
+        self.has_tem = ssl_tem
+        if ssl_tem:
+            assert exists(self.action_pre_encoder), 'TEM requires the action pre-encoder'
+            self.ssl_tem = TEM(
+                dim_action_embed = dim,
+                dim_raw_latent = dim_latent,
+                num_raw_latent_tokens = num_latent_tokens,
+                first_state_as_init_hidden = tem_first_state_as_init_hidden,
+                learn_relative_actions = tem_learn_relative_actions,
+                **tem_kwargs
+            )
+
+        # efficient axial space / time transformer
+
+        num_special_tokens = num_agents + int(has_aug_conditioning)
+
+        self.transformer = AxialSpaceTimeTransformer(
+            dim = dim,
+            depth = depth,
+            attn_heads = attn_heads,
+            attn_dim_head = attn_dim_head,
+            attn_softclamp_value = attn_softclamp_value,
+            attn_kwargs = attn_kwargs,
+            ff_kwargs = ff_kwargs,
+            num_special_tokens = num_special_tokens,
+            time_block_every = time_block_every,
+            mot_temporal = mot_temporal,
+            final_norm = False,
+            rnn_time = use_time_rnn,
+            time_attention_use_pope = time_attention_use_pope,
+            **transformer_kwargs
+        )
+
+        ac_transformer_kwargs = dict(
+            dim = dim,
+            attn_heads = attn_heads,
+            attn_dim_head = attn_dim_head,
+            attn_softclamp_value = attn_softclamp_value,
+            attn_kwargs = attn_kwargs,
+            ff_kwargs = ff_kwargs,
+            num_special_tokens = num_special_tokens,
+            time_block_every = time_block_every,
+            mot_temporal = mot_temporal,
+            final_norm = False,
+            rnn_time = use_time_rnn,
+            time_attention_use_pope = time_attention_use_pope,
+            **transformer_kwargs
+        )
+
+        self.has_actor_transformer = actor_depth > 0
+        self.actor_transformer = AxialSpaceTimeTransformer(depth = actor_depth, **ac_transformer_kwargs) if self.has_actor_transformer else None
+
+        self.has_critic_transformer = critic_depth > 0
+        self.critic_transformer = AxialSpaceTimeTransformer(depth = critic_depth, **ac_transformer_kwargs) if self.has_critic_transformer else None
+
+        # ppo related
+
+        self.gae_use_accelerated = gae_use_accelerated
+        self.gae_discount_factor = gae_discount_factor
+        self.gae_lambda = gae_lambda
+
+        self.ppo_eps_clip = ppo_eps_clip
+        self.value_clip = value_clip
+        self.clip_values = clip_values
+        self.policy_entropy_weight = policy_entropy_weight
+
+        self.agent_policy_gradient_frac = agent_policy_gradient_frac
+        self.agent_value_gradient_frac = agent_value_gradient_frac
+
+        self.normalize_advantages = normalize_advantages
+
+        # pmpo related
+
+        self.pmpo_pos_to_neg_weight = pmpo_pos_to_neg_weight
+        self.pmpo_kl_div_loss_weight = pmpo_kl_div_loss_weight
+        self.pmpo_reverse_kl = pmpo_reverse_kl
+
+        # delight related
+
+        self.use_delight_gating = use_delight_gating
+        self.delight_temperature = delight_temperature
+
+        # rewards related
+
+        self.keep_reward_ema_stats = keep_reward_ema_stats
+        self.reward_ema_decay = reward_ema_decay
+
+        self.register_buffer('reward_quantile_filter', tensor(reward_quantile_filter), persistent = False)
+
+        self.register_buffer('ema_returns_mean', tensor(0.))
+        self.register_buffer('ema_returns_var', tensor(1.))
+
+        # loss related
+
+        self.flow_loss_normalizer = LossNormalizer() if use_loss_normalization else None
+        self.shortcut_flow_loss_normalizer = LossNormalizer() if use_loss_normalization else None
+        self.agent_embed_reward_loss_normalizer = LossNormalizer(multi_token_pred_len) if use_loss_normalization else None
+        self.latent_state_reward_loss_normalizer = LossNormalizer() if use_loss_normalization else None
+        self.agent_embed_terminal_loss_normalizer = LossNormalizer(multi_token_pred_len) if (use_loss_normalization and self.predict_terminals) else None
+        self.latent_state_terminal_loss_normalizer = LossNormalizer() if (use_loss_normalization and self.predict_terminals) else None
+        self.discrete_actions_loss_normalizer = LossNormalizer(multi_token_pred_len) if (exists(num_discrete_actions) and use_loss_normalization) else None
+        self.continuous_actions_loss_normalizer = LossNormalizer(multi_token_pred_len) if (exists(num_continuous_actions) and use_loss_normalization) else None
+
+        self.latent_flow_loss_weight = latent_flow_loss_weight
+        self.shortcut_loss_weight = shortcut_loss_weight
+
+        self.register_buffer('reward_loss_weight', tensor(reward_loss_weight))
+        self.register_buffer('terminal_loss_weight', tensor(terminal_loss_weight))
+        self.register_buffer('discrete_action_loss_weight', tensor(discrete_action_loss_weight))
+        self.register_buffer('continuous_action_loss_weight', tensor(continuous_action_loss_weight))
+
+        assert self.reward_loss_weight.numel() in {1, multi_token_pred_len}
+        assert self.discrete_action_loss_weight.numel() in {1, multi_token_pred_len}
+        assert self.continuous_action_loss_weight.numel() in {1, multi_token_pred_len}
+
+        self.register_buffer('zero', tensor(0.), persistent = False)
+
+    @property
+    def replay_buffer_fields(self):
+        fields = dict(
+            rewards = 'float',
+            terminated = 'bool'
+        )
+
+        tokenizer = self.video_tokenizer
+
+        if exists(tokenizer):
+            assert exists(tokenizer.image_height) and exists(tokenizer.image_width), 'tokenizer image_height and image_width must be defined'
+            fields['video'] = ('uint8', (tokenizer.channels, tokenizer.image_height, tokenizer.image_width))
+
+        if self.action_embedder.num_continuous_action_types > 0:
+            fields['continuous_actions'] = ('float', (self.action_embedder.num_continuous_action_types,))
+
+        num_discrete = self.action_embedder.num_discrete_actions.tolist()
+
+        if len(num_discrete) == 1:
+            fields['discrete_actions'] = 'int'
+        elif len(num_discrete) > 1:
+            fields['discrete_actions'] = ('int', (len(num_discrete),))
+
+        if self.has_proprio:
+            fields['proprio'] = ('float', (self.dim_proprio,))
+
+        return fields
+
+    def create_replay_buffer(
+        self,
+        folder: str | Path,
+        max_episodes: int,
+        max_timesteps: int,
+        video_dtype: Literal['uint8', 'float'] = 'uint8',
+        **kwargs
+    ):
+        assert video_dtype in {'uint8', 'float'}, 'video_dtype must be either uint8 or float'
+
+        fields = self.replay_buffer_fields
+
+        if 'video' in fields:
+            fields['video'] = (video_dtype, fields['video'][1])
+
+        custom_fields = kwargs.pop('fields', dict())
+        fields.update(custom_fields)
+
+        return ReplayBuffer(
+            folder = folder,
+            max_episodes = max_episodes,
+            max_timesteps = max_timesteps,
+            fields = fields,
+            **kwargs
+        )
+
+    @property
+    def device(self):
+        return self.zero.device
+
+    @property
+    def has_image_encoder(self):
+        return exists(self.video_tokenizer) or self.has_aux_image_encoder
+
+    # types of parameters
+
+    def muon_parameters(self):
+        params = self.transformer.muon_parameters()
+        if exists(self.actor_transformer):
+            params.extend(self.actor_transformer.muon_parameters())
+        if exists(self.critic_transformer):
+            params.extend(self.critic_transformer.muon_parameters())
+        return params
+
+    def policy_head_parameters(self):
+        params = [
+            *self.policy_head.parameters(),
+            *self.action_embedder.unembed_parameters() # includes the unembed from the action-embedder
+        ]
+
+        if exists(self.actor_transformer):
+            params.extend(self.actor_transformer.parameters())
+
+        if self.actor_spr:
+            params.extend(self.actor_spr_predictor.parameters())
+
+        return params
+
+    def value_head_parameters(self):
+        params = list(self.value_head.parameters())
+
+        if exists(self.critic_transformer):
+            params.extend(self.critic_transformer.parameters())
+
+        return params
+
+    def agent_parameters(self):
+        params = [
+            *self.policy_head_parameters(),
+            *self.value_head_parameters()
+        ]
+        return params
+
+    def world_model_parameters(self):
+        agent_params = set(self.agent_parameters())
+        return [param for param in self.parameters() if param not in agent_params]
+
+    def image_encoder_parameters(self):
+        params = []
+
+        if exists(self.video_tokenizer):
+            params.extend(self.video_tokenizer.parameters())
+
+        if self.has_aux_image_encoder:
+            params.extend(self.aux_image_encoder.parameters())
+
+        return params
+
+    def parameters(self, *args, **kwargs):
+        params = super().parameters(*args, **kwargs)
+
+        if not exists(self.video_tokenizer):
+            return params
+
+        return list(set(params) - set(self.video_tokenizer.parameters()))
+
+    # aux encoders
+
+    def encode_aux_image_tokens(self, video):
+        context = torch.no_grad if self.freeze_aux_image_encoder else nullcontext
+
+        with context():
+            was_training = self.aux_image_encoder.training
+            if self.freeze_aux_image_encoder:
+                self.aux_image_encoder.eval()
+
+            aux_out = self.aux_image_encoder(video)
+
+            if self.freeze_aux_image_encoder:
+                self.aux_image_encoder.train(was_training)
+
+        (aux_image_tokens, *_), _ = tree_flatten(aux_out)
+
+        if self.freeze_aux_image_encoder:
+            aux_image_tokens = aux_image_tokens.detach()
+
+        return aux_image_tokens
+
+    def embed_agent_actions(
+        self,
+        embeds,
+        discrete_actions = None,
+        continuous_actions = None,
+        head: Literal['reward', 'terminal'] = 'reward'
+    ):
+        if not self.action_embedder.has_actions:
+            return embeds
+
+        assert head in ('reward', 'terminal')
+
+        batch, time = embeds.shape[:2]
+
+        if exists(discrete_actions):
+            discrete_actions_time = discrete_actions.shape[1]
+
+            if discrete_actions_time > time:
+                discrete_actions = discrete_actions[:, :time]
+
+        if exists(continuous_actions):
+            continuous_actions_time = continuous_actions.shape[1]
+
+            if continuous_actions_time > time:
+                continuous_actions = continuous_actions[:, :time]
+
+        if head == 'reward':
+            embedder, learned_embed, proj = self.reward_action_embedder, self.reward_action_learned_embed, self.to_reward_action_embed
+        else:
+            embedder, learned_embed, proj = self.terminal_action_embedder, self.terminal_action_learned_embed, self.to_terminal_action_embed
+
+        # embed actions and add learned agent action embeddings
+
+        action_embeds = embedder(discrete_actions = discrete_actions, continuous_actions = continuous_actions)
+
+        action_embeds = action_embeds + learned_embed
+
+        if action_embeds.ndim == 2:
+            action_embeds = rearrange(action_embeds, 'b d -> b 1 d')
+
+        action_embeds_time = action_embeds.shape[1]
+
+        if action_embeds_time == 1 and time > 1:
+            action_embeds = repeat(action_embeds, 'b 1 d -> b t d', t = time)
+
+        # ensure time dimension matches exactly
+
+        if action_embeds_time > time:
+            action_embeds = action_embeds[:, :time]
+
+        # match intermediate 4d representation (b, t, g, d) if needed
+
+        if embeds.ndim == 4:
+            action_embeds = rearrange(action_embeds, 'b t d -> b t 1 d')
+            action_embeds = repeat(action_embeds, 'b t 1 d -> b t g d', g = embeds.shape[2])
+
+        # concat and project
+
+        agent_action_embeds = cat((embeds, action_embeds), dim = -1)
+
+        return proj(agent_action_embeds)
+
+    # helpers for shortcut flow matching
+
+    def get_times_from_signal_level(
+        self,
+        signal_levels,
+        align_dims_left_to = None
+    ):
+        times = signal_levels.float() / self.max_steps
+
+        if not exists(align_dims_left_to):
+            return times
+
+        aligned_times, _ = align_dims_left((times, align_dims_left_to))
+        return aligned_times
+
+    # evolutionary policy optimization - https://web3.arxiv.org/abs/2503.19037
+
+    @torch.no_grad()
+    def evolve_(
+        self,
+        fitness,
+        select_frac = 0.5,
+        tournament_frac = 0.5
+    ):
+        assert fitness.numel() == self.num_latent_genes
+
+        pop = self.latent_genes
+
+        pop_size = self.num_latent_genes
+        num_selected = ceil(pop_size * select_frac)
+        num_children = pop_size - num_selected
+
+        dim_gene = pop.shape[-1]
+
+        # natural selection just a sort and slice
+
+        selected_fitness, selected_indices = fitness.topk(num_selected, dim = -1)
+        selected = pop[selected_indices]
+
+        # use tournament - one tournament per child
+
+        tournament_size = max(2, ceil(num_selected * tournament_frac))
+
+        tournaments = randn((num_children, num_selected), device = self.device).argsort(dim = -1)[:, :tournament_size]
+
+        parent_ids = selected_fitness[tournaments].topk(2, dim = -1).indices # get top 2 winners as parents
+
+        parents = selected[parent_ids]
+
+        # crossover by random interpolation from parent1 to parent2
+
+        random_uniform_mix = randn((num_children, dim_gene), device = self.device).sigmoid()
+
+        parent1, parent2 = parents.unbind(dim = 1)
+        children = parent1.lerp(parent2, random_uniform_mix)
+
+        # store next population
+
+        next_pop = cat((selected, children))
+
+        self.latent_genes.copy_(next_pop)
+
+    # interacting with env for experience
+
+    @torch.no_grad()
+    def interact_with_env(
+        self,
+        env,
+        seed = None,
+        agent_index = 0,
+        num_steps = 4,
+        max_timesteps = 16,
+        env_is_vectorized = False,
+        use_time_cache = True,
+        store_agent_embed = True,
+        store_old_action_unembeds = True,
+        obs_to_latents_fn = None
+    ):
+        device = self.device
+
+        from env_ssl_wrapper import (
+            ActionTransformWrapper,
+            AutoBatchedWrapper,
+            EpisodePaddingWrapper,
+            StandardizeWrapper,
+            TensorWrapper,
+            TimeLimitWrapper
+        )
+
+        # normalize the environment into a single canonical contract:
+        # standardized step outputs, continuous action rescaling, episode
+        # length capping, torch tensors on device, and a consistent batch dim
+
+        env = StandardizeWrapper(env)
+
+        if self.action_embedder.has_continuous_actions and exists(self.action_embedder.continuous_target_action_range):
+            native_range = self.action_embedder.continuous_readout.get_continuous_native_range()
+
+            if exists(native_range):
+                env = ActionTransformWrapper(
+                    env,
+                    transforms = [dict(rescale_from_to = (native_range, self.action_embedder.continuous_target_action_range))],
+                    clip = self.action_embedder.continuous_target_action_range
+                )
+
+        if env_is_vectorized:
+            env = EpisodePaddingWrapper(env)
+
+        env = TimeLimitWrapper(env, max_timesteps = max_timesteps)
+        env = TensorWrapper(env, device = device)
+        env = AutoBatchedWrapper(env, is_vector = env_is_vectorized)
+
+        init_obs, _ = env.reset(seed = seed)
+
+        if not isinstance(init_obs, dict):
+            init_obs = dict(image = init_obs) if init_obs.ndim >= 3 else dict(state = init_obs)
+
+        assert 'image' in init_obs or 'state' in init_obs
+        assert not self.has_proprio or 'proprio' in init_obs
+
+        image_frame = rearrange(init_obs['image'], 'b c vh vw -> b c 1 vh vw') if 'image' in init_obs else None
+        state_frame = init_obs.get('state', None)
+        accumulated_proprio = maybe(rearrange)(init_obs.get('proprio', None), 'b d -> b 1 d')
+
+        batch = image_frame.shape[0] if exists(image_frame) else state_frame.shape[0]
+
+        video_frames = []
+        if exists(image_frame):
+            video_frames.append(image_frame)
+
+        states = []
+        if exists(state_frame):
+            states.append(state_frame)
+
+        if exists(accumulated_proprio):
+            accumulated_proprio = cast_to_tensor(accumulated_proprio, device, dtype = torch.float32)
+
+        rewards = None
+        discrete_actions = None
+        continuous_actions = None
+        discrete_log_probs = None
+        continuous_log_probs = None
+        values = None
+
+        acc_latents = None
+        acc_agent_embed = None
+        acc_actor_embed = None
+        acc_critic_embed = None
+        acc_policy_embed = None
+
+        is_terminated = full((batch,), False, device = device)
+        is_truncated = full((batch,), False, device = device)
+        was_terminated = full((batch,), False, device = device)
+        done_flag = full((batch,), False, device = device)
+
+        episode_lens = full((batch,), 0, device = device)
+
+        assert divisible_by(self.max_steps, num_steps)
+        step_size = self.max_steps // num_steps
+
+        time_cache = None
+        tokenizer_time_cache = None
+
+        obs = init_obs
+        curr_image = image_frame
+        curr_state = state_frame
+
+        while not done_flag.all():
+            if exists(obs_to_latents_fn):
+                latents, next_tokenizer_time_cache = obs_to_latents_fn(self, obs, tokenizer_time_cache)
+
+            elif exists(curr_image):
+                assert exists(self.video_tokenizer) or self.has_aux_image_encoder, 'video_tokenizer or aux_image_encoder must be defined to automatically parse image observations'
+
+                latents = None
+                next_tokenizer_time_cache = tokenizer_time_cache
+
+                if exists(self.video_tokenizer):
+                    latents, next_tokenizer_time_cache = self.video_tokenizer(curr_image, return_latents = True, time_cache = tokenizer_time_cache, return_time_cache = True)
+
+                if self.has_aux_image_encoder:
+                    aux_image_tokens = self.encode_aux_image_tokens(curr_image)
+                    latents = safe_cat((latents, aux_image_tokens), dim = -2)
+
+            elif exists(curr_state):
+                latents = None
+                next_tokenizer_time_cache = tokenizer_time_cache
+
+                curr_state, unpack_views = pack_one(curr_state, '* d')
+
+                if exists(self.state_tokenizer):
+                    latents, next_tokenizer_time_cache = self.state_tokenizer(curr_state, return_latents = True, time_cache = tokenizer_time_cache, return_time_cache = True)
+                elif exists(self.state_to_latents):
+                    latents = self.state_to_latents(curr_state)
+                else:
+                    raise ValueError('DynamicsWorldModel must have state_tokenizer or state_to_latents defined to parse state observations')
+
+                latents = unpack_views(latents, '* n d')
+
+            else:
+                raise ValueError('Observations must contain an image or state key, or provide a custom obs_to_latents_fn')
+
+            if latents.ndim == 3:
+                latents = rearrange(latents, 'b n d -> b 1 1 n d')
+            elif latents.ndim == 4:
+                latents = rearrange(latents, 'b v n d -> b 1 v n d')
+
+            tokenizer_time_cache = next_tokenizer_time_cache
+            acc_latents = safe_cat((acc_latents, latents), dim=1)
+
+            past_discrete_actions = discrete_actions[:, -1:] if exists(discrete_actions) else None
+            past_continuous_actions = continuous_actions[:, -1:] if exists(continuous_actions) else None
+            past_proprio = accumulated_proprio[:, -1:] if exists(accumulated_proprio) else None
+            past_rewards = rewards[:, -1:] if exists(rewards) else None
+
+            pred, (embeds, next_time_cache) = self.forward(
+                latents = latents,
+                signal_levels = self.max_steps - 1,
+                step_sizes = step_size,
+                rewards = past_rewards,
+                discrete_actions = past_discrete_actions,
+                continuous_actions = past_continuous_actions,
+                proprio = past_proprio,
+                time_cache = time_cache,
+                latent_is_noised = True,
+                latent_has_view_dim = True,
+                return_pred_only = True,
+                return_intermediates = True
+            )
+
+            if use_time_cache:
+                time_cache = next_time_cache
+
+            agent_embed = embeds.agent
+            one_agent_embed = agent_embed[..., -1:, agent_index, :]
+
+            actor_agent_embed = default(embeds.actor, agent_embed)
+            one_actor_agent_embed = actor_agent_embed[..., -1:, agent_index, :]
+
+            critic_agent_embed = default(embeds.critic, agent_embed)
+            one_critic_agent_embed = critic_agent_embed[..., -1:, agent_index, :]
+
+            value_embed = one_critic_agent_embed
+
+            if exists(self.critic_state_embedder) and exists(state_frame):
+                critic_embed = self.critic_state_embedder(state_frame.to(device))
+                value_embed = value_embed + rearrange(critic_embed, 'b d -> b 1 d')
+
+            value_bins = self.value_head(value_embed)
+            value = self.value_encoder.bins_to_scalar_value(value_bins)
+            values = safe_cat((values, value), dim = 1)
+
+            policy_embed = self.policy_head(one_actor_agent_embed)
+
+            if store_old_action_unembeds:
+                acc_policy_embed = safe_cat((acc_policy_embed, policy_embed), dim = 1)
+
+            sampled_discrete_actions, sampled_continuous_actions = self.action_embedder.sample(policy_embed, pred_head_index = 0, squeeze = True)
+
+            # format actions for the environment, rescaling bounded distributions to target range
+
+            env_continuous_actions = sampled_continuous_actions
+
+            discrete_actions = safe_cat((discrete_actions, sampled_discrete_actions), dim = 1)
+            continuous_actions = safe_cat((continuous_actions, sampled_continuous_actions), dim = 1)
+
+            one_discrete_log_probs, one_continuous_log_probs = self.action_embedder.log_probs(
+                policy_embed,
+                pred_head_index = 0,
+                discrete_targets = sampled_discrete_actions,
+                continuous_targets = sampled_continuous_actions
+            )
+
+            discrete_log_probs = safe_cat((discrete_log_probs, one_discrete_log_probs), dim = 1)
+            continuous_log_probs = safe_cat((continuous_log_probs, one_continuous_log_probs), dim = 1)
+
+            if not exists(env_continuous_actions):
+                action_out = sampled_discrete_actions
+            elif not exists(sampled_discrete_actions):
+                action_out = env_continuous_actions
+            else:
+                action_out = (sampled_discrete_actions, env_continuous_actions)
+
+            action_out = tree_map_tensor(lambda t: rearrange(t, 'b 1 ... -> b ...'), action_out)
+
+            next_obs, reward, terminated, truncated, _ = env.step(action_out)
+
+            terminated = terminated.view((batch,))
+            truncated = truncated.view((batch,))
+            reward = rearrange(reward, 'b -> b 1')
+
+            if not isinstance(next_obs, dict):
+                next_obs = dict(image = next_obs) if next_obs.ndim >= 3 else dict(state = next_obs)
+
+            assert 'image' in next_obs or 'state' in next_obs
+
+            episode_lens = torch.where(done_flag, episode_lens, episode_lens + 1)
+
+            is_terminated |= terminated
+            is_truncated |= truncated
+
+            was_terminated |= terminated
+            done_flag |= (is_terminated | is_truncated)
+
+            # maybe state entropy bonus
+
+            if self.add_state_entropy_bonus and exists(pred.state):
+                one_state_pred = pred.state[:, -1:]
+                dist = self.state_beta_dist.dist(one_state_pred)
+
+                state_entropy = reduce(dist.entropy(), 'b 1 v n d -> b 1', 'mean')
+                reward = reward + state_entropy * self.state_entropy_bonus_weight
+
+            rewards = safe_cat((rewards, reward), dim = 1)
+
+            acc_agent_embed = safe_cat((acc_agent_embed, one_agent_embed), dim = 1)
+            acc_actor_embed = safe_cat((acc_actor_embed, one_actor_agent_embed), dim = 1)
+            acc_critic_embed = safe_cat((acc_critic_embed, one_critic_agent_embed), dim = 1)
+
+            obs = next_obs
+
+            # handle fetching new states and images (always batched)
+
+            curr_state = None
+
+            curr_image = rearrange(obs['image'], 'b c vh vw -> b c 1 vh vw') if 'image' in obs else None
+
+            if 'state' in obs:
+                curr_state = obs['state']
+
+            next_proprio = maybe(rearrange)(obs.get('proprio', None), 'b d -> b 1 d')
+
+            if exists(next_proprio):
+                accumulated_proprio = safe_cat((accumulated_proprio, next_proprio), dim=1)
+
+            if exists(curr_state):
+                state_frame = curr_state
+
+            if exists(state_frame):
+                state_frame = state_frame.to(device)
+                states.append(state_frame)
+
+            if exists(curr_image):
+                curr_image = curr_image.to(device)
+                video_frames.append(curr_image)
+
+            need_bootstrap = is_truncated & ~was_terminated
+
+            if done_flag.all() and need_bootstrap.any():
+                if exists(obs_to_latents_fn):
+                    bootstrap_latents, _ = obs_to_latents_fn(self, obs, tokenizer_time_cache)
+
+                elif exists(curr_image):
+                    bootstrap_latents = None
+
+                    if exists(self.video_tokenizer):
+                        bootstrap_latents, _ = self.video_tokenizer(curr_image, return_latents = True, time_cache = tokenizer_time_cache, return_time_cache = True)
+
+                    if self.has_aux_image_encoder:
+                        aux_image_tokens = self.encode_aux_image_tokens(curr_image)
+                        bootstrap_latents = cat((bootstrap_latents, aux_image_tokens), dim = -2) if exists(bootstrap_latents) else aux_image_tokens
+
+                elif exists(curr_state):
+                    if exists(self.state_tokenizer):
+                        bootstrap_latents = self.state_tokenizer(curr_state, return_latents = True)
+                    else:
+                        bootstrap_latents = self.state_to_latents(curr_state)
+
+                if bootstrap_latents.ndim == 3:
+                    bootstrap_latents = rearrange(bootstrap_latents, 'b n d -> b 1 1 n d')
+                elif bootstrap_latents.ndim == 4:
+                    bootstrap_latents = rearrange(bootstrap_latents, 'b v n d -> b 1 v n d')
+
+                _, (embeds, _) = self.forward(
+                    latents = bootstrap_latents,
+                    signal_levels = self.max_steps - 1,
+                    step_sizes = step_size,
+                    rewards = rewards[:, -1:] if exists(rewards) else None,
+                    discrete_actions = discrete_actions[:, -1:] if exists(discrete_actions) else None,
+                    continuous_actions = continuous_actions[:, -1:] if exists(continuous_actions) else None,
+                    proprio = accumulated_proprio[:, -1:] if exists(accumulated_proprio) else None,
+                    time_cache = time_cache,
+                    latent_is_noised = True,
+                    return_pred_only = True,
+                    return_intermediates = True
+                )
+
+                # evaluate the bootstrap state
+
+                one_agent_embed = embeds.agent[..., -1:, agent_index, :]
+                one_actor_agent_embed = default(embeds.actor, embeds.agent)[..., -1:, agent_index, :]
+                one_critic_agent_embed = default(embeds.critic, embeds.agent)[..., -1:, agent_index, :]
+                value_embed = one_critic_agent_embed
+
+                if exists(self.critic_state_embedder) and exists(state_frame):
+                    critic_embed = self.critic_state_embedder(state_frame.to(device))
+                    value_embed = value_embed + rearrange(critic_embed, 'b d -> b 1 d')
+
+                value_bins = self.value_head(value_embed)
+                bootstrap_value = self.value_encoder.bins_to_scalar_value(value_bins)
+                values = safe_cat((values, bootstrap_value), dim = 1)
+
+                # pad everything out for the truncated state
+
+                pad_right_ = lambda t: pad_right_at_dim(t, 1, dim = 1) if exists(t) else None
+
+                rewards, discrete_actions, discrete_log_probs, continuous_actions, continuous_log_probs = map(pad_right_, (
+                    rewards, discrete_actions, discrete_log_probs, continuous_actions, continuous_log_probs
+                ))
+
+                # safely append latents, and only append agent / policy embeds if they are being stored
+
+                acc_latents = safe_cat((acc_latents, bootstrap_latents), dim = 1)
+
+                if exists(acc_agent_embed):
+                    acc_agent_embed = safe_cat((acc_agent_embed, one_agent_embed), dim = 1)
+                    acc_actor_embed = safe_cat((acc_actor_embed, one_actor_agent_embed), dim = 1)
+                    acc_critic_embed = safe_cat((acc_critic_embed, one_critic_agent_embed), dim = 1)
+
+                if exists(acc_policy_embed):
+                    policy_embed = self.policy_head(one_actor_agent_embed)
+                    acc_policy_embed = safe_cat((acc_policy_embed, policy_embed), dim = 1)
+
+                episode_lens = torch.where(need_bootstrap, episode_lens + 1, episode_lens)
+                break
+
+        time_dim = rewards.shape[-1]
+
+        video = cat(video_frames, dim = 2)[:, :, :time_dim] if not is_empty(video_frames) else None
+        stacked_states = stack(states, dim = 1)[:, :time_dim] if not is_empty(states) else None
+
+        # calculate episode return
+
+        step_mask = lens_to_mask(episode_lens, time_dim)
+        episode_return = einsum(rewards, step_mask.float(), 'b t, b t -> b')
+
+        old_action_unembeds = None
+
+        if exists(acc_policy_embed) and store_old_action_unembeds:
+            old_action_unembeds = Actions(*self.action_embedder.unembed(acc_policy_embed, pred_head_index = 0))
+
+        return Experience(
+            latents = acc_latents,
+            video = video,
+            critic_state = stacked_states,
+            rewards = rewards,
+            proprio = accumulated_proprio[:, :time_dim] if exists(accumulated_proprio) else None,
+            actions = Actions(discrete_actions, continuous_actions),
+            log_probs = Actions(discrete_log_probs, continuous_log_probs),
+            values = values,
+            old_action_unembeds = old_action_unembeds,
+            agent_embed = acc_agent_embed if store_agent_embed else None,
+            actor_embed = acc_actor_embed if store_agent_embed else None,
+            critic_embed = acc_critic_embed if store_agent_embed else None,
+            step_size = step_size,
+            agent_index = agent_index,
+            is_truncated = is_truncated,
+            terminals = was_terminated,
+            lens = episode_lens,
+            is_from_world_model = False,
+            episode_return = episode_return
+        )
+
+    # ppo
+
+    def learn_from_experience(
+        self,
+        experience: Experience,
+        policy_optim: Optimizer | None = None,
+        value_optim: Optimizer | None = None,
+        only_learn_policy_value_heads = True, # in the paper, they do not finetune the entire dynamics model, they just learn the heads
+        objective: Literal['ppo', 'pmpo', 'spo'] = 'ppo',
+        use_delight_gating = None,
+        delight_temperature = None,
+        normalize_advantages = None,
+        eps = 1e-6
+    ):
+        use_delight_gating = default(use_delight_gating, self.use_delight_gating)
+        delight_temperature = default(delight_temperature, self.delight_temperature)
+
+        assert isinstance(experience, Experience)
+
+        experience = experience.to(self.device)
+
+        latents = experience.latents
+        if not exists(latents):
+            assert exists(self.video_tokenizer) or self.has_aux_image_encoder, 'video_tokenizer or aux_image_encoder must be defined'
+
+            if exists(self.video_tokenizer):
+                latents = self.video_tokenizer(experience.video, return_latents = True)
+
+            if self.has_aux_image_encoder:
+                aux_image_tokens = self.encode_aux_image_tokens(experience.video)
+                latents = cat((latents, aux_image_tokens), dim = -2) if exists(latents) else aux_image_tokens
+
+        actions = experience.actions
+        proprio = experience.proprio
+        critic_state = experience.critic_state
+        old_log_probs = experience.log_probs
+        old_values = experience.values
+        rewards = experience.rewards
+        agent_embeds = experience.agent_embed
+        actor_embeds = experience.actor_embed
+        critic_embeds = experience.critic_embed
+        old_action_unembeds = experience.old_action_unembeds
+
+        step_size = experience.step_size
+        agent_index = experience.agent_index
+
+        assert all([*map(exists, (old_log_probs, actions, old_values, rewards, step_size))]), 'the generations need to contain the log probs, values, and rewards for policy optimization - world_model.generate(..., return_log_probs_and_values = True)'
+
+        batch, time = latents.shape[0], latents.shape[1]
+
+        # calculate returns
+
+        # mask out anything after the `lens`, which may include a bootstrapped node at the very end if `is_truncated = True`
+
+        if not exists(experience.is_truncated):
+            experience.is_truncated = full((batch,), True, device = latents.device)
+
+        if exists(experience.lens):
+            mask_for_gae = lens_to_mask(experience.lens, time)
+
+            rewards = rewards.masked_fill(~mask_for_gae, 0.)
+            old_values = old_values.masked_fill(~mask_for_gae, 0.)
+
+        lens = default(experience.lens, full((batch,), time, device = self.device))
+
+        learnable_lens = lens - experience.is_truncated.long()
+        mask = lens_to_mask(learnable_lens, time)
+
+        # build continuation masks for gae from predicted terminals
+
+        gae_masks = lens_to_mask((lens - 1).clamp(min = 0), time)
+
+        if exists(experience.terminals):
+            terminals = experience.terminals
+
+            if terminals.ndim == 1:
+                terminals = flags_to_sequence(terminals, (lens - 1).clamp(min = 0), time)
+
+            gae_masks.masked_fill_(terminals.bool(), 0.)
+
+        # calculate returns
+
+        returns = calc_gae(
+            rewards,
+            old_values,
+            masks = gae_masks,
+            learn_masks = mask,
+            gamma = self.gae_discount_factor,
+            lam = self.gae_lambda,
+            use_accelerated = self.gae_use_accelerated
+        )
+
+        # determine whether to finetune entire transformer or just learn the heads
+
+        world_model_forward_context = torch.no_grad if only_learn_policy_value_heads else nullcontext
+
+        # maybe keep track returns statistics and normalize returns and values before calculating advantage, as done in dreamer v3
+
+        if self.keep_reward_ema_stats:
+            ema_returns_mean, ema_returns_var = self.ema_returns_mean, self.ema_returns_var
+
+            decay = 1. - self.reward_ema_decay
+
+            # quantile filter
+
+            returns_for_stats = returns[mask] if exists(mask) else returns
+
+            lo, hi = torch.quantile(returns_for_stats, self.reward_quantile_filter).tolist()
+            returns_for_stats = returns_for_stats.clamp(lo, hi)
+
+            # mean, var - todo - handle distributed
+
+            returns_mean, returns_var = returns_for_stats.mean(), returns_for_stats.var(correction = 0)
+
+            # ema
+
+            ema_returns_mean.lerp_(returns_mean, decay)
+            ema_returns_var.lerp_(returns_var, decay)
+
+            # normalize
+
+            ema_returns_std = ema_returns_var.clamp(min = 1e-5).sqrt()
+
+            normed_returns = (returns - ema_returns_mean) / ema_returns_std
+            normed_old_values = (old_values - ema_returns_mean) / ema_returns_std
+
+            advantage = normed_returns - normed_old_values
+        else:
+            advantage = returns - old_values
+
+        # if using pmpo, do not normalize advantages, but can be overridden
+
+        normalize_advantages = default(normalize_advantages, self.normalize_advantages, objective != 'pmpo')
+
+        if normalize_advantages:
+            advantage = z_score(advantage, mask = mask, eps = eps)
+
+        # https://arxiv.org/abs/2410.04166v1
+
+        if objective == 'pmpo':
+            pos_advantage_mask = advantage >= 0.
+            neg_advantage_mask = ~pos_advantage_mask
+
+        # replay for the action logits and values
+        # but only do so if fine tuning the entire world model for RL
+
+        discrete_actions, continuous_actions = actions
+
+        # handle discrete or continuous only having 1 action, squeezed out
+
+        if exists(discrete_actions) and discrete_actions.ndim == 2:
+            discrete_actions = rearrange(discrete_actions, 'b t -> b t 1')
+
+        if exists(continuous_actions) and continuous_actions.ndim == 2:
+            continuous_actions = rearrange(continuous_actions, 'b t -> b t 1')
+
+        if (
+            not only_learn_policy_value_heads or
+            not exists(agent_embeds)
+        ):
+
+            with world_model_forward_context():
+                _, (embeds, _) = self.forward(
+                    latents = latents,
+                    signal_levels = self.max_steps - 1,
+                    step_sizes = step_size,
+                    rewards = rewards,
+                    discrete_actions = discrete_actions,
+                    continuous_actions = continuous_actions,
+                    proprio = proprio,
+                    latent_is_noised = True,
+                    return_pred_only = True,
+                    return_intermediates = True
+                )
+
+            # handle agent_index is a batched tensor from replay buffer - todo, examine multi-agent scenario learning
+
+            if is_tensor(agent_index):
+                batch_indices = torch.arange(agent_index.shape[0], device = agent_index.device)
+                agent_embeds = embeds.agent[batch_indices, :, agent_index]
+                actor_embeds = embeds.actor[batch_indices, :, agent_index] if exists(embeds.actor) else agent_embeds
+                critic_embeds = embeds.critic[batch_indices, :, agent_index] if exists(embeds.critic) else agent_embeds
+            else:
+                agent_embeds = embeds.agent[..., agent_index, :]
+                actor_embeds = embeds.actor[..., agent_index, :] if exists(embeds.actor) else agent_embeds
+                critic_embeds = embeds.critic[..., agent_index, :] if exists(embeds.critic) else agent_embeds
+
+        actor_embeds = default(actor_embeds, agent_embeds)
+        critic_embeds = default(critic_embeds, agent_embeds)
+
+        # maybe detach agent embed
+
+        if only_learn_policy_value_heads:
+            agent_embeds = agent_embeds.detach()
+            actor_embeds = actor_embeds.detach()
+            critic_embeds = critic_embeds.detach()
+
+        # ppo
+
+        policy_agent_embeds = frac_gradient(actor_embeds, self.agent_policy_gradient_frac)
+        policy_embed = self.policy_head(policy_agent_embeds)
+
+        # align actions with policy embed if latents had a bootstrap state appended
+
+        def maybe_slice_time(t):
+            return t[:, :-1] if exists(t) and t.shape[1] == policy_embed.shape[1] + 1 else t
+
+        discrete_actions = maybe_slice_time(discrete_actions)
+        continuous_actions = maybe_slice_time(continuous_actions)
+
+        log_probs, entropies = self.action_embedder.log_probs(policy_embed, pred_head_index = 0, discrete_targets = discrete_actions, continuous_targets = continuous_actions, return_entropies = True)
+
+        # concat discrete and continuous actions into one for optimizing
+
+        if exists(old_log_probs):
+            old_log_probs = Actions(*(maybe_slice_time(t) for t in old_log_probs))
+
+        old_log_probs = safe_cat(old_log_probs, dim = -1)
+        log_probs = safe_cat(log_probs, dim = -1)
+        entropies = safe_cat(entropies, dim = -1)
+
+        # align advantage to log_probs length if bootstrap padded
+
+        if advantage.shape[1] == log_probs.shape[1] + 1:
+            advantage = advantage[:, :-1]
+            mask = mask[:, :-1] if exists(mask) else None
+            pos_advantage_mask = pos_advantage_mask[:, :-1] if exists(pos_advantage_mask) else None
+            neg_advantage_mask = neg_advantage_mask[:, :-1] if exists(neg_advantage_mask) else None
+
+        # calculate joint log probs
+
+        log_probs = log_probs.sum(dim = -1)
+
+        if exists(old_log_probs):
+            old_log_probs = old_log_probs.sum(dim = -1)
+
+        # calculate delight
+        # Ian Osband - https://arxiv.org/abs/2603.14608v1
+
+        if use_delight_gating:
+            delight_gate = ((-log_probs * advantage) / delight_temperature).sigmoid().detach()
+
+        # maybe pmpo
+        # pmpo - weighting the positive and negative advantages equally - ignoring magnitude of advantage and taking the sign
+        # seems to be weighted across batch and time, iiuc
+        # eq (10) in https://arxiv.org/html/2410.04166v1
+
+        if objective == 'pmpo':
+
+            maybe_gated_log_prob = log_probs
+
+            if use_delight_gating:
+                maybe_gated_log_prob = log_probs * delight_gate
+
+            pos = pos_advantage_mask
+            neg = neg_advantage_mask
+
+            if exists(mask):
+                pos = pos & mask
+                neg = neg & mask
+
+            scaled_action_log_probs = maybe_gated_log_prob * advantage.tanh().abs()
+
+            pos_loss, neg_loss = 0., 0.
+
+            if pos.any():
+                pos_loss = scaled_action_log_probs[pos].sum()
+
+            if neg.any():
+                neg_loss = scaled_action_log_probs[neg].sum()
+
+            num_advantages = max(1., mask.sum().item() if exists(mask) else advantage.numel())
+
+            α = self.pmpo_pos_to_neg_weight
+            policy_loss = -α * (pos_loss - neg_loss) / num_advantages
+
+            # take care of kl
+
+            if self.pmpo_kl_div_loss_weight > 0.:
+
+                new_unembedded_actions = self.action_embedder.unembed(policy_embed, pred_head_index = 0)
+
+                kl_div_inputs, kl_div_targets = new_unembedded_actions, old_action_unembeds
+
+                # mentioned that the "reverse direction for the prior KL" was used
+                # make optional, as observed instability in toy task
+
+                if self.pmpo_reverse_kl:
+                    kl_div_inputs, kl_div_targets = kl_div_targets, kl_div_inputs
+
+                discrete_kl_div, continuous_kl_div = self.action_embedder.kl_div(kl_div_inputs, kl_div_targets)
+
+                # accumulate discrete and continuous kl div
+
+                kl_div_loss = 0.
+
+                if exists(discrete_kl_div):
+                    kl_div_loss = kl_div_loss + masked_mean(discrete_kl_div, mask)
+
+                if exists(continuous_kl_div):
+                    kl_div_loss = kl_div_loss + masked_mean(continuous_kl_div, mask)
+
+                policy_loss = policy_loss + kl_div_loss * self.pmpo_kl_div_loss_weight
+
+        elif objective == 'spo':
+
+            # spo clipped surrogate loss
+
+            ratio = (log_probs - old_log_probs).clamp(-20., 20.).exp()
+
+            policy_loss = -(
+                ratio * advantage -
+                (advantage.abs() * (ratio - 1.).square()) / (2 * self.ppo_eps_clip)
+            )
+
+            if use_delight_gating:
+                policy_loss = policy_loss * delight_gate
+
+            policy_loss = masked_mean(policy_loss, mask)
+
+        elif objective == 'ppo':
+
+            # ppo clipped surrogate loss
+
+            # clamp the log ratio before exponentiating, as near-deterministic
+            # policies can sample actions with extreme log probs, blowing the
+            # ratio up to inf and the loss to nan
+
+            ratio = (log_probs - old_log_probs).clamp(-20., 20.).exp()
+            clipped_ratio = ratio.clamp(1. - self.ppo_eps_clip, 1. + self.ppo_eps_clip)
+
+            policy_loss = -torch.min(ratio * advantage, clipped_ratio * advantage)
+
+            if use_delight_gating:
+                policy_loss = policy_loss * delight_gate
+
+            policy_loss = masked_mean(policy_loss, mask)
+
+        else:
+            raise ValueError(f'unknown objective {objective}')
+
+        # handle entropy loss for naive exploration bonus
+
+        entropy_loss = - reduce(entropies, 'b t na -> b t', 'sum')
+
+        entropy_loss = masked_mean(entropy_loss, mask)
+
+        # maybe actor next latent prediction loss
+
+        actor_spr_loss = self.zero
+
+        if self.actor_spr:
+            actor_spr_loss, _ = self.actor_spr_predictor(
+                policy_embed = policy_embed,
+                discrete_actions = discrete_actions,
+                continuous_actions = continuous_actions,
+                mask = mask
+            )
+            actor_spr_loss = actor_spr_loss
+
+        # total policy loss
+
+        total_policy_loss = (
+            policy_loss +
+            entropy_loss * self.policy_entropy_weight +
+            actor_spr_loss
+        )
+
+        # maybe take policy optimizer step
+
+        if exists(policy_optim):
+            total_policy_loss.backward()
+
+            policy_optim.step()
+            policy_optim.zero_grad()
+
+        # value loss
+
+        value_agent_embeds = frac_gradient(critic_embeds, self.agent_value_gradient_frac)
+
+        # maybe critic asymmetric state
+
+        if exists(self.critic_state_embedder) and exists(critic_state):
+            critic_embeds = self.critic_state_embedder(critic_state)
+
+            if critic_embeds.ndim == 3 and value_agent_embeds.ndim == 4:
+                critic_embeds = rearrange(critic_embeds, 'b t d -> b t 1 d')
+
+            value_agent_embeds = value_agent_embeds + critic_embeds
+
+        # value head prediction
+
+        value_bins = self.value_head(value_agent_embeds)
+        values = self.value_encoder.bins_to_scalar_value(value_bins)
+
+        # align returns and old_values to value_bins length if bootstrap padded
+
+        if returns.shape[1] == value_bins.shape[1] + 1:
+            returns = returns[:, :-1]
+            old_values = old_values[:, :-1]
+
+        return_bins = self.value_encoder(returns)
+
+        value_bins, return_bins = tuple(rearrange(t, 'b t l -> b l t') for t in (value_bins, return_bins))
+
+        value_loss = -(return_bins * value_bins.log_softmax(dim = 1)).sum(dim = 1)
+
+        # maybe clip values
+
+        if self.clip_values:
+            clipped_values = old_values + (values - old_values).clamp(-self.value_clip, self.value_clip)
+            clipped_value_bins = self.value_encoder(clipped_values)
+            clipped_value_bins = rearrange(clipped_value_bins, 'b t l -> b l t')
+
+            clipped_value_loss = -(return_bins * log(clipped_value_bins)).sum(dim = 1)
+            value_loss = torch.maximum(value_loss, clipped_value_loss)
+
+        # mask out bootstrapped terminal step from bounds seamlessly
+
+        value_loss = value_loss[mask].mean()
+
+        # maybe take value optimizer step
+
+        if exists(value_optim):
+            value_loss.backward()
+
+            value_optim.step()
+            value_optim.zero_grad()
+
+        return total_policy_loss, value_loss
+
+    @torch.no_grad()
+    @temp_eval
+    def generate(
+        self,
+        time_steps,
+        num_steps = 4,
+        batch_size = 1,
+        agent_index = 0,
+        tasks: int | Tensor | None = None,
+        latent_gene_ids = None,
+        image_height = None,
+        image_width = None,
+        return_decoded_video = None,
+        context_signal_noise = 0.1,       # they do a noising of the past, this was from an old diffusion world modeling paper from EPFL iirc
+        time_cache: Tensor | None = None,
+        use_time_cache = True,
+        return_rewards_per_frame = False,
+        return_terminals = False,
+        return_agent_actions = False,
+        return_log_probs_and_values = False,
+        return_for_policy_optimization = False,
+        return_time_cache = False,
+        store_agent_embed = True,
+        store_old_action_unembeds = True,
+        prompt: Tensor | None = None,           # (b c t h w) or (b c h w)
+        prompt_audio: Tensor | None = None,     # (b c t samples) or (b c samples)
+        prompt_state: Tensor | None = None,     # (b t d) or (b d)
+        prompt_latents: Tensor | None = None,   # (b t v n d)
+        prompt_proprio: Tensor | None = None,
+        prompt_discrete_actions: Tensor | None = None,
+        prompt_continuous_actions: Tensor | None = None,
+        prompt_rewards: Tensor | None = None,
+        aug_id: bool | int | Tensor = False,
+        discrete_temperature = 1.,
+        continuous_temperature = 1.,
+    ): # (b t n d) | (b c t h w)
+
+        # handy flag for returning generations for rl
+
+        if return_for_policy_optimization:
+            return_agent_actions |= True
+            return_log_probs_and_values |= True
+            return_rewards_per_frame |= True
+            return_terminals |= self.predict_terminals
+
+        # more variables
+
+        has_proprio = self.has_proprio
+
+        # validation
+
+        assert log2(num_steps).is_integer(), f'number of steps {num_steps} must be a power of 2'
+        assert 1 < num_steps <= self.max_steps, f'number of steps {num_steps} must be from 2 to {self.max_steps}'
+
+        if isinstance(tasks, int):
+            tasks = full((batch_size,), tasks, device = self.device)
+
+        assert not exists(tasks) or tasks.shape[0] == batch_size
+
+        # get state latent shape
+
+        latent_shape = self.latent_shape
+
+        # derive step size
+
+        step_size = self.max_steps // num_steps
+
+        # handle prompt, prompt_audio, prompt_state, or prompt_latents
+
+        has_raw_prompts = any([exists(i) for i in (prompt, prompt_audio, prompt_state)])
+        assert has_raw_prompts ^ exists(prompt_latents) or not (has_raw_prompts or exists(prompt_latents)), 'either raw prompts (prompt, prompt_audio, prompt_state) or prompt_latents must be provided, but not both'
+
+        if has_raw_prompts:
+            all_prompt_latents = tuple()
+
+            if exists(prompt):
+                if prompt.ndim == 4:
+                    prompt = rearrange(prompt, 'b c h w -> b 1 c 1 h w')
+                elif prompt.ndim == 5:
+                    prompt = rearrange(prompt, 'b c t h w -> b 1 c t h w')
+
+                prompt_packed, unpack_views = pack_one(prompt, '* c t h w')
+
+                tokenizer = self.video_tokenizer
+                if prompt_packed.shape[1] != tokenizer.channels:
+                    prompt_packed = repeat(prompt_packed, 'b 1 t h w -> b c t h w', c = tokenizer.channels)
+
+                video_latents = tokenizer.tokenize(prompt_packed)
+                video_latents = unpack_views(video_latents, '* t n d')
+                video_latents = rearrange(video_latents, 'b v t n d -> b t v n d')
+                all_prompt_latents = (*all_prompt_latents, video_latents)
+
+            if exists(prompt_audio):
+                if prompt_audio.ndim == 3:
+                    prompt_audio = rearrange(prompt_audio, 'b c s -> b 1 c 1 s')
+                elif prompt_audio.ndim == 4:
+                    prompt_audio = rearrange(prompt_audio, 'b c t s -> b 1 c t s')
+
+                audio_packed, unpack_views = pack_one(prompt_audio, '* c t s')
+
+                audio_latents = self.audio_tokenizer.tokenize(audio_packed)
+                audio_latents = unpack_views(audio_latents, '* t n d')
+                audio_latents = rearrange(audio_latents, 'b v t n d -> b t v n d')
+                all_prompt_latents = (*all_prompt_latents, audio_latents)
+
+            if exists(prompt_state):
+                if prompt_state.ndim == 2:
+                    prompt_state = rearrange(prompt_state, 'b d -> b 1 1 d')
+                elif prompt_state.ndim == 3:
+                    prompt_state = rearrange(prompt_state, 'b t d -> b 1 t d')
+
+                prompt_state_packed, unpack_views = pack_one(prompt_state, '* t d')
+
+                if exists(self.state_tokenizer):
+                    state_latents = self.state_tokenizer.tokenize(prompt_state_packed)
+                else:
+                    state_latents = self.state_to_latents(prompt_state_packed)
+
+                state_latents = unpack_views(state_latents, '* t n d')
+                state_latents = rearrange(state_latents, 'b v t n d -> b t v n d')
+                all_prompt_latents = (*all_prompt_latents, state_latents)
+
+            prompt_latents = safe_cat(all_prompt_latents, dim = -2)
+
+        # denoising
+        # teacher forcing to start with
+
+        if exists(prompt_latents):
+            prompt_latents = rearrange(prompt_latents, 'b t n d -> b t 1 n d') if prompt_latents.ndim == 4 else prompt_latents
+
+            assert prompt_latents.shape[0] == batch_size
+            latents = prompt_latents.clone()
+        else:
+            latents = empty((batch_size, 0, self.num_video_views, *latent_shape), device = self.device)
+
+        past_latents_context_noise = latents.clone()
+
+        # prompt related variables
+
+        prompt_time = latents.shape[1]
+
+        # proprio
+
+        if has_proprio:
+            if exists(prompt_proprio):
+                proprio = prompt_proprio.clone()
+            else:
+                proprio = zeros((batch_size, prompt_time, self.dim_proprio), device = self.device)
+
+            past_proprio_context_noise = proprio.clone()
+
+        # actions
+
+        return_agent_actions |= return_log_probs_and_values
+
+        decoded_discrete_actions = prompt_discrete_actions
+        decoded_continuous_actions = prompt_continuous_actions
+
+        if return_agent_actions:
+            num_discrete = self.action_embedder.num_discrete_action_types
+            num_continuous = self.action_embedder.num_continuous_action_types
+
+            if exists(decoded_discrete_actions):
+                decoded_discrete_actions = decoded_discrete_actions.clone()
+            elif num_discrete > 0:
+                decoded_discrete_actions = zeros((batch_size, prompt_time, num_discrete), device = self.device, dtype = torch.long)
+
+            if exists(decoded_continuous_actions):
+                decoded_continuous_actions = decoded_continuous_actions.clone()
+            elif num_continuous > 0:
+                decoded_continuous_actions = zeros((batch_size, prompt_time, num_continuous), device = self.device, dtype = torch.float)
+
+        # policy optimization related
+
+        decoded_discrete_log_probs = None
+        decoded_continuous_log_probs = None
+        decoded_values = None
+
+        # agent / policy embeds
+
+        acc_agent_embed = None
+        acc_actor_embed = None
+        acc_critic_embed = None
+        acc_policy_embed = None
+
+        # rewards
+
+        decoded_rewards = None
+
+        if return_rewards_per_frame:
+            if exists(prompt_rewards):
+                decoded_rewards = prompt_rewards.clone()
+
+                # if prompt rewards has 1 less timestep than latents (e.g. from standard RL episodes where the first state has no reward)
+                # pad it on the left with 0 to ensure the sequence perfectly aligns with latents for the einsum step mask later
+                if decoded_rewards.shape[1] == prompt_time - 1:
+                    decoded_rewards = pad_left_at_dim(decoded_rewards, 1, value = 0., dim = 1)
+            else:
+                decoded_rewards = zeros((batch_size, prompt_time), device = self.device, dtype = torch.float32)
+
+        # maybe return terminals
+
+        decoded_terminals = zeros((batch_size,), device = self.device, dtype = torch.bool)
+        decoded_lens = full((batch_size,), time_steps, device = self.device)
+
+        should_predict_terminals = return_terminals and self.predict_terminals
+
+        # while all the frames of the video (per latent) is not generated
+
+        while latents.shape[1] < time_steps:
+
+            curr_time_steps = latents.shape[1]
+
+            # determine whether to take an extra step if
+            # (1) using time kv cache
+            # (2) decoding anything off agent embedding (rewards, actions, etc)
+
+            take_extra_step = (
+                use_time_cache or
+                return_rewards_per_frame or
+                store_agent_embed or
+                return_agent_actions
+            )
+
+            # prepare noised latent / proprio inputs
+
+            noised_latent = randn((batch_size, 1, self.num_video_views, *latent_shape), device = self.device)
+
+            noised_proprio = None
+
+            if has_proprio:
+                noised_proprio = randn((batch_size, 1, self.dim_proprio), device = self.device)
+
+            # denoising steps
+
+            num_iterations = num_steps + int(take_extra_step)
+
+            for step in range(num_iterations):
+
+                is_last_step = (step + 1) == num_iterations
+
+                # clamp signal levels to max_steps - 1 for the extra clean step
+
+                signal_levels_val = min(step * step_size, self.max_steps - 1)
+                signal_levels = full((batch_size, 1), signal_levels_val, dtype = torch.long, device = self.device)
+
+                # noising past latent context
+
+                noised_context = latents.lerp(past_latents_context_noise, context_signal_noise) # the paragraph after eq (8)
+
+                noised_latent_with_context, pack_context_shape = pack((noised_context, noised_latent), 'b * v n d')
+
+                # handle proprio
+
+                noised_proprio_with_context = None
+
+                if has_proprio:
+                    noised_proprio_context = proprio.lerp(past_proprio_context_noise, context_signal_noise)
+                    noised_proprio_with_context, _ = pack((noised_proprio_context, noised_proprio), 'b * d')
+
+                # proper signal levels
+
+                signal_levels_with_context = F.pad(signal_levels, (curr_time_steps, 0), value = self.max_steps - 1)
+
+                # action conditioning
+
+                curr_discrete = None
+                if exists(decoded_discrete_actions) and not is_empty(decoded_discrete_actions):
+                    curr_discrete = decoded_discrete_actions[:, :curr_time_steps]
+                    curr_discrete = pad_right_at_dim_to(curr_discrete, curr_time_steps, dim = 1)
+
+                curr_continuous = None
+                if exists(decoded_continuous_actions) and not is_empty(decoded_continuous_actions):
+                    curr_continuous = decoded_continuous_actions[:, :curr_time_steps]
+                    curr_continuous = pad_right_at_dim_to(curr_continuous, curr_time_steps, dim = 1)
+
+                # forward for prediction
+
+                pred, (embeds, next_time_cache) = self.forward(
+                    latents = noised_latent_with_context,
+                    signal_levels = signal_levels_with_context,
+                    step_sizes = step_size,
+                    rewards = decoded_rewards,
+                    tasks = tasks,
+                    latent_gene_ids = latent_gene_ids,
+                    discrete_actions = curr_discrete,
+                    continuous_actions = curr_continuous,
+                    proprio = noised_proprio_with_context,
+                    time_cache = time_cache,
+                    aug_id = aug_id,
+                    latent_is_noised = True,
+                    latent_has_view_dim = True,
+                    return_pred_only = True,
+                    return_intermediates = True,
+                )
+
+                if use_time_cache and is_last_step:
+                    time_cache = next_time_cache
+
+                # early break if taking an extra step for agent embedding off cleaned latents for decoding
+
+                if take_extra_step and is_last_step:
+                    break
+
+                # maybe proprio
+
+                pred_proprio = pred.proprioception
+                pred = pred.flow
+
+                # unpack pred
+
+                _, pred = unpack(pred, pack_context_shape, 'b * v n d')
+
+                if has_proprio:
+                    _, pred_proprio = unpack(pred_proprio, pack_context_shape, 'b * d')
+
+                # derive flow, based on whether in x-space or not
+
+                def denoise_step(pred, noised, signal_levels):
+                    if self.pred_orig_latent:
+                        times = self.get_times_from_signal_level(signal_levels)
+                        aligned_times, _ = align_dims_left((times, noised))
+
+                        flow = (pred - noised) / (1. - aligned_times)
+                    else:
+                        flow = pred
+
+                    return flow * (step_size / self.max_steps)
+
+                # denoise
+
+                noised_latent += denoise_step(pred, noised_latent, signal_levels)
+
+                if has_proprio:
+                    noised_proprio += denoise_step(pred_proprio, noised_proprio, signal_levels)
+
+            denoised_latent = noised_latent # it is now denoised
+
+            if has_proprio:
+                denoised_proprio = noised_proprio
+
+            # predictions off agent token embedding on the last denoising step
+
+            needs_agent_embed = return_rewards_per_frame or should_predict_terminals or store_agent_embed or return_agent_actions
+
+            if needs_agent_embed:
+                one_agent_embed = embeds.agent[:, -1:, agent_index]
+                one_actor_agent_embed = default(embeds.actor, embeds.agent)[:, -1:, agent_index]
+                one_critic_agent_embed = default(embeds.critic, embeds.agent)[:, -1:, agent_index]
+
+            if return_rewards_per_frame:
+                pooled_latents = reduce(denoised_latent, 'b t v n d -> b t d', 'mean')
+                reward_logits = self.to_latent_state_reward_pred(pooled_latents)
+                pred_reward = self.reward_encoder.bins_to_scalar_value(reward_logits)
+
+                decoded_rewards = cat((decoded_rewards, pred_reward), dim = 1)
+
+            # maybe predict terminals
+
+            if should_predict_terminals:
+                pooled_latents = reduce(denoised_latent, 'b t v n d -> b t d', 'mean')
+                state_terminal_logits = self.to_latent_state_terminal_pred(pooled_latents)
+
+                # bernoulli sampling
+
+                is_terminal = torch.bernoulli(state_terminal_logits.sigmoid()) == 1.
+                is_terminal = rearrange(is_terminal, 'b 1 -> b')
+
+                just_terminated = is_terminal & ~decoded_terminals
+                decoded_lens.masked_fill_(just_terminated, curr_time_steps + 1)
+                decoded_terminals |= is_terminal
+
+            # maybe store agent embed
+
+            if store_agent_embed:
+                acc_agent_embed = safe_cat((acc_agent_embed, one_agent_embed), dim = 1)
+                acc_actor_embed = safe_cat((acc_actor_embed, one_actor_agent_embed), dim = 1)
+                acc_critic_embed = safe_cat((acc_critic_embed, one_critic_agent_embed), dim = 1)
+
+            # decode the agent actions if needed
+
+            if return_agent_actions:
+                assert self.action_embedder.has_actions
+
+                policy_embed = self.policy_head(one_actor_agent_embed)
+
+                # maybe store old actions
+
+                if store_old_action_unembeds:
+                    acc_policy_embed = safe_cat((acc_policy_embed, policy_embed), dim = 1)
+
+                # sample actions
+
+                sampled_discrete_actions, sampled_continuous_actions = self.action_embedder.sample(
+                    policy_embed,
+                    pred_head_index = 0,
+                    squeeze = True,
+                    discrete_temperature = discrete_temperature,
+                    continuous_temperature = continuous_temperature
+                )
+
+                decoded_discrete_actions = safe_cat((decoded_discrete_actions, sampled_discrete_actions), dim = 1)
+                decoded_continuous_actions = safe_cat((decoded_continuous_actions, sampled_continuous_actions), dim = 1)
+
+                if return_log_probs_and_values:
+                    discrete_log_probs, continuous_log_probs = self.action_embedder.log_probs(
+                        policy_embed,
+                        pred_head_index = 0,
+                        discrete_targets = sampled_discrete_actions,
+                        continuous_targets = sampled_continuous_actions
+                    )
+
+                    decoded_discrete_log_probs = safe_cat((decoded_discrete_log_probs, discrete_log_probs), dim = 1)
+                    decoded_continuous_log_probs = safe_cat((decoded_continuous_log_probs, continuous_log_probs), dim = 1)
+
+                    value_bins = self.value_head(one_critic_agent_embed)
+                    values = self.value_encoder.bins_to_scalar_value(value_bins)
+
+                    decoded_values = safe_cat((decoded_values, values), dim = 1)
+
+            # concat the denoised latent
+
+            latents = cat((latents, denoised_latent), dim = 1)
+
+            # add new fixed context noise for the temporal consistency
+
+            past_latents_context_noise = cat((past_latents_context_noise, randn_like(denoised_latent)), dim = 1)
+
+            # handle proprio
+
+            if has_proprio:
+                proprio = cat((proprio, denoised_proprio), dim = 1)
+
+                past_proprio_context_noise = cat((past_proprio_context_noise, randn_like(denoised_proprio)), dim = 1)
+
+            # maybe early break if entirely terminated
+
+            if should_predict_terminals and decoded_terminals.all():
+                break
+
+        # clamp latents to range of tanh
+
+        latents.clamp_(-1., 1.)
+
+        # returning video
+
+        has_tokenizer = exists(self.video_tokenizer)
+        return_decoded_video = default(return_decoded_video, has_tokenizer)
+
+        video = None
+
+        if return_decoded_video:
+
+            latents_for_video = rearrange(latents, 'b t v n d -> b v t n d')
+            latents_for_video, unpack_view = pack_one(latents_for_video, '* t n d')
+
+            video = self.video_tokenizer.decode(
+                latents_for_video,
+                height = image_height,
+                width = image_width,
+                aug_id = aug_id
+            )
+
+            video = unpack_view(video, '* t c vh vw')
+
+        # remove the lone view dimension on video, and on latents unless an experience is returned
+
+        if not self.video_has_multi_view and exists(video):
+            video = rearrange(video, 'b 1 ... -> b ...')
+
+        # only return video or latent if not requesting anything else, for first stage training
+
+        if not has_at_least_one(return_rewards_per_frame, return_agent_actions, has_proprio):
+            if not self.video_has_multi_view:
+                latents = rearrange(latents, 'b t 1 ... -> b t ...')
+
+            out = video if return_decoded_video else latents
+
+            if not return_time_cache:
+                return out
+
+            return out, time_cache
+
+        # returning agent actions, rewards, and log probs + values for policy optimization
+
+        batch, time_dim, device = *latents.shape[:2], latents.device
+
+        is_truncated = ~decoded_terminals
+
+        # derive episode return
+
+        episode_return = None
+
+        if exists(decoded_rewards):
+            step_mask = lens_to_mask(decoded_lens, time_dim)
+            episode_return = einsum(decoded_rewards, step_mask.float(), 'b t, b t -> b')
+
+        # experience
+
+        old_action_unembeds = None
+
+        if exists(acc_policy_embed) and store_old_action_unembeds:
+            old_action_unembeds = Actions(*self.action_embedder.unembed(acc_policy_embed, pred_head_index = 0))
+
+        gen = Experience(
+            latents = latents,
+            video = video,
+            proprio = proprio if has_proprio else None,
+            agent_embed = acc_agent_embed if store_agent_embed else None,
+            actor_embed = acc_actor_embed if store_agent_embed else None,
+            critic_embed = acc_critic_embed if store_agent_embed else None,
+            old_action_unembeds = old_action_unembeds,
+            step_size = step_size,
+            agent_index = agent_index,
+            lens = decoded_lens,
+            is_truncated = is_truncated,
+            terminals = decoded_terminals,
+            is_from_world_model = True,
+            episode_return = episode_return,
+            rewards = decoded_rewards if return_rewards_per_frame else None,
+            actions = Actions(decoded_discrete_actions, decoded_continuous_actions) if return_agent_actions else None,
+            log_probs = Actions(decoded_discrete_log_probs, decoded_continuous_log_probs) if return_log_probs_and_values else None,
+            values = decoded_values if return_log_probs_and_values else None
+        )
+
+        if not return_time_cache:
+            return gen
+
+        return gen, time_cache
+
+    @torch.no_grad()
+    def apply_fire_(
+        self,
+        num_iters = 20,
+        coefs = (1.5, -0.5),
+        shrink_perturb = False,
+        shrink_perturb_factors = (0.5, 0.01)
+    ):
+        apply_fire(
+            self,
+            num_iters = num_iters,
+            coefs = coefs,
+            shrink_perturb = shrink_perturb,
+            shrink_perturb_factors = shrink_perturb_factors
+        )
+
+    def forward(
+        self,
+        *,
+        video = None,                    # (b v? c t vh vw)
+        audio = None,                    # (b v? c t samples)
+        state = None,                    # (b v? t d)
+        latents = None,                  # (b t v? n d) | (b t v? d)
+        aug_id = None,                   # (b)
+        cfg_dropout_aug = None,
+        lens = None,                     # (b)
+        signal_levels = None,            # () | (b) | (b t)
+        step_sizes = None,               # () | (b)
+        step_sizes_log2 = None,          # () | (b)
+        latent_gene_ids = None,          # (b)
+        tasks = None,                    # (b)
+        rewards = None,                  # (b t) | (b t-1) during generation
+        terminals = None,                # (b)
+        discrete_actions = None,         # (b t na) | (b t-1 na)
+        continuous_actions = None,       # (b t na) | (b t-1 na)
+        shift_action_tokens = True,      # set to False if actions already properly paired, which is different than the usual replay buffer pairing
+        discrete_action_types = None,    # (na)
+        continuous_action_types = None,  # (na)
+        proprio = None,                  # (b t dp)
+        time_cache = None,
+        return_pred_only = False,
+        latent_is_noised = False,
+        return_all_losses = False,
+        return_intermediates = False,
+        add_autoregressive_action_loss = True,
+        update_loss_ema = None,
+        latent_has_view_dim = False,
+        seed = None,
+        agent_token_cond = None,         # (b t d) optional conditioning to be summed to agent tokens
+        time_modifier_fn: Callable | None = None,
+        return_tem_preds = False,
+        return_latent_disagreement: bool = False,
+        return_latent_disagreement_clip_decoded: bool = False
+    ):
+        # handle video, audio, state, or latents
+
+        has_raw_modalities = any([exists(i) for i in (video, audio, state)])
+        assert has_raw_modalities ^ exists(latents), 'either raw modalities (video, audio, state) or latents must be provided, but not both'
+
+        # standardize view dimension
+
+        if not self.video_has_multi_view:
+            if exists(video):
+                video = rearrange(video, 'b ... -> b 1 ...')
+
+            if exists(audio):
+                audio = rearrange(audio, 'b ... -> b 1 ...')
+
+            if exists(state):
+                state = rearrange(state, 'b ... -> b 1 ...')
+
+            if exists(latents) and not latent_has_view_dim:
+                latents = rearrange(latents, 'b t ... -> b t 1 ...')
+
+        # if raw modalities passed in, tokenize
+
+        if has_raw_modalities:
+            all_latents = tuple()
+
+            if exists(video):
+                assert video.ndim == 6
+
+                video_packed, unpack_views = pack_one(video, '* c t vh vw')
+                assert exists(self.video_tokenizer) or self.has_aux_image_encoder, 'video_tokenizer or aux_image_encoder must be passed in if training from raw video on dynamics model'
+
+                if exists(self.video_tokenizer):
+                    video_latents = self.video_tokenizer.tokenize(video_packed)
+                    video_latents = unpack_views(video_latents, '* t n d')
+                    video_latents = rearrange(video_latents, 'b v t n d -> b t v n d')
+                    all_latents = (*all_latents, video_latents)
+
+                if self.has_aux_image_encoder:
+                    aux_image_tokens = self.encode_aux_image_tokens(video_packed)
+                    aux_image_tokens = unpack_views(aux_image_tokens, '* t n d')
+                    aux_image_tokens = rearrange(aux_image_tokens, 'b v t n d -> b t v n d')
+                    all_latents = (*all_latents, aux_image_tokens)
+
+            if exists(audio):
+                assert audio.ndim == 5, 'audio should have shape (b v c t samples)'
+
+                audio_packed, unpack_views = pack_one(audio, '* c t samples')
+                assert exists(self.audio_tokenizer), 'audio_tokenizer must be passed in if training from raw audio on dynamics model'
+
+                audio_latents = self.audio_tokenizer.tokenize(audio_packed)
+                audio_latents = unpack_views(audio_latents, '* t n d')
+                audio_latents = rearrange(audio_latents, 'b v t n d -> b t v n d')
+                all_latents = (*all_latents, audio_latents)
+
+            if exists(state):
+                assert state.ndim == 4, 'state should have shape (b v t d)'
+                assert exists(self.state_tokenizer) or exists(self.state_to_latents), 'state_tokenizer or state_to_latents must be provided for state input'
+
+                state_packed, unpack_views = pack_one(state, '* t d')
+                if exists(self.state_tokenizer):
+                    state_latents = self.state_tokenizer.tokenize(state_packed)
+                else:
+                    state_latents = self.state_to_latents(state_packed)
+
+                state_latents = unpack_views(state_latents, '* t n d')
+                state_latents = rearrange(state_latents, 'b v t n d -> b t v n d')
+                all_latents = (*all_latents, state_latents)
+
+            latents = safe_cat(all_latents, dim = -2)
+
+        if latents.ndim == 4:
+            latents = rearrange(latents, 'b t v d -> b t v 1 d') # 1 latent edge case
+
+        assert latents.shape[-2:] == self.latent_shape, f'latents must have shape {self.latent_shape}, got {latents.shape[-2:]}'
+        assert latents.shape[2] == self.num_video_views, f'latents must have {self.num_video_views} views, got {latents.shape[2]}'
+
+        if return_latent_disagreement:
+            # Hansen et al. https://arxiv.org/abs/2606.27326
+
+            latents_for_residual = latents
+
+            if self.has_aux_image_encoder:
+                latents_for_residual = latents[..., :-self.num_aux_image_tokens, :]
+
+            latents_packed = rearrange(latents_for_residual, 'b t v n d -> (b v) t n d')
+
+            residual = self.video_tokenizer.latent_disagreement(
+                latents_packed,
+                clip_decoded_video = return_latent_disagreement_clip_decoded
+            )
+
+            residual = rearrange(residual, '(b v) t -> b v t', v = self.num_video_views)
+
+            # average over multiple views if present, otherwise squeeze
+
+            residual = reduce(residual, 'b v t -> b t', 'mean')
+
+            return residual
+
+        # variables
+
+        batch, time, device = *latents.shape[:2], latents.device
+        time_minus_one = time - 1
+
+        # left pad rewards and terminals to perfectly align with states
+        # first timestep (reset state) will have reward 0 and terminal False
+
+        if exists(rewards):
+            if rewards.shape[1] == time_minus_one:
+                rewards = pad_left_at_dim(rewards, 1, dim = 1, value = 0.)
+            assert return_pred_only or rewards.shape[1] == time, f'during training, rewards must perfectly align with video length {time}, got {rewards.shape[1]}'
+
+        if exists(terminals) and terminals.ndim > 1 and terminals.shape[1] == time_minus_one:
+            terminals = pad_left_at_dim(terminals, 1, dim = 1, value = False)
+
+        if exists(discrete_actions) and discrete_actions.ndim == 2:
+            discrete_actions = rearrange(discrete_actions, 'b t -> b t 1')
+
+        # signal and step size related input conforming
+
+        if exists(signal_levels):
+            if isinstance(signal_levels, int):
+                signal_levels = tensor(signal_levels, device = self.device)
+
+            if signal_levels.ndim == 0:
+                signal_levels = repeat(signal_levels, '-> b', b = batch)
+
+            if signal_levels.ndim == 1:
+                signal_levels = repeat(signal_levels, 'b -> b t', t = time)
+
+        if exists(step_sizes):
+            if isinstance(step_sizes, int):
+                step_sizes = tensor(step_sizes, device = self.device)
+
+            if step_sizes.ndim == 0:
+                step_sizes = repeat(step_sizes, '-> b', b = batch)
+
+        if exists(step_sizes_log2):
+            if isinstance(step_sizes_log2, int):
+                step_sizes_log2 = tensor(step_sizes_log2, device = self.device)
+
+            if step_sizes_log2.ndim == 0:
+                step_sizes_log2 = repeat(step_sizes_log2, '-> b', b = batch)
+
+        # handle step sizes -> step size log2
+
+        assert not (exists(step_sizes) and exists(step_sizes_log2))
+
+        if exists(step_sizes):
+            step_sizes_log2_maybe_float = torch.log2(step_sizes)
+            step_sizes_log2 = step_sizes_log2_maybe_float.long()
+
+            assert (step_sizes_log2 == step_sizes_log2_maybe_float).all(), f'`step_sizes` must be powers of 2'
+
+        # flow related
+
+        assert not (exists(signal_levels) ^ exists(step_sizes_log2))
+
+        is_inference = exists(signal_levels)
+
+        return_pred_only = return_pred_only or latent_is_noised
+
+        # seeded stochastic helpers
+
+        _sample_prob = with_seed(seed)(sample_prob)
+        _randint = with_seed(seed)(randint)
+        _randn_like = with_seed(seed)(randn_like)
+
+        # if neither signal levels or step sizes passed in, assume training
+        # generate them randomly for training
+
+        if not is_inference:
+
+            shortcut_train = _sample_prob(self.prob_shortcut_train)
+
+            if shortcut_train:
+
+                # now we follow eq (4)
+
+                step_sizes_log2 = _randint(1, self.num_step_sizes_log2, (batch,), device = device)
+                num_step_sizes = 2 ** step_sizes_log2
+
+                signal_levels = _randint(0, self.max_steps, (batch, time), device = device) // num_step_sizes[:, None] * num_step_sizes[:, None] # times are discretized to step sizes
+            else:
+                step_sizes_log2 = zeros((batch,), device = device).long() # zero because zero is equivalent to step size of 1
+                signal_levels = _randint(0, self.max_steps, (batch, time), device = device)
+
+        # times is from 0 to 1
+
+        times = self.get_times_from_signal_level(signal_levels)
+
+        if exists(time_modifier_fn):
+            times = time_modifier_fn(times).clamp(0., 1.)
+
+            # update signal levels for the embeddings so it reflects the modified noise level
+            signal_levels = (times * self.max_steps).long().clamp(0, self.max_steps - 1)
+
+        if not latent_is_noised:
+            # get the noise
+
+            noise = _randn_like(latents)
+            aligned_times, _ = align_dims_left((times, latents))
+
+            # noise from 0 as noise to 1 as data
+
+            noised_latents = noise.lerp(latents, aligned_times)
+
+        else:
+            noised_latents = latents
+
+        # reinforcement learning related
+
+        agent_tokens = repeat(self.agent_learned_embed, '... d -> b ... d', b = batch)
+
+        if exists(tasks):
+            assert self.num_tasks > 0
+
+            task_embeds = self.task_embed(tasks)
+            agent_tokens = add('b ... d, b d', agent_tokens, task_embeds)
+
+        # maybe evolution
+
+        if exists(latent_gene_ids):
+            assert exists(self.latent_genes)
+            latent_genes = self.latent_genes[latent_gene_ids]
+
+            agent_tokens = add('b ... d,  b d', agent_tokens, latent_genes)
+
+        # handle agent tokens w/ actions and task embeds
+
+        agent_tokens = repeat(agent_tokens, 'b ... d -> b t ... d', t = time)
+
+        if exists(agent_token_cond):
+            assert self.num_agents == 1, 'agent_token_cond only supports the single agent case for now'
+            agent_tokens = einx.add('b t n d, b t d', agent_tokens, agent_token_cond)
+
+        # empty token
+
+        empty_token = agent_tokens[:, :, 0:0]
+
+        # maybe reward tokens
+
+        reward_tokens = empty_token
+
+        if exists(rewards):
+            two_hot_encoding = self.reward_encoder(rewards)
+
+            if (
+                self.add_reward_embed_to_agent_token and
+                (not self.training or not _sample_prob(self.add_reward_embed_dropout)) # a bit of noise goes a long way
+            ):
+                assert self.num_agents == 1
+
+                reward_tokens = self.reward_encoder.embed(two_hot_encoding)
+
+                pop_last_reward = int(reward_tokens.shape[1] == agent_tokens.shape[1]) # the last reward is popped off during training, during inference, it is not known yet, so need to handle this edge case
+
+                is_sequential_step = exists(time_cache) and time == 1 and reward_tokens.shape[1] == 1
+
+                if not is_sequential_step:
+                    reward_tokens = pad_at_dim(reward_tokens, (1, -pop_last_reward), dim = -2, value = 0.)  # shift as each agent token predicts the next reward
+
+                reward_tokens = add('1 d, b t d', self.reward_learned_embed, reward_tokens)
+
+        # maybe proprioception
+
+        assert xnor(self.has_proprio, exists(proprio)), 'proprio must be passed in if `dim_proprio` is set and vice versa'
+
+        noised_proprio = None
+
+        if self.has_proprio:
+
+            if not latent_is_noised:
+                # get the noise
+
+                proprio_noise = _randn_like(proprio)
+                aligned_times, _ = align_dims_left((times, proprio))
+
+                # noise from 0 as noise to 1 as data
+
+                noised_proprio = proprio_noise.lerp(proprio, aligned_times)
+
+            else:
+                noised_proprio = proprio
+
+        # maybe state prediction token
+
+        if self.should_pred_state:
+            state_pred_token = repeat(self.state_pred_token, 'd -> b t 1 d', b = batch, t = time)
+        else:
+            state_pred_token = empty_token
+
+        # maybe create the action tokens
+
+        latent_ar_action_embed = None
+
+        if exists(discrete_actions) or exists(continuous_actions):
+            assert self.action_embedder.has_actions
+            assert self.num_agents == 1, 'only one agent allowed for now'
+
+            action_tokens = self.action_embedder(
+                discrete_actions = discrete_actions,
+                discrete_action_types = discrete_action_types,
+                continuous_actions = continuous_actions,
+                continuous_action_types = continuous_action_types
+            )
+
+            action_len = action_tokens.shape[1]
+
+            action_tokens = add('1 d, b t d', self.action_learned_embed, action_tokens)
+
+            is_sequential_step = exists(time_cache) and time == 1 and action_len == 1
+
+            if action_len == time and shift_action_tokens and not is_sequential_step:
+                # handle first timestep not having an associated past action
+                # in replay buffers for rl, typically the action paired up with the state is the very next one, not the previous one that led up to that state
+                # next_action_tokens contains the actual actions from t=1 to t=time-1
+                next_action_tokens = action_tokens
+                action_tokens = pad_at_dim(action_tokens[:, :-1], (1, 0), value = 0., dim = 1)
+
+            elif action_len == (time - 1):
+                # explicitly pad first timestep when actions do not include final step
+                next_action_tokens = action_tokens
+                action_tokens = pad_at_dim(action_tokens, (1, 0), value = 0., dim = 1)
+            else:
+                next_action_tokens = action_tokens
+
+            if self.latent_ar_action_conditioned:
+                latent_ar_action_embed = next_action_tokens
+                if next_action_tokens.shape[1] == (time - 1):
+                    latent_ar_action_embed = pad_at_dim(latent_ar_action_embed, (0, 1), value = 0., dim = 1)
+
+        elif self.action_embedder.has_actions:
+            action_tokens = zeros_like(agent_tokens[:, :, narrow(0)])
+            next_action_tokens = action_tokens
+
+        else:
+            action_tokens = empty_token
+            next_action_tokens = empty_token
+
+        # aug conditioning
+
+        if self.has_aug_conditioning:
+            aug_id = default(aug_id, 0)
+
+            if isinstance(aug_id, bool):
+                aug_id = int(aug_id) + 1
+
+            if not is_tensor(aug_id):
+                aug_id = tensor(aug_id, device = device)
+
+            if aug_id.dtype == torch.bool:
+                aug_id = aug_id.long() + 1
+
+            aug_id = aug_id.expand(batch)
+
+            cfg_dropout_aug = default(cfg_dropout_aug, self.training)
+
+            if cfg_dropout_aug:
+                drop_mask = rand(batch, device = device) < self.aug_cfg_dropout_prob
+                aug_id = torch.where(drop_mask, 0, aug_id)
+
+            maybe_aug_token = self.aug_cond_embedding(aug_id)
+            maybe_aug_token = repeat(maybe_aug_token, 'b d -> b t 1 d', t = time)
+        else:
+            maybe_aug_token = None
+
+        # main function, needs to be defined as such for shortcut training - additional calls for consistency loss
+
+        def get_prediction(noised_latents, noised_proprio, signal_levels, step_sizes_log2, state_pred_token, action_tokens, reward_tokens, agent_tokens, time_cache = None, return_agent_tokens = False, return_time_cache = False, return_intermediates = False, maybe_aug_token = maybe_aug_token):
+
+            if not self.has_aug_conditioning:
+                maybe_aug_token = agent_tokens[:, :, 0:0]
+
+            # latents to spatial tokens
+
+            space_tokens = self.latents_to_spatial_tokens(noised_latents)
+
+            # maybe add view embedding
+
+            if self.video_has_multi_view:
+                space_tokens = add('b t v ... d, v d', space_tokens, self.view_emb)
+
+            # merge spatial tokens
+
+            space_tokens, inverse_pack_space_per_latent = pack_one(space_tokens, 'b t * d')
+
+            # pack to tokens
+            # [signal + step size embed] [latent space tokens] [register] [actions / agent]
+
+            registers = repeat(self.register_tokens, 's d -> b t s d', b = batch, t = time)
+
+            # maybe proprio
+
+            if exists(noised_proprio):
+                proprio_token = self.to_proprio_token(noised_proprio)
+            else:
+                proprio_token = registers[:, :, 0:0]
+
+            # determine signal + step size embed for their diffusion forcing + shortcut
+
+            signal_embed = self.signal_levels_embed(signal_levels)
+
+            step_size_embed = self.step_size_embed(step_sizes_log2)
+            step_size_embed = repeat(step_size_embed, 'b ... -> b t ...', t = time)
+
+            flow_token = cat((signal_embed, step_size_embed), dim = -1)
+            flow_token = rearrange(flow_token, 'b t d -> b t d')
+
+            # handle caching
+
+            if not exists(time_cache):
+                time_cache = DynamicsIntermediates()
+
+            main_cache, actor_cache, critic_cache, spatial_cache, action_cache, *_ = time_cache
+
+            spatial_intermediates = action_intermediates = None
+
+            # spatial pre-encoding
+
+            if exists(self.spatial_pre_encoder):
+                space_tokens, spatial_intermediates = self.spatial_pre_encoder(space_tokens, cache = spatial_cache, return_intermediates = True)
+
+            # action pre-encoding
+
+            if exists(self.action_pre_encoder):
+                action_tokens, action_intermediates = self.action_pre_encoder(action_tokens, cache = action_cache, return_intermediates = True)
+
+            # pack to tokens for attending
+
+            tokens, packed_tokens_shape = pack([flow_token, space_tokens, proprio_token, state_pred_token, registers, action_tokens, reward_tokens, maybe_aug_token, agent_tokens], 'b t * d')
+
+            # main space time transformer
+
+            tokens, intermediates = self.transformer(tokens, cache = main_cache, return_intermediates = True)
+
+            # maybe actor / critic transformer heads
+
+            actor_intermediates = critic_intermediates = None
+
+            actor_tokens = tokens
+            if self.has_actor_transformer:
+                actor_tokens, actor_intermediates = self.actor_transformer(actor_tokens, cache = actor_cache, return_intermediates = True)
+
+            critic_tokens = tokens
+            if self.has_critic_transformer:
+                critic_tokens, critic_intermediates = self.critic_transformer(critic_tokens, cache = critic_cache, return_intermediates = True)
+
+            # unpack
+
+            flow_token, space_tokens, proprio_token, state_pred_token, register_tokens, action_tokens, reward_tokens, maybe_aug_token, agent_tokens = unpack(tokens, packed_tokens_shape, 'b t * d')
+
+            actor_agent_tokens = unpack(actor_tokens, packed_tokens_shape, 'b t * d')[-1] if self.has_actor_transformer else agent_tokens
+            critic_agent_tokens = unpack(critic_tokens, packed_tokens_shape, 'b t * d')[-1] if self.has_critic_transformer else agent_tokens
+
+            # pooling
+
+            space_tokens = inverse_pack_space_per_latent(space_tokens)
+
+            pred = self.to_latent_pred(space_tokens)
+
+            # maybe proprio
+
+            if self.has_proprio:
+                pred_proprio = self.to_proprio_pred(proprio_token)
+            else:
+                pred_proprio = None
+
+            # maybe state pred
+
+            if self.should_pred_state:
+                pred_state = self.to_state_pred(state_pred_token)
+            else:
+                pred_state = None
+
+            # returning
+
+            predictions = Predictions(pred, pred_proprio, pred_state)
+
+            embeds = Embeds(agent_tokens, state_pred_token, actor_agent_tokens, critic_agent_tokens)
+
+            if not return_agent_tokens:
+                return predictions
+
+            if not return_time_cache:
+                return predictions, embeds
+
+            dynamics_intermediates = DynamicsIntermediates(intermediates, actor_intermediates, critic_intermediates, spatial_intermediates, action_intermediates, space_tokens, action_tokens)
+
+            return predictions, (embeds, dynamics_intermediates, packed_tokens_shape)
+
+        # curry into get_prediction what does not change during first call as well as the shortcut ones
+
+        _get_prediction = partial(get_prediction, state_pred_token = state_pred_token, action_tokens = action_tokens, reward_tokens = reward_tokens, agent_tokens = agent_tokens, time_cache = time_cache)
+
+        # forward the network
+
+        pred, (embeds, intermediates, packed_tokens_shape) = _get_prediction(noised_latents, noised_proprio, signal_levels, step_sizes_log2, return_agent_tokens = True, return_time_cache = True, return_intermediates = return_intermediates)
+
+        if return_pred_only:
+            if not return_intermediates:
+                return pred
+
+            return pred, (embeds, intermediates)
+
+        # pack the predictions to calculate flow for different modalities all at once
+
+        if self.has_proprio:
+            packed_pred, for_flow_loss_packed_shape = pack((pred.flow, pred.proprioception), 'b t *')
+
+            noised, _ = pack((noised_latents, noised_proprio), 'b t *')
+            data, _ = pack((latents, proprio), 'b t *')
+            noise, _ = pack((noise, proprio_noise), 'b t *')
+        else:
+            packed_pred = pred.flow
+            noised = noised_latents
+            data = latents
+
+        # wrapper function for maybe unpacking and packing modalities for doing flow math in unison
+
+        def maybe_pack_unpack(fn):
+            @wraps(fn)
+            @torch.no_grad()
+            def inner(noised, *args, **kwargs):
+
+                noised_proprio = None
+
+                if self.has_proprio:
+                    noised, noised_proprio = unpack(noised, for_flow_loss_packed_shape, 'b t *')
+
+                pred = fn(noised, noised_proprio, *args, **kwargs)
+
+                if self.has_proprio:
+                    packed_flow, _ = pack((pred.flow, pred.proprioception), 'b t *')
+                    return packed_flow
+
+                return pred.flow
+            return inner
+
+        wrapped_get_prediction = maybe_pack_unpack(_get_prediction)
+
+        # determine the targets for the standard and shortcut losses
+
+        is_x_space = self.pred_orig_latent
+        is_v_space_pred = not self.pred_orig_latent
+
+        # flow loss prep
+
+        if is_v_space_pred:
+            pred_target = data - noise
+            pred_flow = packed_pred
+        else:
+            pred_target = data
+            pred_flow = packed_pred
+
+        # flow loss
+
+        flow_losses = F.mse_loss(pred_flow, pred_target, reduction = 'none')
+
+        # shortcut loss
+
+        should_compute_shortcut = not is_inference and shortcut_train
+
+        if should_compute_shortcut:
+            step_sizes_log2_minus_one = step_sizes_log2 - 1 # which equals d / 2
+            half_step_size = 2 ** step_sizes_log2_minus_one
+
+            first_step_pred = wrapped_get_prediction(noised, signal_levels, step_sizes_log2_minus_one)
+
+            # first derive b'
+
+            if is_v_space_pred:
+                first_step_pred_flow = first_step_pred
+            else:
+                first_times = self.get_times_from_signal_level(signal_levels, noised)
+
+                first_step_pred_flow = (first_step_pred - noised) / (1. - first_times)
+
+            # take a half step
+
+            half_step_size_align_left, _ = align_dims_left((half_step_size, noised))
+
+            denoised = noised + first_step_pred_flow * (half_step_size_align_left / self.max_steps)
+
+            # get second prediction for b''
+
+            signal_levels_plus_half_step = signal_levels + half_step_size[:, None]
+            second_step_pred = wrapped_get_prediction(denoised, signal_levels_plus_half_step, step_sizes_log2_minus_one)
+
+            if is_v_space_pred:
+                second_step_pred_flow = second_step_pred
+            else:
+                second_times = self.get_times_from_signal_level(signal_levels_plus_half_step, denoised)
+                second_step_pred_flow = (second_step_pred - denoised) / (1. - second_times)
+
+            # pred target is sg(b' + b'') / 2
+
+            shortcut_pred_target = (first_step_pred_flow + second_step_pred_flow).detach() / 2
+            shortcut_pred = packed_pred
+
+            # shortcut loss
+
+            shortcut_loss_weight = 1.
+
+            if is_x_space:
+                shortcut_pred = (shortcut_pred - noised) / (1. - first_times)
+                shortcut_loss_weight = (1. - first_times) ** 2
+
+            if is_tensor(shortcut_loss_weight):
+                shortcut_loss_weight, _ = align_dims_left((shortcut_loss_weight, shortcut_pred_target))
+
+            shortcut_flow_losses = F.mse_loss(shortcut_pred, shortcut_pred_target, reduction = 'none')
+            shortcut_flow_losses = shortcut_flow_losses * shortcut_loss_weight
+        else:
+            shortcut_flow_losses = zeros_like(flow_losses)
+
+        # loss weighting with their ramp function
+
+        if exists(self.loss_weight_fn):
+            loss_weight = self.loss_weight_fn(times)
+            loss_weight, _ = align_dims_left((loss_weight, flow_losses))
+
+            flow_losses = flow_losses * loss_weight
+
+        # handle variable lengths if needed
+
+        is_var_len = exists(lens)
+        loss_mask = loss_mask_without_last = None
+
+        if is_var_len:
+
+            loss_mask = lens_to_mask(lens, time)
+            loss_mask_without_last = loss_mask[:, :-1]
+
+            flow_loss = flow_losses[loss_mask].mean()
+            shortcut_flow_loss = shortcut_flow_losses[loss_mask].mean() if should_compute_shortcut else self.zero
+
+        else:
+            flow_loss = flow_losses.mean()
+            shortcut_flow_loss = shortcut_flow_losses.mean() if should_compute_shortcut else self.zero
+
+        # now take care of the agent token losses
+
+        agent_embed_reward_loss = latent_state_reward_loss = self.zero
+        agent_embed_terminal_loss = latent_state_terminal_loss = self.zero
+
+        has_discrete = exists(discrete_actions) and discrete_actions.shape[-1] > 0
+        has_continuous = exists(continuous_actions) and continuous_actions.shape[-1] > 0
+        has_any_actions = has_discrete or has_continuous
+
+        needs_agent_pred = exists(rewards) or exists(terminals)
+
+        if needs_agent_pred:
+            encoded_agent_tokens = embeds.agent
+
+            if encoded_agent_tokens.ndim == 4:
+                encoded_agent_tokens = reduce(encoded_agent_tokens, 'b t g d -> b t d', 'mean')
+
+            agent_tokens_shifted = encoded_agent_tokens[:, :-1]
+
+        if exists(rewards):
+
+            # mtp reward prediction with agent action conditioning
+
+            if has_any_actions:
+                agent_action_embed = self.embed_agent_actions(agent_tokens_shifted, discrete_actions, continuous_actions, head = 'reward')
+                reward_pred = self.to_agent_embed_reward_pred(agent_action_embed)
+                reward_pred = rearrange(reward_pred, 'mtp b t l -> b l t mtp')
+
+                # mtp targets
+
+                reward_targets, reward_loss_mask = create_multi_token_prediction_targets(two_hot_encoding[:, 1:], self.multi_token_pred_len)
+                reward_targets = rearrange(reward_targets, 'b t mtp l -> b l t mtp')
+
+                # ce loss
+
+                reward_losses = -(reward_targets * reward_pred.log_softmax(dim = 1)).sum(dim = 1)
+                reward_losses = reward_losses.masked_fill(~reward_loss_mask, 0.)
+
+                if is_var_len:
+                    agent_embed_reward_loss = reward_losses[loss_mask_without_last].mean(dim = 0)
+                else:
+                    agent_embed_reward_loss = reduce(reward_losses, '... mtp -> mtp', 'mean')
+            # latent state reward prediction (for generation)
+
+            pooled_latents = reduce(latents[:, 1:], 'b t v n d -> b t d', 'mean')
+            latent_reward_pred = self.to_latent_state_reward_pred(pooled_latents)
+            latent_reward_targets = two_hot_encoding[:, 1:]
+
+            latent_reward_pred = rearrange(latent_reward_pred, 'b t l -> b l t')
+            latent_reward_targets = rearrange(latent_reward_targets, 'b t l -> b l t')
+
+            latent_state_reward_loss = F.cross_entropy(latent_reward_pred, latent_reward_targets, reduction = 'none')
+
+            if is_var_len:
+                latent_state_reward_loss = latent_state_reward_loss[loss_mask_without_last]
+
+            latent_state_reward_loss = latent_state_reward_loss.mean()
+        # terminal prediction loss
+
+        if exists(terminals) and self.predict_terminals:
+
+            if terminals.ndim == 1:
+                last_transition = (lens - 2).clamp(min = 0) if is_var_len else full((batch,), max(time - 2, 0), device = device)
+                terminals_seq = flags_to_sequence(terminals, last_transition, max(time - 1, 0))
+            else:
+                terminals_seq = terminals[:, 1:]
+
+            terminals_seq = terminals_seq.float()
+
+            # mtp terminal prediction with agent action conditioning
+
+            if has_any_actions:
+                agent_action_embed = self.embed_agent_actions(agent_tokens_shifted, discrete_actions, continuous_actions, head = 'terminal')
+                terminal_pred = self.to_agent_embed_terminal_pred(agent_action_embed)
+                terminal_pred = rearrange(terminal_pred, 'mtp b t -> b t mtp')
+
+                # mtp targets
+
+                terminal_targets, terminal_loss_mask = create_multi_token_prediction_targets(terminals_seq, self.multi_token_pred_len)
+
+                # bce loss
+
+                state_terminal_losses = F.binary_cross_entropy_with_logits(terminal_pred, terminal_targets.float(), reduction = 'none')
+                state_terminal_losses = state_terminal_losses.masked_fill(~terminal_loss_mask, 0.)
+
+                if is_var_len:
+                    agent_embed_terminal_loss = state_terminal_losses[loss_mask_without_last].mean(dim = 0)
+                else:
+                    agent_embed_terminal_loss = reduce(state_terminal_losses, '... mtp -> mtp', 'mean')
+
+            # latent state terminal prediction (for generation)
+
+            pooled_latents = reduce(latents[:, 1:], 'b t v n d -> b t d', 'mean')
+            latent_terminal_pred = self.to_latent_state_terminal_pred(pooled_latents)
+
+            # label smoothing trick from dreamerv3
+
+            eps = 1. - self.gae_discount_factor
+            terminals_seq = terminals_seq.clamp(min = eps, max = 1. - eps)
+
+            latent_state_terminal_loss = F.binary_cross_entropy_with_logits(latent_terminal_pred, terminals_seq, reduction = 'none')
+
+            if is_var_len:
+                latent_state_terminal_loss = latent_state_terminal_loss[loss_mask_without_last]
+
+            latent_state_terminal_loss = latent_state_terminal_loss.mean()
+
+        # maybe autoregressive state prediction loss
+
+        state_pred_loss = self.zero
+
+        if self.should_pred_state:
+            pred_latent, latent_to_pred = pred.state[:, :-1], latents[:, 1:]
+
+            dist = self.state_beta_dist.dist(pred_latent)
+
+            # scale latent from tanh-ed (-1, 1) to (0, 1)
+
+            latent_to_pred = (latent_to_pred + 1.) / 2.
+            latent_to_pred = latent_to_pred.clamp(min = self.eps_latent_pred, max = 1. - self.eps_latent_pred)
+
+            state_pred_losses = -dist.log_prob(latent_to_pred)
+
+            if is_var_len:
+                state_pred_loss = state_pred_losses[loss_mask_without_last].mean()
+            else:
+                state_pred_loss = state_pred_losses.mean()
+
+        # maybe autoregressive action loss
+
+        discrete_action_loss = self.zero
+        continuous_action_loss = self.zero
+
+        has_action_loss_weight = (self.discrete_action_loss_weight.sum() + self.continuous_action_loss_weight.sum()) > 0
+
+        if (
+            has_action_loss_weight and
+            self.num_agents == 1 and
+            add_autoregressive_action_loss and
+            time > 1 and
+            (exists(discrete_actions) or exists(continuous_actions))
+        ):
+            assert self.action_embedder.has_actions
+
+            # if shift_action_tokens, pad a sentinel at the front so that
+            # multi-token-prediction targets are shifted by one after creation
+
+            has_discrete = exists(discrete_actions)
+            has_continuous = exists(continuous_actions)
+
+            if has_discrete and shift_action_tokens:
+                discrete_actions = pad_at_dim(discrete_actions, (1, 0), value = -1, dim = 1)
+
+            if has_continuous and shift_action_tokens:
+                continuous_actions = pad_at_dim(continuous_actions, (1, 0), value = 0., dim = 1)
+
+            first_has_action = discrete_actions if has_discrete else continuous_actions
+            pred_len = first_has_action.shape[1]
+
+            # only for 1 agent
+
+            num_targets = pred_len - 1 if shift_action_tokens else pred_len
+
+            actor_agent_tokens = default(embeds.actor, embeds.agent)
+            encoded_actor_tokens = rearrange(actor_agent_tokens, 'b t 1 d -> b t d')
+            policy_embed = self.policy_head(encoded_actor_tokens[:, :num_targets])
+
+            # constitute multi token prediction targets
+
+            def make_mtp_targets(actions):
+                targets, mask = create_multi_token_prediction_targets(actions, self.multi_token_pred_len)
+
+                if shift_action_tokens:
+                    targets, mask = targets[:, 1:], mask[:, 1:]
+
+                targets = rearrange(targets, 'b t mtp ... -> mtp b t ...')
+                mask = rearrange(mask, 'b t mtp -> mtp b t')
+                return targets, mask
+
+            discrete_action_targets = continuous_action_targets = None
+
+            if has_discrete:
+                discrete_action_targets, discrete_mask = make_mtp_targets(discrete_actions)
+
+            if has_continuous:
+                continuous_action_targets, continuous_mask = make_mtp_targets(continuous_actions)
+
+            discrete_log_probs, continuous_log_probs = self.action_embedder.log_probs(
+                policy_embed,
+                discrete_targets = discrete_action_targets,
+                continuous_targets = continuous_action_targets,
+                soft_validate_range = True
+            )
+
+            if is_var_len:
+                action_loss_mask = loss_mask_without_last if num_targets == (time - 1) else loss_mask
+
+            if exists(discrete_log_probs):
+                discrete_log_probs = discrete_log_probs.masked_fill(~discrete_mask[..., None], 0.)
+
+                if is_var_len:
+                    discrete_action_losses = rearrange(-discrete_log_probs, 'mtp b t na -> b t na mtp')
+                    discrete_action_loss = reduce(discrete_action_losses[action_loss_mask], '... mtp -> mtp', 'mean')
+                else:
+                    discrete_action_loss = reduce(-discrete_log_probs, 'mtp b t na -> mtp', 'mean')
+
+            if exists(continuous_log_probs):
+                continuous_log_probs = continuous_log_probs.masked_fill(~continuous_mask[..., None], 0.)
+
+                if is_var_len:
+                    continuous_action_losses = rearrange(-continuous_log_probs, 'mtp b t na -> b t na mtp')
+                    continuous_action_loss = reduce(continuous_action_losses[action_loss_mask], '... mtp -> mtp', 'mean')
+                else:
+                    continuous_action_loss = reduce(-continuous_log_probs, 'mtp b t na -> mtp', 'mean')
+
+        # maybe agent state prediction loss
+
+        agent_state_pred_loss = self.zero
+
+        has_next_actions = exists(next_action_tokens) and next_action_tokens.shape[-2] > 0
+        should_pred_agent_state = self.agent_predicts_state and (not self.action_embedder.has_actions or has_next_actions)
+
+        if should_pred_agent_state:
+            agent_embeds = rearrange(embeds.agent[:, :-1], 'b t 1 d -> b t d')
+
+            agent_pred_input = agent_embeds
+
+            if self.action_embedder.has_actions:
+                next_actions = rearrange(next_action_tokens, '... 1 d -> ... d') if next_action_tokens.ndim == 4 else next_action_tokens
+
+                seq_len = min(agent_pred_input.shape[1], next_actions.shape[1])
+                agent_pred_input = cat((agent_pred_input[:, :seq_len], next_actions[:, :seq_len]), dim = -1)
+
+            pred_latent = self.to_agent_state_pred(agent_pred_input)
+            pred_latent = rearrange(pred_latent, 'b t ... -> b t 1 ...')
+
+            seq_len = pred_latent.shape[1]
+
+            latent_to_pred = latents[:, 1:(1 + seq_len)]
+            latent_to_pred = (latent_to_pred + 1.) / 2.
+            latent_to_pred = latent_to_pred.clamp(min = self.eps_latent_pred, max = 1. - self.eps_latent_pred)
+
+            dist = self.agent_state_beta_dist.dist(pred_latent)
+            agent_state_pred_losses = -dist.log_prob(latent_to_pred)
+
+            if is_var_len:
+                agent_state_pred_loss = agent_state_pred_losses[loss_mask_without_last[:, :seq_len]].mean()
+            else:
+                agent_state_pred_loss = agent_state_pred_losses.mean()
+
+        # handle loss normalization
+
+        if exists(self.flow_loss_normalizer):
+            flow_loss = self.flow_loss_normalizer(flow_loss, update_ema = update_loss_ema)
+
+        if exists(self.shortcut_flow_loss_normalizer):
+            shortcut_flow_loss = self.shortcut_flow_loss_normalizer(shortcut_flow_loss, update_ema = update_loss_ema)
+
+        if exists(rewards):
+            agent_embed_reward_loss = maybe(self.agent_embed_reward_loss_normalizer)(agent_embed_reward_loss, update_ema = update_loss_ema)
+            latent_state_reward_loss = maybe(self.latent_state_reward_loss_normalizer)(latent_state_reward_loss, update_ema = update_loss_ema)
+
+        if exists(terminals):
+            agent_embed_terminal_loss = maybe(self.agent_embed_terminal_loss_normalizer)(agent_embed_terminal_loss, update_ema = update_loss_ema)
+            latent_state_terminal_loss = maybe(self.latent_state_terminal_loss_normalizer)(latent_state_terminal_loss, update_ema = update_loss_ema)
+
+        if exists(discrete_actions) and exists(self.discrete_actions_loss_normalizer):
+            discrete_action_loss = self.discrete_actions_loss_normalizer(discrete_action_loss, update_ema = update_loss_ema)
+
+        if exists(continuous_actions) and exists(self.continuous_actions_loss_normalizer):
+            continuous_action_loss = self.continuous_actions_loss_normalizer(continuous_action_loss, update_ema = update_loss_ema)
+
+        # latent autoregressive loss with sigreg
+
+        latent_ar_loss = latent_ar_sigreg_loss = self.zero
+
+        if self.has_latent_ar:
+            layer_hiddens = intermediates.main.layer_hiddens
+
+            if isinstance(self.latent_ar_layer, tuple):
+                source_layer, target_layer = self.latent_ar_layer
+            else:
+                source_layer = target_layer = self.latent_ar_layer
+
+            source_hiddens = layer_hiddens[source_layer]
+            target_hiddens = layer_hiddens[target_layer]
+
+            _, space_source_hiddens, *_ = unpack(source_hiddens, packed_tokens_shape, 'b t * d')
+            _, space_target_hiddens, *_ = unpack(target_hiddens, packed_tokens_shape, 'b t * d')
+
+            cond_action = None
+
+            if self.latent_ar_action_conditioned:
+                if not exists(latent_ar_action_embed):
+                    latent_ar_action_embed = zeros((*latents.shape[:2], self.action_embedder.dim), device = self.device, dtype = torch.float32)
+
+                cond_action = repeat(latent_ar_action_embed, 'b t d -> b t n d', n = space_source_hiddens.shape[2])
+
+            latent_ar_loss, latent_ar_sigreg_loss, _ = self.latent_ar(space_source_hiddens, target = space_target_hiddens, mask = loss_mask, cond = cond_action)
+
+        # maybe ssl losses
+
+        # predict actions from states - LAPO (Dominik Schmidt)
+
+        lapo_action_loss = self.zero
+        lapo_fdm_loss = self.zero
+        lapo_raw_latent_fdm_loss = self.zero
+
+        if self.has_lapo:
+            space_tokens_for_lapo = intermediates.pre_encoded_spatial
+
+            raw_actions = Actions(discrete_actions, continuous_actions) if (exists(discrete_actions) or exists(continuous_actions)) else None
+            lapo_action_loss, lapo_fdm_loss, lapo_raw_latent_fdm_loss = self.ssl_lapo(space_tokens_for_lapo, raw_actions, raw_latents = latents)
+
+        # predict states from actions - TEM (James Whittington)
+
+        tem_loss = self.zero
+
+        if self.has_tem:
+            action_tokens_for_tem = next_action_tokens
+            tem_loss, tem_pred_latents = self.ssl_tem(action_tokens_for_tem, raw_latents = latents, return_preds = True)
+        else:
+            tem_pred_latents = None
+
+        # h-net ratio loss - across all configured transformers
+
+        h_net_loss = sum((i.h_net_loss for i in filter(exists, (intermediates.main, intermediates.actor, intermediates.critic, intermediates.spatial, intermediates.action))), self.zero)
+
+        # gather losses - they sum across the multi token prediction steps for rewards and actions - eq (9)
+
+        total_loss = (
+            flow_loss * self.latent_flow_loss_weight +
+            shortcut_flow_loss * self.shortcut_loss_weight +
+            (agent_embed_reward_loss * self.reward_loss_weight).sum() +
+            (latent_state_reward_loss * self.reward_loss_weight).sum() +
+            (agent_embed_terminal_loss * self.terminal_loss_weight).sum() +
+            (latent_state_terminal_loss * self.terminal_loss_weight).sum() +
+            (discrete_action_loss * self.discrete_action_loss_weight).sum() +
+            (continuous_action_loss * self.continuous_action_loss_weight).sum() +
+            (state_pred_loss * self.state_pred_loss_weight) +
+            (agent_state_pred_loss * self.agent_state_pred_loss_weight) +
+            (latent_ar_loss * self.latent_ar_loss_weight) +
+            (latent_ar_sigreg_loss * self.latent_ar_sigreg_loss_weight) +
+            (lapo_action_loss * self.lapo_action_loss_weight) +
+            (lapo_fdm_loss * self.lapo_fdm_loss_weight) +
+            (lapo_raw_latent_fdm_loss * self.lapo_raw_latent_fdm_loss_weight) +
+            (tem_loss * self.tem_loss_weight) +
+            (h_net_loss * self.h_net_loss_weight)
+        )
+
+        losses = WorldModelLosses(flow_loss, shortcut_flow_loss, agent_embed_reward_loss, latent_state_reward_loss, agent_embed_terminal_loss, latent_state_terminal_loss, discrete_action_loss, continuous_action_loss, state_pred_loss, agent_state_pred_loss, latent_ar_loss, latent_ar_sigreg_loss, lapo_action_loss, lapo_fdm_loss, lapo_raw_latent_fdm_loss, tem_loss, h_net_loss)
+
+        if not (return_all_losses or return_intermediates):
+            return total_loss
+
+        ret = (total_loss,)
+
+        if return_all_losses:
+            ret = (*ret, losses)
+
+        if return_intermediates:
+            ret = (*ret, intermediates)
+
+        if return_tem_preds:
+            ret = (*ret, tem_pred_latents)
+
+        return ret

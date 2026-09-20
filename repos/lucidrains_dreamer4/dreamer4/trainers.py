@@ -1,0 +1,1737 @@
+from __future__ import annotations
+from typing import Literal
+
+import math
+import pickle
+import shutil
+
+from collections import OrderedDict, namedtuple
+from random import randint
+from functools import wraps
+import inspect
+
+import torch
+import torch.nn.functional as F
+from torch import is_tensor, tensor, stack
+from torch.nn import Module
+from torch.optim import AdamW
+from torch.utils.data import Dataset, DataLoader, TensorDataset
+
+import numpy as np
+
+import torchvision.transforms as T
+
+from einops import rearrange, repeat, reduce
+from torch_einops_utils import shape_with_replace, pad_right_at_dim, pad_left_at_dim, temp_eval
+from torch_einops_utils.save_load import dehydrate_config
+
+from pathlib import Path
+
+from tqdm import tqdm
+
+from accelerate import Accelerator
+
+from adam_atan2_pytorch import MuonAdamAtan2
+
+from dreamer4.dreamer4 import (
+    VideoTokenizer,
+    DynamicsWorldModel,
+    Experience,
+    SelfFlow,
+    combine_experiences,
+    eval_decorator
+)
+
+from ema_pytorch import EMA
+
+import einx
+from torch_einops_utils import pack_with_inverse, pad_sequence
+
+import cv2
+import numpy as np
+from PIL import Image, ImageSequence
+
+from memmap_replay_buffer import ReplayBuffer, ConcatReplayBuffer
+
+# helpers
+
+def exists(v):
+    return v is not None
+
+def default(v, d):
+    return v if exists(v) else d
+
+def filter_by_keys(d, keys):
+    return {k: v for k, v in d.items() if k in keys}
+
+def cast_tuple(val, length = 1):
+    return val if isinstance(val, tuple) else ((val,) * length)
+
+def divisible_by(num, den):
+    return (num % den) == 0
+
+def check_import(module_name, err_msg):
+    import importlib
+    try:
+        importlib.import_module(module_name)
+    except ImportError:
+        raise ImportError(err_msg)
+
+# augmentation
+
+AugmentedOutput = namedtuple('AugmentedOutput', ['video', 'aug_id'])
+
+def randomly_apply_aug(aug_fn):
+    @wraps(aug_fn)
+    def wrapper(video, prob = 0.5, **kwargs):
+        batch, device = video.shape[0], video.device
+        mask = torch.rand(batch, device = device) < prob
+        aug_id = mask
+
+        aug_video = aug_fn(video, **kwargs)
+
+        video = einx.where('b, b ..., b ... -> b ...', mask, aug_video, video)
+        return AugmentedOutput(video, aug_id)
+    return wrapper
+
+@randomly_apply_aug
+def pixel_shift_aug(video, max_pixel_shift = 3):
+    video, unpack = pack_with_inverse(video, 'b * h w')
+
+    batch, _, height, width = video.shape
+    device = video.device
+
+    shifts_x = torch.randint(-max_pixel_shift, max_pixel_shift + 1, (batch,), device = device)
+    shifts_y = torch.randint(-max_pixel_shift, max_pixel_shift + 1, (batch,), device = device)
+
+    padded_video = F.pad(video, (max_pixel_shift,) * 4, mode = 'reflect')
+    shifted_video = torch.empty_like(video)
+
+    for i in range(batch):
+        shift_y, shift_x = shifts_y[i].item(), shifts_x[i].item()
+        y_start, x_start = max_pixel_shift - shift_y, max_pixel_shift - shift_x
+        shifted_video[i] = padded_video[i, ..., y_start:y_start + height, x_start:x_start + width]
+
+    shifted_video = unpack(shifted_video)
+
+    return shifted_video
+
+def video_tensor_to_gif(
+    tensor,
+    path,
+    duration = 120,
+    loop = 0,
+    optimize = True
+):
+    tensor = tensor.clamp(0, 1)
+    images = [T.ToPILImage()(img) for img in tensor.unbind(dim = 1)]
+
+    first_img, *rest_imgs = images
+
+    first_img.save(
+        path,
+        save_all = True,
+        append_images = rest_imgs,
+        duration = duration,
+        loop = loop,
+        optimize = optimize
+    )
+
+def video_tensor_to_grid(video):
+    batch = video.shape[0]
+    num_rows = int(math.sqrt(batch))
+    num_keep = num_rows ** 2
+    video = video[:num_keep]
+    return rearrange(video, '(row col) c f h w -> c f (row h) (col w)', row = num_rows)
+
+def save_video_grid_as_gif(video, path):
+    grid = video_tensor_to_grid(video)
+    video_tensor_to_gif(grid.cpu(), str(path))
+
+def cycle(dl):
+    while True:
+        for batch in dl:
+            yield batch
+
+# video files dataset and dataloader
+
+def video_to_tensor(
+    path: str,
+    num_frames = -1,
+    channels = 3,
+    rgb_to_grayscale_weights = (0.2989, 0.5870, 0.1140)
+):
+    video = cv2.VideoCapture(str(path))
+    frames = []
+
+    while video.isOpened():
+        success, frame = video.read()
+        if not success:
+            break
+
+        frames.append(frame)
+        if len(frames) == num_frames:
+            break
+
+    video.release()
+
+    tensor = torch.from_numpy(np.stack(frames))
+    tensor = rearrange(tensor, 'f h w c -> c f h w')
+    tensor = tensor.flip(dims = (0,)).float() / 255.
+
+    if channels == 1:
+        weights = tensor.new_tensor(rgb_to_grayscale_weights)
+        weights = rearrange(weights, 'c -> c 1 1 1')
+        tensor = reduce(tensor * weights, 'c ... -> 1 ...', 'sum')
+
+    return tensor
+
+def seek_all_images(img, channels = 3, num_frames = -1):
+    mode = 'RGB' if channels == 3 else ('RGBA' if channels == 4 else 'L')
+    for i, frame in enumerate(ImageSequence.Iterator(img)):
+        if i == num_frames:
+            break
+        yield frame.convert(mode)
+
+def gif_to_tensor(path, channels = 3, num_frames = -1):
+    img = Image.open(str(path))
+    tensors = tuple(map(T.ToTensor(), seek_all_images(img, channels = channels, num_frames = num_frames)))
+    return stack(tensors, dim = 1)
+
+# datasets
+
+def sample_video_and_actions(
+    video,                  # (c, f, h, w)
+    actions = None,         # (f - 1, ...) or tuple of (f - 1, ...)
+    max_num_frames = None,
+    random_crop = True
+):
+    frames = video.shape[1]
+    start = 0
+
+    if exists(max_num_frames):
+        if frames > max_num_frames:
+            start = randint(0, frames - max_num_frames) if random_crop else 0
+            video = video.narrow(1, start, max_num_frames)
+        elif frames < max_num_frames:
+            pad_len = max_num_frames - frames
+            video = pad_right_at_dim(video, pad_len, dim = 1)
+
+    if not exists(actions):
+        return video, None, start, frames
+
+    target_action_frames = (max_num_frames - 1) if exists(max_num_frames) else (frames - 1)
+    target_obs_frames = max_num_frames if exists(max_num_frames) else frames
+
+    is_tuple = isinstance(actions, tuple)
+    actions = cast_tuple(actions)
+
+    sliced_actions = []
+
+    for act in actions:
+        if not exists(act) or (torch.is_tensor(act) and act.ndim == 0):
+            sliced_actions.append(act)
+            continue
+
+        original_len = act.shape[0]
+        is_frame_aligned = (original_len == frames)
+        target_len = target_obs_frames if is_frame_aligned else target_action_frames
+
+        if original_len > target_len:
+            act = act[start:start + target_len]
+        elif original_len < target_len:
+            pad_len = target_len - original_len
+
+            if torch.is_tensor(act):
+                act = pad_right_at_dim(act, pad_len, dim = 0)
+            else:
+                act = np.pad(act, ((0, pad_len), *([(0, 0)] * (act.ndim - 1))))
+
+        sliced_actions.append(act)
+
+    actions = tuple(sliced_actions) if is_tuple else sliced_actions[0]
+    return video, actions, start, frames
+
+class VideoDataset(Dataset):
+    def __init__(
+        self,
+        folder,
+        image_size,
+        channels = 3,
+        max_num_frames = None,
+        exts: list[str] = ['gif', 'mp4'],
+        random_crop = True
+    ):
+        super().__init__()
+        if isinstance(folder, str):
+            folder = Path(folder)
+
+        self.folder = folder
+        self.image_size = image_size
+        self.channels = channels
+        self.max_num_frames = max_num_frames
+        self.random_crop = random_crop
+
+        self.paths = [p for ext in exts for p in self.folder.glob(f'**/*.{ext}')]
+        assert len(self.paths) > 0, f'no videos found in {self.folder}'
+
+        self.transform = T.Compose([
+            T.Resize(image_size),
+            T.CenterCrop(image_size)
+        ])
+
+    def __len__(self):
+        return len(self.paths)
+
+    def _get_tensor(self, index):
+        path = self.paths[index]
+        ext = path.suffix.lower()
+
+        if ext == '.gif':
+            tensor = gif_to_tensor(path, channels = self.channels)
+        elif ext == '.mp4':
+            tensor = video_to_tensor(path, channels = self.channels)
+        else:
+            raise ValueError(f'unknown extension {ext}')
+
+        return tensor
+
+    def __getitem__(self, index):
+        tensor = self._get_tensor(index)
+
+        tensor, _, _, _ = sample_video_and_actions(
+            tensor, max_num_frames = self.max_num_frames, random_crop = self.random_crop
+        )
+
+        tensor = rearrange(tensor, 'c f h w -> f c h w')
+        tensor = self.transform(tensor)
+        tensor = rearrange(tensor, 'f c h w -> c f h w')
+
+        return tensor
+
+class VideoTrajectoryDataset(VideoDataset):
+    """
+    Loads videos and corresponding '.npy' files (actions, rewards, termination signals, etc.).
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.paths = sorted(self.paths)
+
+    def __getitem__(self, index):
+        tensor = self._get_tensor(index)
+        video_path = self.paths[index]
+
+        numpy_files = list(video_path.parent.glob(f"{video_path.stem}.*.npy"))
+
+        data_dict = {
+            p.name.split('.')[-2]: np.load(p)
+            for p in numpy_files
+        }
+
+        keys = tuple(data_dict.keys())
+        arrays = tuple(data_dict.values())
+
+        tensor, sampled_arrays, _, _ = sample_video_and_actions(
+            tensor, arrays if arrays else None, max_num_frames = self.max_num_frames, random_crop = self.random_crop
+        )
+
+        tensor = rearrange(tensor, 'c f h w -> f c h w')
+        tensor = self.transform(tensor)
+        tensor = rearrange(tensor, 'f c h w -> c f h w')
+
+        sampled_arrays = cast_tuple(sampled_arrays) if exists(sampled_arrays) else tuple()
+        sampled_arrays = tuple(torch.from_numpy(t) for t in sampled_arrays)
+        sampled_arrays = tuple(t.float() if t.dtype == torch.float64 else t for t in sampled_arrays)
+
+        return dict(
+            video = tensor,
+            **dict(zip(keys, sampled_arrays))
+        )
+
+class VideoDatasetFromReplayBuffer(Dataset):
+    def __init__(
+        self,
+        replay_buffer,
+        image_size,
+        max_num_frames = None,
+        random_crop = True
+    ):
+        super().__init__()
+
+        if isinstance(replay_buffer, (str, Path)):
+            replay_buffer = ReplayBuffer.from_folder(replay_buffer, read_only = True)
+
+        elif isinstance(replay_buffer, (list, tuple)):
+            replay_buffer = ConcatReplayBuffer(list(replay_buffer))
+
+        self.dataset = replay_buffer.dataset(
+            slice_by_episode_len = True,
+            return_episode_lens = False
+        )
+
+        self.transform = T.Compose([
+            T.Resize(image_size),
+            T.CenterCrop(image_size)
+        ])
+
+        self.max_num_frames = max_num_frames
+        self.random_crop = random_crop
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, index):
+        data = self.dataset[index]
+
+        video = data.pop('video')
+
+        if video.ndim == 4:
+            video = rearrange(video, 'f c h w -> c f h w')
+
+        keys = tuple(data.keys())
+        arrays = tuple(data.values())
+
+        video, sampled_arrays, _, _ = sample_video_and_actions(
+            video, arrays if arrays else None, max_num_frames = self.max_num_frames, random_crop = self.random_crop
+        )
+
+        video = self.transform(video)
+
+        if not video.is_floating_point():
+            video = video.float() / 255.
+
+        sampled_arrays = cast_tuple(sampled_arrays) if exists(sampled_arrays) else tuple()
+
+        return dict(
+            video = video,
+            **dict(zip(keys, sampled_arrays))
+        )
+
+def video_tensor_collate_fn(data):
+    if not data:
+        return data
+
+    padded, time_lens = pad_sequence(data, dim = 1, return_lens = True)
+    return dict(video = padded, time_lens = time_lens)
+
+# trainers
+
+class VideoTokenizerTrainer(Module):
+    def __init__(
+        self,
+        model: VideoTokenizer,
+        dataset: Dataset,
+        *,
+        checkpoint_path: str | None = None,
+        optim_klass = MuonAdamAtan2,
+        batch_size = 16,
+        learning_rate = 3e-4,
+        max_grad_norm = 0.5,
+        num_train_steps = 10_000,
+        grad_accum_every = 1,
+        weight_decay = 0.,
+        accelerate_kwargs: dict = dict(),
+        optim_kwargs: dict = dict(),
+        cpu = False,
+        use_ema = False,
+        ema_decay = 0.999,
+        use_tensorboard = False,
+        use_wandb = False,
+        log_dir: str | None = None,
+        project_name = 'dreamer4',
+        run_name: str | None = None,
+        log_video = False,
+        video_fps = -1,
+        log_video_every = 1000,
+        checkpoint_every = 2500,
+        checkpoint_folder = './checkpoints_tokenizer',
+        custom_aug_fn = None,
+        aug_prob = 0.5,
+        collate_fn = None,
+        apply_byol_every = 1
+    ):
+        super().__init__()
+        batch_size = min(batch_size, len(dataset))
+
+        assert not (use_tensorboard and use_wandb), 'use either tensorboard or wandb, not both'
+
+        self.use_tensorboard = use_tensorboard
+        self.use_wandb = use_wandb
+
+        if use_tensorboard:
+            accelerate_kwargs.update(log_with = 'tensorboard', project_dir = log_dir)
+        elif use_wandb:
+            accelerate_kwargs.update(log_with = 'wandb', project_dir = log_dir)
+
+        self.accelerator = Accelerator(
+            cpu = cpu,
+            **accelerate_kwargs
+        )
+
+        if use_tensorboard or use_wandb:
+            init_kwargs = dict()
+            if exists(run_name) and use_wandb:
+                init_kwargs = {'wandb': {'name': run_name}}
+
+            self.accelerator.init_trackers(project_name, init_kwargs = init_kwargs)
+
+        self.video_logger = None
+        if log_video:
+            assert video_fps > 0, "Video fps must be passed in and positive when log_video=True"
+
+            self.fps = video_fps
+            self.log_video_every = log_video_every
+
+            self.results_folder = None
+            if exists(log_dir):
+                self.results_folder = Path(log_dir) / 'results'
+                self.results_folder.mkdir(parents = True, exist_ok = True)
+
+            if use_tensorboard:
+                check_import('tensorboard', 'tensorboard is not installed. Please install it using `pip install tensorboard`')
+                self.video_logger = self.accelerator.get_tracker("tensorboard").writer.add_video
+
+            if use_wandb:
+                check_import('moviepy', 'wandb video logging requires the moviepy package. Please install it using `pip install moviepy` or `pip install "wandb[media]"`')
+
+        self.log_video_flag = log_video
+        self.checkpoint_every = checkpoint_every
+        self.checkpoint_folder = Path(checkpoint_folder)
+        self.checkpoint_folder.mkdir(parents = True, exist_ok = True)
+
+        self.model = model
+        self.use_ema = use_ema
+        self.ema_decay = ema_decay
+        self.checkpoint_path = checkpoint_path
+
+        self.aug_prob = aug_prob
+        self.custom_aug_fn = custom_aug_fn
+
+        self.dataset = dataset
+        self.train_dataloader = DataLoader(dataset, batch_size = batch_size, drop_last = True, shuffle = True, collate_fn = collate_fn)
+
+        optim_kwargs = dict(
+            lr = learning_rate,
+            weight_decay = weight_decay
+        )
+
+        self.apply_byol_every = apply_byol_every
+        self.has_byol = model.has_byol
+
+        if self.has_byol:
+            assert use_ema, 'EMA must be enabled for BYOL'
+            assert apply_byol_every > 0, 'apply_byol_every must be > 0'
+
+        if optim_klass is MuonAdamAtan2:
+            optim = MuonAdamAtan2(
+                model.muon_parameters(),
+                model.parameters(),
+                **optim_kwargs
+            )
+        else:
+            optim = optim_klass(
+                model.parameters(),
+                **optim_kwargs
+            )
+
+        self.optim = optim
+
+        self.max_grad_norm = max_grad_norm
+
+        self.num_train_steps = num_train_steps
+        self.grad_accum_every = grad_accum_every
+        self.batch_size = batch_size
+
+        self.register_buffer('step', tensor(0))
+
+        self.ema_model = None
+        if self.use_ema and self.accelerator.is_main_process:
+            self.ema_model = EMA(
+                self.model,
+                beta = self.ema_decay
+            )
+
+        if exists(self.checkpoint_path):
+            self.load(self.checkpoint_path)
+
+        (
+            self.model,
+            self.train_dataloader,
+            self.optim
+        ) = self.accelerator.prepare(
+            self.model,
+            self.train_dataloader,
+            self.optim
+        )
+
+        if exists(self.ema_model):
+            self.ema_model.to(self.device)
+
+    @property
+    def device(self):
+        return self.accelerator.device
+
+    @property
+    def is_main_process(self):
+        return self.accelerator.is_main_process
+
+    @property
+    def unwrap_model(self):
+        return self.accelerator.unwrap_model
+
+    def print(self, *args, **kwargs):
+        return self.accelerator.print(*args, **kwargs)
+
+    def log(self, **data):
+        self.accelerator.log(data, step = self.step.item())
+
+    def log_video(self, video, tag: str):
+        grid = video_tensor_to_grid(video)
+
+        if self.use_tensorboard and exists(self.video_logger):
+            self.video_logger(tag, rearrange(grid, 'c f h w -> 1 f c h w'), self.step.item(), self.fps)
+
+        if self.use_wandb:
+            import wandb
+            video_np = (rearrange(grid, 'c f h w -> f c h w').cpu().numpy() * 255).astype('uint8')
+            wandb.log({tag: wandb.Video(video_np, fps = self.fps, format = 'mp4')}, step = self.step.item())
+
+    def load(self, path):
+        path = Path(path)
+        assert path.exists(), f"checkpoint not found at {path}"
+
+        pkg = torch.load(str(path), map_location = 'cpu', weights_only = False)
+
+        if 'step' in pkg:
+            self.step.copy_(tensor(pkg['step']))
+
+        self.unwrap_model(self.model).load_state_dict(pkg.get('model', pkg), strict = False)
+
+        # load ema model if active
+        if not self.is_main_process or not self.use_ema or not exists(self.ema_model):
+            return
+
+        ema_model = self.ema_model.ema_model
+
+        ema_path = path.parent / f"{path.stem}-ema.pt"
+
+        if not ema_path.exists():
+            self.print(f"warning: ema model checkpoint not found at {ema_path}, loading from main model")
+            ema_model.load_state_dict(pkg.get('model', pkg), strict = False)
+            return
+
+        ema_pkg = torch.load(str(ema_path), map_location = 'cpu', weights_only = False)
+        ema_model.load_state_dict(ema_pkg.get('model', ema_pkg), strict = False)
+
+    def forward(
+        self
+    ):
+        iter_train_dl = cycle(self.train_dataloader)
+
+        if self.is_main_process and self.log_video_flag:
+            msg = "saving logs to tensorboard" if exists(self.video_logger) else "saving logs"
+            if exists(self.results_folder):
+                msg += f" and video samples to {self.results_folder}"
+            self.print(msg)
+
+        pbar = tqdm(
+            range(self.step.item(), self.num_train_steps),
+            initial = self.step.item(),
+            total = self.num_train_steps,
+            disable = not self.is_main_process
+        )
+
+        for _ in pbar:
+
+            total_loss = 0.
+
+            for _ in range(self.grad_accum_every):
+                data = next(iter_train_dl)
+
+                is_dict = isinstance(data, dict)
+                video = data['video'] if is_dict else data
+                time_lens = data.get('time_lens') if is_dict else None
+
+                aug_id = None
+                if exists(self.custom_aug_fn):
+                    video, aug_id = self.custom_aug_fn(video, prob = self.aug_prob)
+
+                byol_target_latents = None
+                is_byol_step = self.has_byol and divisible_by(self.step.item(), self.apply_byol_every)
+
+                if is_byol_step:
+                    byol_target_latents = self.ema_model(
+                        video,
+                        return_latents = True,
+                        mask_patches = False,
+                        aug_id = aug_id
+                    )
+
+                loss, intermediates = self.model(
+                    video,
+                    time_lens = time_lens,
+                    update_loss_ema = True,
+                    return_intermediates = True,
+                    aug_id = aug_id,
+                    byol_target_latents = byol_target_latents
+                )
+
+                losses = intermediates.losses
+                recon_video = intermediates.recon
+
+                loss = loss / self.grad_accum_every
+
+                self.accelerator.backward(loss)
+
+                total_loss += loss.item()
+
+            if exists(self.max_grad_norm):
+                self.accelerator.clip_grad_norm_(self.model.parameters(), self.max_grad_norm)
+
+            self.optim.step()
+            self.optim.zero_grad()
+
+            if self.use_ema and self.is_main_process:
+                self.ema_model.update()
+
+            self.log(
+                loss = total_loss,
+                recon_loss = losses.recon.item(),
+                flow_recon_loss = losses.flow_recon.item(),
+                lpips_loss = losses.lpips.item(),
+                time_decorr_loss = losses.time_decorr.item(),
+                space_decorr_loss = losses.space_decorr.item(),
+                latent_ortho_loss = losses.latent_ortho.item(),
+                latent_ar_loss = losses.latent_ar.item(),
+                byol_loss = losses.byol.item()
+            )
+
+            if self.log_video_flag and divisible_by(self.step.item(), self.log_video_every) and self.is_main_process:
+
+                sample_model = self.ema_model.ema_model if self.use_ema else self.model
+
+                with temp_eval(sample_model), torch.no_grad():
+                    video_height, video_width = video.shape[-2:]
+
+                    if self.model.has_flow:
+                        latents = sample_model.tokenize(video)
+                        recon_video, all_pred_videos = sample_model.decode(
+                            latents,
+                            height = video_height,
+                            width = video_width,
+                            return_recons_across_steps = True
+                        )
+                    else:
+                        _, intermediates = sample_model(video, return_intermediates = True)
+                        recon_video = intermediates.recon
+                        all_pred_videos = [recon_video]
+
+                recon_video = recon_video.clamp(0., 1.)
+                self.log_video(video, "original_video")
+                self.log_video(recon_video, "reconstructed_video")
+
+                if sample_model.has_flow:
+                    recon_timestep_zero = all_pred_videos[0].clamp(0., 1.)
+                    self.log_video(recon_timestep_zero, "recon_timestep_zero")
+
+                if exists(self.results_folder):
+                    videos_to_concat = (video, recon_timestep_zero, recon_video) if sample_model.has_flow else (video, recon_video)
+
+                    combined_video = torch.cat(videos_to_concat, dim = -1)
+                    gif_path = self.results_folder / f'sample-{self.step.item()}.gif'
+                    save_video_grid_as_gif(combined_video, gif_path)
+
+            # display active losses in pbar
+
+            postfix_kwargs = dict(loss = f"{total_loss:.4f}")
+
+            recon_loss = losses.recon.item()
+            if recon_loss > 0.:
+                postfix_kwargs['recon'] = f"{recon_loss:.4f}"
+
+            flow_recon_loss = losses.flow_recon.item()
+            if flow_recon_loss > 0.:
+                postfix_kwargs['flow_recon'] = f"{flow_recon_loss:.4f}"
+
+            lpips_loss = losses.lpips.item()
+            if lpips_loss > 0.:
+                postfix_kwargs['lpips'] = f"{lpips_loss:.4f}"
+
+            time_decorr_loss = losses.time_decorr.item()
+            if time_decorr_loss > 0.:
+                postfix_kwargs['time_decorr'] = f"{time_decorr_loss:.4f}"
+
+            space_decorr_loss = losses.space_decorr.item()
+            if space_decorr_loss > 0.:
+                postfix_kwargs['space_decorr'] = f"{space_decorr_loss:.4f}"
+
+            latent_ortho_loss = losses.latent_ortho.item()
+            if latent_ortho_loss > 0.:
+                postfix_kwargs['latent_ortho'] = f"{latent_ortho_loss:.4f}"
+
+            latent_ar_loss = losses.latent_ar.item()
+            if latent_ar_loss > 0.:
+                postfix_kwargs['latent_ar'] = f"{latent_ar_loss:.4f}"
+
+            latent_consistency_loss = losses.latent_consistency.item()
+            if latent_consistency_loss > 0.:
+                postfix_kwargs['latent_consistency'] = f"{latent_consistency_loss:.4f}"
+
+            byol_loss = losses.byol.item()
+            if byol_loss > 0.:
+                postfix_kwargs['byol'] = f"{byol_loss:.4f}"
+
+            pbar.set_postfix(**postfix_kwargs)
+
+            self.step += 1
+
+            self.accelerator.wait_for_everyone()
+
+            if self.checkpoint_every > 0 and self.is_main_process and divisible_by(self.step.item(), self.checkpoint_every):
+                ckpt_path = self.checkpoint_folder / f'tokenizer-{self.step.item()}.pt'
+
+                model = self.unwrap_model(self.model)
+                config = getattr(model, '_config', None)
+
+                pkg = dict(
+                    model = model.state_dict(),
+                    config = pickle.dumps(dehydrate_config(config, '_config')) if config else None,
+                    step = self.step.item()
+                )
+                torch.save(pkg, str(ckpt_path))
+
+                shutil.copy(str(ckpt_path), str(self.checkpoint_folder / 'tokenizer.pt'))
+
+                if self.use_ema:
+                    ema_ckpt_path = self.checkpoint_folder / f'tokenizer-{self.step.item()}-ema.pt'
+                    ema_model = self.ema_model.ema_model
+
+                    ema_config = getattr(ema_model, '_config', None)
+                    ema_pkg = dict(
+                        model = ema_model.state_dict(),
+                        config = pickle.dumps(dehydrate_config(ema_config, '_config')) if ema_config else None,
+                        step = self.step.item()
+                    )
+                    torch.save(ema_pkg, str(ema_ckpt_path))
+                    shutil.copy(str(ema_ckpt_path), str(self.checkpoint_folder / 'tokenizer-ema.pt'))
+
+                self.print(f"checkpoint saved to {ckpt_path}")
+
+        self.accelerator.end_training()
+
+        self.print('training complete')
+
+# dynamics world model
+
+class BehaviorCloneTrainer(Module):
+    def __init__(
+        self,
+        model: DynamicsWorldModel,
+        dataset: Dataset,
+        optim_klass = MuonAdamAtan2,
+        batch_size = 16,
+        learning_rate = 3e-4,
+        max_grad_norm = 0.5,
+        num_train_steps = 10_000,
+        weight_decay = 0.,
+        accelerate_kwargs: dict = dict(),
+        optim_kwargs: dict = dict(),
+        cpu = False,
+        use_tensorboard = False,
+        use_wandb = False,
+        log_dir: str | None = None,
+        project_name = 'dreamer4',
+        run_name: str | None = None,
+        log_video = True,
+        log_video_every = 100,
+        checkpoint_every = 5000,
+        checkpoint_folder = './checkpoints',
+        video_fps = -1,
+        sample_time_steps = 16,
+        sample_batch_size = 25,
+        sample_prompt_frames = 1,
+        sample_sticky_action = False,
+        sample_autoregressive_actions = None,
+        sample_filename_prefix = 'sample',
+        use_ema = False,
+        ema_decay = 0.999,
+        grad_accum_every = 1,
+        self_flow = False,
+        self_flow_student_layer = -3,
+        self_flow_layer = -1,
+        self_flow_loss_weight = 1.0,
+        self_flow_kwargs: dict = dict(),
+        collate_fn = None,
+        custom_sample_fn = None,
+        custom_aug_fn = None,
+        aug_prob = 0.5,
+        valid_model_kwargs: set | None = None
+    ):
+        super().__init__()
+
+        self.aug_prob = aug_prob
+        self.custom_aug_fn = custom_aug_fn
+        self.valid_model_kwargs = default(valid_model_kwargs, set(inspect.signature(model.forward).parameters.keys()))
+
+        batch_size = min(batch_size, len(dataset))
+
+        assert not (use_tensorboard and use_wandb), 'use either tensorboard or wandb, not both'
+
+        self.use_tensorboard = use_tensorboard
+        self.use_wandb = use_wandb
+
+        if use_tensorboard:
+            accelerate_kwargs.update(log_with = 'tensorboard', project_dir = log_dir)
+        elif use_wandb:
+            accelerate_kwargs.update(log_with = 'wandb', project_dir = log_dir)
+
+        self.accelerator = Accelerator(
+            cpu = cpu,
+            **accelerate_kwargs
+        )
+
+        if use_tensorboard or use_wandb:
+            init_kwargs = dict()
+            if exists(run_name) and use_wandb:
+                init_kwargs = {'wandb': {'name': run_name}}
+            self.accelerator.init_trackers(project_name, init_kwargs = init_kwargs)
+
+        self.model = model
+        self.dataset = dataset
+        self.train_dataloader = DataLoader(dataset, batch_size = batch_size, drop_last = True, shuffle = True, collate_fn = collate_fn)
+
+        self.custom_sample_fn = custom_sample_fn
+
+        self.grad_accum_every = grad_accum_every
+
+        # self-flow distillation
+
+        self.self_flow = self_flow
+        self.self_flow_loss_weight = self_flow_loss_weight
+
+        self.self_flow_module = None
+
+        if self_flow:
+            use_ema = True
+
+            self.self_flow_module = SelfFlow(
+                model = model,
+                student_layer = self_flow_student_layer,
+                teacher_layer = self_flow_layer,
+                **self_flow_kwargs
+            )
+
+        self.use_ema = use_ema
+        self.ema_decay = ema_decay
+
+        # optimizer
+
+        optim_kwargs = dict(
+            lr = learning_rate,
+            weight_decay = weight_decay
+        )
+
+        model_params = list(model.parameters())
+        muon_params = list(model.muon_parameters()) if hasattr(model, 'muon_parameters') else []
+
+        if exists(self.self_flow_module):
+            model_params.extend(self.self_flow_module.parameters())
+
+        if optim_klass is MuonAdamAtan2:
+            optim = MuonAdamAtan2(
+                muon_params,
+                model_params,
+                **optim_kwargs
+            )
+        else:
+            optim = optim_klass(
+                model_params,
+                **optim_kwargs
+            )
+
+        self.optim = optim
+
+        self.max_grad_norm = max_grad_norm
+
+        self.num_train_steps = num_train_steps
+        self.batch_size = batch_size
+
+        self.register_buffer('step', tensor(0))
+
+        self.video_logger = None
+        self.results_folder = None
+
+        if log_video:
+            assert video_fps > 0, "Video fps must be passed in and positive when log_video=True"
+
+            self.fps = video_fps
+            self.log_video_every = log_video_every
+
+            self.results_folder = None
+            if exists(log_dir):
+                self.results_folder = Path(log_dir) / 'results'
+                self.results_folder.mkdir(parents = True, exist_ok = True)
+
+            if use_tensorboard:
+                check_import('tensorboard', 'tensorboard is not installed. Please install it using `pip install tensorboard`')
+                self.video_logger = self.accelerator.get_tracker("tensorboard").writer.add_video
+
+            if use_wandb:
+                check_import('moviepy', 'wandb video logging requires the moviepy package. Please install it using `pip install moviepy` or `pip install "wandb[media]"`')
+
+        self.log_video_flag = log_video
+        self.sample_time_steps = sample_time_steps
+        self.sample_batch_size = sample_batch_size
+        self.sample_prompt_frames = sample_prompt_frames
+        self.sample_sticky_action = sample_sticky_action
+        self.sample_autoregressive_actions = sample_autoregressive_actions
+        self.sample_filename_prefix = sample_filename_prefix
+
+        self.checkpoint_every = checkpoint_every
+        self.checkpoint_folder = Path(checkpoint_folder)
+        self.checkpoint_folder.mkdir(exist_ok = True, parents = True)
+
+        self.ema_model = None
+
+        if self.use_ema and self.accelerator.is_main_process:
+            self.ema_model = EMA(
+                self.model,
+                beta = self.ema_decay
+            )
+
+        # prepare with accelerator
+
+        to_prepare = [self.model, self.train_dataloader, self.optim]
+
+        if exists(self.self_flow_module):
+            to_prepare.append(self.self_flow_module)
+
+        self.model, self.train_dataloader, self.optim, *rest = self.accelerator.prepare(*to_prepare)
+
+        if rest:
+            self.self_flow_module, = rest
+
+        if exists(self.ema_model):
+            self.ema_model.to(self.device)
+
+    @property
+    def device(self):
+        return self.accelerator.device
+
+    def print(self, *args, **kwargs):
+        return self.accelerator.print(*args, **kwargs)
+
+    @property
+    def is_main_process(self):
+        return self.accelerator.is_main_process
+
+    @property
+    def unwrap_model(self):
+        return self.accelerator.unwrap_model
+
+    def log(self, **data):
+        self.accelerator.log(data, step = self.step.item())
+
+    def log_video(self, video, tag: str):
+        grid = video_tensor_to_grid(video)
+
+        if self.use_tensorboard and exists(self.video_logger):
+            self.video_logger(tag, rearrange(grid, 'c f h w -> 1 f c h w'), self.step.item(), self.fps)
+
+        if self.use_wandb:
+            import wandb
+            video_np = (rearrange(grid, 'c f h w -> f c h w').cpu().numpy() * 255).astype('uint8')
+            wandb.log({tag: wandb.Video(video_np, fps = self.fps, format = 'mp4')}, step = self.step.item())
+
+    def load(self, path):
+        path = Path(path)
+        assert path.exists(), f"checkpoint not found at {path}"
+
+        pkg = torch.load(str(path), map_location = 'cpu', weights_only = False)
+
+        if 'step' in pkg:
+            self.step.copy_(tensor(pkg['step']))
+
+        self.unwrap_model(self.model).load_state_dict(pkg.get('model', pkg), strict = False)
+
+        # load ema model if active
+        if not self.is_main_process or not self.use_ema or not exists(self.ema_model):
+            return
+
+        ema_model = self.ema_model.ema_model
+
+        ema_path = path.parent / f"{path.stem}-ema.pt"
+        if not ema_path.exists():
+            self.print(f"warning: ema model checkpoint not found at {ema_path}, loading from main model")
+            ema_model.load_state_dict(pkg.get('model', pkg), strict = False)
+            return
+
+        ema_pkg = torch.load(str(ema_path), map_location = 'cpu', weights_only = False)
+        ema_model.load_state_dict(ema_pkg.get('model', ema_pkg), strict = False)
+
+    def save_checkpoint(self):
+        import pickle
+        from torch_einops_utils.save_load import dehydrate_config
+
+        ckpt_path = self.checkpoint_folder / f'dynamics-{self.step.item()}.pt'
+
+        model = self.unwrap_model(self.model)
+        config = getattr(model, '_config', None)
+
+        pkg = dict(
+            model = model.state_dict(),
+            config = pickle.dumps(dehydrate_config(config, '_config')) if config else None,
+            step = self.step.item()
+        )
+        torch.save(pkg, str(ckpt_path))
+
+        if self.use_ema:
+            ema_ckpt_path = self.checkpoint_folder / f'dynamics-{self.step.item()}-ema.pt'
+            ema_model = self.ema_model.ema_model
+
+            ema_config = getattr(ema_model, '_config', None)
+            ema_pkg = dict(
+                model = ema_model.state_dict(),
+                config = pickle.dumps(dehydrate_config(ema_config, '_config')) if ema_config else None,
+                step = self.step.item()
+            )
+            torch.save(ema_pkg, str(ema_ckpt_path))
+
+        self.print(f"checkpoint saved to {ckpt_path}")
+
+    @eval_decorator
+    @torch.no_grad()
+    def sample(self, batch_data):
+        unwrapped = self.unwrap_model(self.model)
+
+        if is_tensor(batch_data):
+            prompt_video = batch_data[:self.sample_batch_size, :, :self.sample_prompt_frames]
+            real_video = batch_data[:self.sample_batch_size]
+        else:
+            prompt_video = batch_data['video'][:self.sample_batch_size, :, :self.sample_prompt_frames]
+            real_video = batch_data['video'][:self.sample_batch_size]
+
+        image_size = prompt_video.shape[-1]
+        sample_batch_size = prompt_video.shape[0]
+
+        kwargs = dict()
+        is_autoregressive = exists(self.sample_autoregressive_actions) and self.sample_autoregressive_actions
+
+        if not is_tensor(batch_data):
+            action_idx = max(0, self.sample_prompt_frames - 2)
+            for action_key in ('continuous_actions', 'discrete_actions'):
+                if action_key not in batch_data:
+                    continue
+
+                actions = batch_data[action_key][:self.sample_batch_size]
+
+                # sticky the last provided prompt action and extrapolate it for the rest of generation
+
+                if self.sample_sticky_action:
+                    actions = actions[:, action_idx:(action_idx + 1)]
+                    actions = repeat(actions, 'b 1 d -> b t d', t = self.sample_time_steps - 1)
+                    kwargs[f'prompt_{action_key}'] = actions
+                    continue
+
+                seq_len = actions.shape[1]
+                target_len = self.sample_time_steps - 1
+
+                if seq_len < target_len and not is_autoregressive:
+                    padding = actions[:, -1:]
+                    padding = repeat(padding, 'b 1 d -> b t d', t = target_len - seq_len)
+                    actions = torch.cat((actions, padding), dim = 1)
+
+                kwargs[f'prompt_{action_key}'] = actions
+
+        generated_video = unwrapped.generate(
+            prompt = prompt_video,
+            time_steps = self.sample_time_steps,
+            batch_size = sample_batch_size,
+            image_height = image_size,
+            image_width = image_size,
+            return_decoded_video = True,
+            return_agent_actions = is_autoregressive,
+            **kwargs
+        )
+
+        generated_video = generated_video.clamp(0., 1.)
+        self.log_video(generated_video, 'samples')
+
+        if exists(self.results_folder):
+            # Prepend the prompt to the generated video
+            generated_video = torch.cat((prompt_video, generated_video), dim = 2)
+
+            gen_len = generated_video.shape[2]
+            real_len = real_video.shape[2]
+
+            # pad generated or real video so they match in time length for concat
+
+            if gen_len < real_len:
+                pad_shape = shape_with_replace(generated_video, {2: real_len - gen_len})
+                padding = generated_video.new_zeros(pad_shape)
+                generated_video = torch.cat((generated_video, padding), dim = 2)
+            elif real_len < gen_len:
+                pad_shape = shape_with_replace(real_video, {2: gen_len - real_len})
+                padding = real_video.new_zeros(pad_shape)
+                real_video = torch.cat((real_video, padding), dim = 2)
+
+            combined_video = torch.cat((real_video, generated_video), dim = -1)
+            gif_path = self.results_folder / f'{self.sample_filename_prefix}-{self.step.item()}.gif'
+            save_video_grid_as_gif(combined_video, gif_path)
+
+        if exists(self.custom_sample_fn):
+            self.custom_sample_fn(self, batch_data)
+
+    def forward(
+        self
+    ):
+        iter_train_dl = cycle(self.train_dataloader)
+
+        if self.is_main_process and self.log_video_flag:
+            msg = "saving logs to tensorboard" if exists(self.video_logger) else "saving logs"
+            if exists(self.results_folder):
+                msg += f" and video samples to {self.results_folder}"
+            self.print(msg)
+
+        pbar = tqdm(
+            range(self.step.item(), self.num_train_steps),
+            initial = self.step.item(),
+            total = self.num_train_steps,
+            disable = not self.is_main_process
+        )
+
+        last_shortcut_loss = 0.
+
+        for _ in pbar:
+            total_loss = 0.
+            total_flow_loss = 0.
+            total_shortcut_loss = 0.
+            total_agent_embed_reward_loss = 0.
+            total_latent_state_reward_loss = 0.
+            total_agent_embed_terminal_loss = 0.
+            total_latent_state_terminal_loss = 0.
+            total_discrete_action_loss = 0.
+            total_continuous_action_loss = 0.
+            total_self_flow_loss = 0.
+
+            for _ in range(self.grad_accum_every):
+                batch_data = next(iter_train_dl)
+
+                if is_tensor(batch_data):
+                    batch_data = dict(video = batch_data)
+
+                if exists(self.custom_aug_fn) and 'video' in batch_data:
+                    aug_out = self.custom_aug_fn(batch_data['video'], prob = self.aug_prob)
+
+                    batch_data['video'] = aug_out.video
+                    batch_data['aug_id'] = aug_out.aug_id
+
+                batch_data['return_intermediates'] = True
+
+                if self.self_flow:
+                    batch_data['seed'] = randint(0, int(1e7))
+
+                if 'terminated' in batch_data:
+                    batch_data['terminals'] = batch_data.pop('terminated')
+
+                time = batch_data['video'].shape[2]
+
+                batch_data = filter_by_keys(batch_data, self.valid_model_kwargs)
+                loss, losses, intermediates = self.model(**batch_data, return_all_losses = True)
+
+                loss = loss / self.grad_accum_every
+
+                if self.self_flow:
+                    with torch.no_grad():
+                        self_flow_loss = self.self_flow_module(self.ema_model.ema_model, intermediates, batch_data)
+
+                    self_flow_loss = self_flow_loss / self.grad_accum_every
+
+                    loss = loss + self_flow_loss * self.self_flow_loss_weight
+                    total_self_flow_loss += self_flow_loss.item()
+
+                self.accelerator.backward(loss)
+
+                total_loss += loss.item()
+                total_flow_loss += (losses.flow.item() / self.grad_accum_every)
+                total_shortcut_loss += (losses.shortcut.item() / self.grad_accum_every)
+                total_agent_embed_reward_loss += (losses.agent_embed_reward.sum().item() / self.grad_accum_every)
+                total_latent_state_reward_loss += (losses.latent_state_reward.sum().item() / self.grad_accum_every)
+                total_agent_embed_terminal_loss += (losses.agent_embed_terminal.sum().item() / self.grad_accum_every)
+                total_latent_state_terminal_loss += (losses.latent_state_terminal.sum().item() / self.grad_accum_every)
+                total_discrete_action_loss += (losses.discrete_actions.sum().item() / self.grad_accum_every)
+                total_continuous_action_loss += (losses.continuous_actions.sum().item() / self.grad_accum_every)
+
+            if exists(self.max_grad_norm):
+                self.accelerator.clip_grad_norm_(self.model.parameters(), self.max_grad_norm)
+
+            self.optim.step()
+            self.optim.zero_grad()
+
+            if self.use_ema and self.is_main_process:
+                self.ema_model.update()
+
+            log_dict = dict(
+                total_loss = total_loss,
+                flow_loss = total_flow_loss,
+                shortcut_loss = total_shortcut_loss,
+                agent_embed_reward_loss = total_agent_embed_reward_loss,
+                latent_state_reward_loss = total_latent_state_reward_loss,
+                agent_embed_terminal_loss = total_agent_embed_terminal_loss,
+                latent_state_terminal_loss = total_latent_state_terminal_loss,
+                discrete_action_loss = total_discrete_action_loss,
+                continuous_action_loss = total_continuous_action_loss,
+            )
+
+            if self.self_flow:
+                log_dict.update(self_flow_loss = total_self_flow_loss)
+
+            self.log(**log_dict)
+
+            postfix = OrderedDict(total = f"{total_loss:.4f}")
+
+            if total_flow_loss > 0.:
+                postfix['flow'] = f"{total_flow_loss:.4f}"
+
+            if self.self_flow:
+                postfix['self_flow'] = f"{total_self_flow_loss:.4f}"
+
+            if total_shortcut_loss > 0.:
+                last_shortcut_loss = total_shortcut_loss
+
+            if last_shortcut_loss > 0.:
+                postfix['shortcut'] = f"{last_shortcut_loss:.4f}"
+
+            if total_agent_embed_reward_loss > 0.:
+                postfix['agent_reward'] = f"{total_agent_embed_reward_loss:.4f}"
+
+            if total_latent_state_reward_loss > 0.:
+                postfix['latent_reward'] = f"{total_latent_state_reward_loss:.4f}"
+
+            if total_agent_embed_terminal_loss > 0.:
+                postfix['agent_terminal'] = f"{total_agent_embed_terminal_loss:.4f}"
+
+            if total_latent_state_terminal_loss > 0.:
+                postfix['latent_terminal'] = f"{total_latent_state_terminal_loss:.4f}"
+
+            if total_discrete_action_loss > 0.:
+                postfix['disc_act'] = f"{total_discrete_action_loss:.4f}"
+
+            if total_continuous_action_loss > 0.:
+                postfix['cont_act'] = f"{total_continuous_action_loss:.4f}"
+
+            pbar.set_postfix(ordered_dict = postfix)
+
+            self.step += 1
+
+            self.accelerator.wait_for_everyone()
+
+            if self.is_main_process and self.log_video_flag and divisible_by(self.step.item(), self.log_video_every):
+                self.sample(batch_data)
+
+            if self.checkpoint_every > 0 and self.is_main_process and divisible_by(self.step.item(), self.checkpoint_every):
+                self.save_checkpoint()
+
+        self.accelerator.end_training()
+        self.print('training complete')
+
+# training from dreams
+
+class DreamTrainer(Module):
+    def __init__(
+        self,
+        model: DynamicsWorldModel,
+        optim_klass = AdamW,
+        batch_size = 16,
+        generate_timesteps = 16,
+        learning_rate = 3e-4,
+        max_grad_norm = 0.5,
+        num_train_steps = 10_000,
+        weight_decay = 0.,
+        objective: Literal['ppo', 'pmpo', 'spo'] = 'ppo',
+        accelerate_kwargs: dict = dict(),
+        optim_kwargs: dict = dict(),
+        cpu = False,
+        use_tensorboard = False,
+        use_wandb = False,
+        log_dir: str | None = None,
+        project_name = 'dreamer4'
+    ):
+        super().__init__()
+
+        assert not (use_tensorboard and use_wandb), 'use either tensorboard or wandb, not both'
+
+        if use_tensorboard:
+            accelerate_kwargs.update(log_with = 'tensorboard', project_dir = log_dir)
+        elif use_wandb:
+            accelerate_kwargs.update(log_with = 'wandb', project_dir = log_dir)
+
+        self.accelerator = Accelerator(
+            cpu = cpu,
+            **accelerate_kwargs
+        )
+
+        if use_tensorboard or use_wandb:
+            self.accelerator.init_trackers(project_name)
+
+        self.model = model
+        self.objective = objective
+
+        optim_kwargs = dict(
+            lr = learning_rate,
+            weight_decay = weight_decay
+        )
+
+        self.policy_head_optim = optim_klass(model.policy_head_parameters(), **optim_kwargs)
+        self.value_head_optim = optim_klass(model.value_head_parameters(), **optim_kwargs)
+
+        self.max_grad_norm = max_grad_norm
+
+        self.num_train_steps = num_train_steps
+        self.batch_size = batch_size
+        self.generate_timesteps = generate_timesteps
+
+        self.register_buffer('step', tensor(0))
+
+        self.unwrapped_model = self.model
+
+        (
+            self.model,
+            self.policy_head_optim,
+            self.value_head_optim,
+        ) = self.accelerator.prepare(
+            self.model,
+            self.policy_head_optim,
+            self.value_head_optim
+        )
+
+    @property
+    def device(self):
+        return self.accelerator.device
+
+    @property
+    def unwrapped_model(self):
+        return self.accelerator.unwrap_model(self.model)
+
+    @property
+    def is_main_process(self):
+        return self.accelerator.is_main_process
+
+    def print(self, *args, **kwargs):
+        return self.accelerator.print(*args, **kwargs)
+
+    def log(self, **data):
+        self.accelerator.log(data, step = self.step.item())
+
+    def forward(
+        self
+    ):
+        pbar = tqdm(range(self.num_train_steps), disable = not self.is_main_process)
+
+        for _ in pbar:
+            dreams = self.unwrapped_model.generate(
+                self.generate_timesteps + 1, # plus one for bootstrap value
+                batch_size = self.batch_size,
+                return_rewards_per_frame = True,
+                return_agent_actions = True,
+                return_log_probs_and_values = True
+            )
+
+            policy_head_loss, value_head_loss = self.model.learn_from_experience(dreams, objective = self.objective)
+
+            self.print(f'policy head loss: {policy_head_loss.item():.3f} | value head loss: {value_head_loss.item():.3f}')
+
+            # update policy head
+
+            self.accelerator.backward(policy_head_loss)
+
+            if exists(self.max_grad_norm):
+                self.accelerator.clip_grad_norm_(self.model.policy_head_parameters(), self.max_grad_norm)
+
+            self.policy_head_optim.step()
+            self.policy_head_optim.zero_grad()
+
+            # update value head
+
+            self.accelerator.backward(value_head_loss)
+
+            if exists(self.max_grad_norm):
+                self.accelerator.clip_grad_norm_(self.model.value_head_parameters(), self.max_grad_norm)
+
+            self.value_head_optim.step()
+            self.value_head_optim.zero_grad()
+
+            self.log(
+                policy_head_loss = policy_head_loss.item(),
+                value_head_loss = value_head_loss.item()
+            )
+
+            pbar.set_postfix(
+                policy_loss = f"{policy_head_loss.item():.4f}",
+                value_loss = f"{value_head_loss.item():.4f}"
+            )
+
+            self.step += 1
+
+        self.accelerator.end_training()
+
+        self.print('training complete')
+
+# training from sim
+
+class SimTrainer(Module):
+    def __init__(
+        self,
+        model: DynamicsWorldModel,
+        optim_klass = AdamW,
+        batch_size = 16,
+        generate_timesteps = 16,
+        learning_rate = 3e-4,
+        max_grad_norm = None,
+        epochs = 2,
+        weight_decay = 0.,
+        objective: Literal['ppo', 'pmpo', 'spo'] = 'ppo',
+        accelerate_kwargs: dict = dict(),
+        optim_kwargs: dict = dict(),
+        cpu = False,
+        use_tensorboard = False,
+        use_wandb = False,
+        log_dir = None,
+        project_name = 'dreamer4'
+    ):
+        super().__init__()
+
+        assert not (use_tensorboard and use_wandb), 'use either tensorboard or wandb, not both'
+
+        if use_tensorboard:
+            accelerate_kwargs.update(log_with = 'tensorboard', project_dir = log_dir)
+        elif use_wandb:
+            accelerate_kwargs.update(log_with = 'wandb', project_dir = log_dir)
+
+        self.accelerator = Accelerator(
+            cpu = cpu,
+            **accelerate_kwargs
+        )
+
+        if use_tensorboard or use_wandb:
+            self.accelerator.init_trackers(project_name)
+
+        self.model = model
+        self.objective = objective
+
+        optim_kwargs = dict(
+            lr = learning_rate,
+            weight_decay = weight_decay
+        )
+
+        self.policy_head_optim = optim_klass(model.policy_head_parameters(), **optim_kwargs)
+        self.value_head_optim = optim_klass(model.value_head_parameters(), **optim_kwargs)
+
+        self.max_grad_norm = max_grad_norm
+
+        self.epochs = epochs
+        self.batch_size = batch_size
+
+        self.generate_timesteps = generate_timesteps
+
+        self.register_buffer('step', torch.tensor(0))
+
+        self.unwrapped_model = self.model
+
+        (
+            self.model,
+            self.policy_head_optim,
+            self.value_head_optim,
+        ) = self.accelerator.prepare(
+            self.model,
+            self.policy_head_optim,
+            self.value_head_optim
+        )
+
+    @property
+    def device(self):
+        return self.accelerator.device
+
+    @property
+    def unwrapped_model(self):
+        return self.accelerator.unwrap_model(self.model)
+
+    @property
+    def is_main_process(self):
+        return self.accelerator.is_main_process
+
+    def log(self, **data):
+        self.accelerator.log(data, step = self.step.item())
+
+    def print(self, *args, **kwargs):
+        return self.accelerator.print(*args, **kwargs)
+
+    def learn(
+        self,
+        experience: Experience
+    ):
+
+        step_size = experience.step_size
+        agent_index = experience.agent_index
+
+        latents = experience.latents
+        old_values = experience.values
+        rewards = experience.rewards
+
+        has_proprio = exists(experience.proprio)
+        proprio = experience.proprio
+
+        has_agent_embed = exists(experience.agent_embed)
+        agent_embed = experience.agent_embed
+
+        discrete_actions, continuous_actions = experience.actions
+        discrete_log_probs, continuous_log_probs = experience.log_probs
+
+        discrete_old_action_unembeds, continuous_old_action_unembeds = default(experience.old_action_unembeds, (None, None))
+
+        # handle empties
+
+        empty_tensor = torch.empty_like(rewards)
+
+        agent_embed = default(agent_embed, empty_tensor)
+        proprio = default(proprio, empty_tensor)
+
+        has_discrete = exists(discrete_actions)
+        has_continuous = exists(continuous_actions)
+
+        discrete_actions = default(discrete_actions, empty_tensor)
+        continuous_actions = default(continuous_actions, empty_tensor)
+
+        discrete_log_probs = default(discrete_log_probs, empty_tensor)
+        continuous_log_probs = default(continuous_log_probs, empty_tensor)
+
+        discrete_old_action_unembeds = default(discrete_old_action_unembeds, empty_tensor)
+        continuous_old_action_unembeds = default(continuous_old_action_unembeds, empty_tensor)
+
+        # create the dataset and dataloader
+
+        dataset = TensorDataset(
+            latents,
+            discrete_actions,
+            continuous_actions,
+            discrete_log_probs,
+            continuous_log_probs,
+            agent_embed,
+            proprio,
+            discrete_old_action_unembeds,
+            continuous_old_action_unembeds,
+            old_values,
+            rewards
+        )
+
+        dataloader = DataLoader(dataset, batch_size = self.batch_size, shuffle = True)
+
+        for epoch in range(self.epochs):
+
+            for (
+                latents,
+                discrete_actions,
+                continuous_actions,
+                discrete_log_probs,
+                continuous_log_probs,
+                agent_embed,
+                proprio,
+                discrete_old_action_unembeds,
+                continuous_old_action_unembeds,
+                old_values,
+                rewards
+            ) in dataloader:
+
+                actions = (
+                    discrete_actions if has_discrete else None,
+                    continuous_actions if has_continuous else None
+                )
+
+                log_probs = (
+                    discrete_log_probs if has_discrete else None,
+                    continuous_log_probs if has_continuous else None
+                )
+
+                old_action_unembeds = (
+                    discrete_old_action_unembeds if has_discrete else None,
+                    continuous_old_action_unembeds if has_continuous else None
+                )
+
+                batch_experience = Experience(
+                    latents = latents,
+                    actions = actions,
+                    log_probs = log_probs,
+                    agent_embed = agent_embed if has_agent_embed else None,
+                    proprio = proprio if has_proprio else None,
+                    old_action_unembeds = old_action_unembeds,
+                    values = old_values,
+                    rewards = rewards,
+                    step_size = step_size,
+                    agent_index = agent_index
+                )
+
+                policy_head_loss, value_head_loss = self.model.learn_from_experience(batch_experience, objective = self.objective)
+
+                self.print(f'policy head loss: {policy_head_loss.item():.3f} | value head loss: {value_head_loss.item():.3f}')
+
+                self.log(
+                    policy_head_loss = policy_head_loss.item(),
+                    value_head_loss = value_head_loss.item()
+                )
+
+                self.step += 1
+
+                # update policy head
+
+                self.accelerator.backward(policy_head_loss)
+
+                if exists(self.max_grad_norm):
+                    self.accelerator.clip_grad_norm_(self.model.policy_head_parameters(), self.max_grad_norm)
+
+                self.policy_head_optim.step()
+                self.policy_head_optim.zero_grad()
+
+                # update value head
+
+                self.accelerator.backward(value_head_loss)
+
+                if exists(self.max_grad_norm):
+                    self.accelerator.clip_grad_norm_(self.model.value_head_parameters(), self.max_grad_norm)
+
+                self.value_head_optim.step()
+                self.value_head_optim.zero_grad()
+
+        self.accelerator.end_training()
+
+        self.print('training complete')
+
+    def forward(
+        self,
+        env,
+        num_episodes = 50000,
+        max_experiences_before_learn = 8,
+        env_is_vectorized = False
+    ):
+        pbar = tqdm(range(num_episodes), disable = not self.is_main_process)
+
+        for _ in pbar:
+            total_experience = 0
+            experiences = []
+
+            while total_experience < max_experiences_before_learn:
+
+                experience = self.unwrapped_model.interact_with_env(env, env_is_vectorized = env_is_vectorized)
+
+                num_experience = experience.video.shape[0]
+
+                total_experience += num_experience
+
+                experiences.append(experience.cpu())
+
+            combined_experiences = combine_experiences(experiences)
+
+            self.learn(combined_experiences)
+
+            experiences.clear()
+
+        self.print('training complete')

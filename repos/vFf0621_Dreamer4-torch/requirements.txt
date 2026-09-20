@@ -1,0 +1,7 @@
+torch==2.8.0
+opencv-python
+wandb
+tqdm
+numpy==2.2.6
+lpips
+gymnasium

@@ -1,0 +1,1762 @@
+[
+ {
+  "url": "https://danijar.com/asset/dreamer4/benchmark.png",
+  "bytes": 313192,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task00.mp4",
+  "bytes": 846889,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task01.mp4",
+  "bytes": 136224,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task02.mp4",
+  "bytes": 216699,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task03.mp4",
+  "bytes": 495104,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task04.mp4",
+  "bytes": 839783,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task05.mp4",
+  "bytes": 165135,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task06.mp4",
+  "bytes": 101459,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task07.mp4",
+  "bytes": 387975,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task08.mp4",
+  "bytes": 380771,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task09.mp4",
+  "bytes": 280220,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task10.mp4",
+  "bytes": 544689,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task11.mp4",
+  "bytes": 633432,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task12.mp4",
+  "bytes": 760553,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task13.mp4",
+  "bytes": 176745,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task14.mp4",
+  "bytes": 472540,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task15.mp4",
+  "bytes": 340741,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task16.mp4",
+  "bytes": 160140,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task00.mp4",
+  "bytes": 1110563,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task01.mp4",
+  "bytes": 1187449,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task02.mp4",
+  "bytes": 63997,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task03.mp4",
+  "bytes": 622795,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task04.mp4",
+  "bytes": 553876,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task05.mp4",
+  "bytes": 610105,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task06.mp4",
+  "bytes": 185951,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task07.mp4",
+  "bytes": 430422,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task08.mp4",
+  "bytes": 223431,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task09.mp4",
+  "bytes": 294563,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task10.mp4",
+  "bytes": 621718,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task11.mp4",
+  "bytes": 143314,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task12.mp4",
+  "bytes": 318176,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task13.mp4",
+  "bytes": 445384,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task14.mp4",
+  "bytes": 721775,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task15.mp4",
+  "bytes": 402279,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task16.mp4",
+  "bytes": 601144,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task00.mp4",
+  "bytes": 614115,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task01.mp4",
+  "bytes": 262773,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task02.mp4",
+  "bytes": 153897,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task03.mp4",
+  "bytes": 286639,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task04.mp4",
+  "bytes": 531985,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task05.mp4",
+  "bytes": 362709,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task06.mp4",
+  "bytes": 62878,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task07.mp4",
+  "bytes": 105587,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task08.mp4",
+  "bytes": 94847,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task09.mp4",
+  "bytes": 160923,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task10.mp4",
+  "bytes": 224425,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task11.mp4",
+  "bytes": 446074,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task12.mp4",
+  "bytes": 415467,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task13.mp4",
+  "bytes": 159399,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task14.mp4",
+  "bytes": 545301,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task15.mp4",
+  "bytes": 477157,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task16.mp4",
+  "bytes": 355670,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/imag/cobble1.mp4",
+  "bytes": 516771,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/imag/cobble2.mp4",
+  "bytes": 254397,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/imag/cobble3.mp4",
+  "bytes": 473986,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/imag/treechop1.mp4",
+  "bytes": 542462,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/imag/treechop2.mp4",
+  "bytes": 386600,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/imag/treechop3.mp4",
+  "bytes": 604990,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/realworld/soar1.mp4",
+  "bytes": 554288,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/realworld/soar2.mp4",
+  "bytes": 269009,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/realworld/soar3.mp4",
+  "bytes": 403476,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://danijar.com/asset/dreamer4/teaser.mp4",
+  "bytes": 1789839,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "official Dreamer 4 project page (danijar.com)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/image/compute_compare.png",
+  "bytes": 6477356,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/image/dynamic_attn.png",
+  "bytes": 6191519,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/image/ringbuffer.jpg",
+  "bytes": 121579,
+  "status": 200,
+  "content_type": "image/jpeg",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/image/tokenizer.jpg",
+  "bytes": 144307,
+  "status": 200,
+  "content_type": "image/jpeg",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/arrow_01.mp4",
+  "bytes": 1064530,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/arrow_02.mp4",
+  "bytes": 660796,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/arrow_03.mp4",
+  "bytes": 2058733,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/boat_01.mp4",
+  "bytes": 1542280,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/boat_02.mp4",
+  "bytes": 3726378,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/boat_03.mp4",
+  "bytes": 2350562,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/bucket_01.mp4",
+  "bytes": 540034,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/bucket_02.mp4",
+  "bytes": 1255157,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/bucket_03.mp4",
+  "bytes": 1195709,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/consume_item_01.mp4",
+  "bytes": 259595,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/consume_item_02.mp4",
+  "bytes": 378349,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/consume_item_03.mp4",
+  "bytes": 429305,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/first_view.mp4",
+  "bytes": 4190839,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/mining_01.mp4",
+  "bytes": 913013,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/mining_02.mp4",
+  "bytes": 4304128,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/mining_03.mp4",
+  "bytes": 701293,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/portal_01.mp4",
+  "bytes": 762367,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/portal_02.mp4",
+  "bytes": 1082728,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/portal_03.mp4",
+  "bytes": 538255,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/sleep_01.mp4",
+  "bytes": 391746,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/sleep_02.mp4",
+  "bytes": 375247,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://findlamp.github.io/dreamer-mc.github.io/video/sleep_03.mp4",
+  "bytes": 321686,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Dreamer-MC blog (IamCreateAI)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://media.transistor.fm/e440a692/bfc0657e.mp3",
+  "bytes": 81038948,
+  "status": 200,
+  "content_type": "audio/mpeg",
+  "referenced_by": "TalkRL E73 audio",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/behaviour-cloning.gif",
+  "bytes": 82171,
+  "status": 200,
+  "content_type": "image/gif",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/causal-sequence.svg",
+  "bytes": 7090,
+  "status": 200,
+  "content_type": "image/svg+xml",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/causal-space-time.svg",
+  "bytes": 17251,
+  "status": 200,
+  "content_type": "image/svg+xml",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/coinrun-tokenizer.jpg",
+  "bytes": 34844,
+  "status": 200,
+  "content_type": "image/jpeg",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/coinrun-wm.mp4",
+  "bytes": 1096930,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/coinrun.gif",
+  "bytes": 2608735,
+  "status": 200,
+  "content_type": "image/gif",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/comparison.mp4",
+  "bytes": 3223628,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/compute_scaling_reconstructed.svg",
+  "bytes": 4460,
+  "status": 200,
+  "content_type": "image/svg+xml",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/diffusion-forcing.svg",
+  "bytes": 1471942,
+  "status": 200,
+  "content_type": "image/svg+xml",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/hollow-inside.jpg",
+  "bytes": 15754,
+  "status": 200,
+  "content_type": "image/jpeg",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/maetok-autoencoder-platformer.svg",
+  "bytes": 266914,
+  "status": 200,
+  "content_type": "image/svg+xml",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/optimizer-comparison.svg",
+  "bytes": 24337,
+  "status": 200,
+  "content_type": "image/svg+xml",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/roofline-analysis.svg",
+  "bytes": 1514,
+  "status": 200,
+  "content_type": "image/svg+xml",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/search-space.svg",
+  "bytes": 916,
+  "status": 200,
+  "content_type": "image/svg+xml",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://next-state.github.io/open-dreamer/website/xpred-vpred-noise-comparison.svg",
+  "bytes": 4716589,
+  "status": 200,
+  "content_type": "image/svg+xml",
+  "referenced_by": "Open Dreamer blog (next-state)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://paper-podcasts.alphaxiv.org/01999b5f-4ac0-71a8-832d-da75e4bd1b18/podcast.mp3",
+  "bytes": 6163435,
+  "status": 200,
+  "content_type": "audio/mpeg",
+  "referenced_by": "alphaXiv AI-generated paper podcast",
+  "archived_locally": false
+ },
+ {
+  "url": "https://scx1.b-cdn.net/csz/news/800a/2025/deepmind-introduces-an.jpg",
+  "bytes": null,
+  "status": 200,
+  "content_type": "image/jpeg",
+  "referenced_by": "TechXplore article",
+  "archived_locally": false
+ },
+ {
+  "url": "https://scx2.b-cdn.net/gfx/video/2025/deepmind-introduces-an-1.mp4",
+  "bytes": 2217007,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "TechXplore article",
+  "archived_locally": false
+ },
+ {
+  "url": "https://scx2.b-cdn.net/gfx/video/2025/deepmind-introduces-an.mp4",
+  "bytes": 2653815,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "TechXplore article",
+  "archived_locally": false
+ },
+ {
+  "url": "https://video.twimg.com/amplify_video/1973071536891502597/vid/avc1/1280x720/_hfNoSEUCtlY_uC_.mp4",
+  "bytes": 1904200,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "X announcement tweet video (1973072288351396320)",
+  "archived_locally": true
+ },
+ {
+  "url": "https://video.twimg.com/amplify_video/2011883006512742400/vid/avc1/1920x1080/p-yRX6XfviBfxoxA.mp4",
+  "bytes": 7017172,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "later X video on @danijarh profile (tweet media id 2011883006512742400)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/cup-catch_density.png",
+  "bytes": 34292,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/cup-catch_hallu_u_r.png",
+  "bytes": 30639,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/cup-catch_initial.png",
+  "bytes": 66352,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/lunarlander-takeoff_hallu_coverage.png",
+  "bytes": 30135,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/lunarlander-takeoff_hallu_u_r.png",
+  "bytes": 30452,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/lunarlander-takeoff_initial.png",
+  "bytes": 21314,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/og-point-maze_density.png",
+  "bytes": 33997,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/og-point-maze_hallu_u_r.png",
+  "bytes": 31728,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/og-point-maze_initial.png",
+  "bytes": 48967,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/pygame-rocket-collect_density.png",
+  "bytes": 36567,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/pygame-rocket-collect_hallu_u_r.png",
+  "bytes": 33707,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/coverage/pygame-rocket-collect_initial.png",
+  "bytes": 21749,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/datacoll/bottleneck_curiosity.png",
+  "bytes": 62307,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/datacoll/bottleneck_expert.png",
+  "bytes": 61834,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/datacoll/bottleneck_human.png",
+  "bytes": 74051,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/datacoll/bottleneck_noop.png",
+  "bytes": 46388,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/datacoll/bottleneck_random.png",
+  "bytes": 71272,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/demo-poster.jpg",
+  "bytes": 18184,
+  "status": 200,
+  "content_type": "image/jpeg",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/perceptual/cupcatch_decoded.png",
+  "bytes": 60075,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/perceptual/cupcatch_input.png",
+  "bytes": 25720,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/perceptual/pmaze_decoded.png",
+  "bytes": 40265,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/perceptual/pmaze_input.png",
+  "bytes": 3200,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/perceptual/pong_decoded.png",
+  "bytes": 4189,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/perceptual/pong_input.png",
+  "bytes": 1501,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/perceptual/reacher_decoded.png",
+  "bytes": 54685,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/images/perceptual/reacher_input.png",
+  "bytes": 4664,
+  "status": 200,
+  "content_type": "image/png",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/coverage/cup-catch_gt.mp4",
+  "bytes": 64239,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/coverage/lunarlander-takeoff_gt.mp4",
+  "bytes": 39353,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/coverage/og-point-maze_gt.mp4",
+  "bytes": 56401,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/coverage/pygame-rocket-collect_gt.mp4",
+  "bytes": 71123,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/cup-catch-var1_gt.mp4",
+  "bytes": 43419,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/cup-catch-var1_post.mp4",
+  "bytes": 149868,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/cup-catch-var1_pre.mp4",
+  "bytes": 193448,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/og-point-var1_gt.mp4",
+  "bytes": 93503,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/og-point-var1_post.mp4",
+  "bytes": 134773,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/og-point-var1_pre.mp4",
+  "bytes": 175867,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/pygame-dungeon-explorer1_gt.mp4",
+  "bytes": 57979,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/pygame-dungeon-explorer1_post.mp4",
+  "bytes": 188286,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/pygame-dungeon-explorer1_pre.mp4",
+  "bytes": 679542,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/pygame-reacher-easy_gt.mp4",
+  "bytes": 60430,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/pygame-reacher-easy_post.mp4",
+  "bytes": 180879,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/finetune/pygame-reacher-easy_pre.mp4",
+  "bytes": 501103,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/mujoco-walker_flip.mp4",
+  "bytes": 73752,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/mujoco-walker_real.mp4",
+  "bytes": 75026,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/mujoco-walker_zero.mp4",
+  "bytes": 74984,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/mw-pick-place_left.mp4",
+  "bytes": 84067,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/mw-pick-place_none.mp4",
+  "bytes": 64179,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/mw-pick-place_right.mp4",
+  "bytes": 142210,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/og-point-arena_left.mp4",
+  "bytes": 55924,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/og-point-arena_none.mp4",
+  "bytes": 29431,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/og-point-arena_right.mp4",
+  "bytes": 78330,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/pygame-highway_left.mp4",
+  "bytes": 21953,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/pygame-highway_none.mp4",
+  "bytes": 24803,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/pygame-highway_right.mp4",
+  "bytes": 27306,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/walker-run_flip.mp4",
+  "bytes": 162098,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/walker-run_real.mp4",
+  "bytes": 156945,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/realvs/walker-run_zero.mp4",
+  "bytes": 110682,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/rollouts/cup-catch-good_gt.mp4",
+  "bytes": 110369,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/rollouts/cup-catch-good_wm.mp4",
+  "bytes": 223019,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/rollouts/mw-push-base_gt.mp4",
+  "bytes": 315045,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/rollouts/mw-push-base_wm.mp4",
+  "bytes": 191463,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/scene/og-point-bottleneck_gt.mp4",
+  "bytes": 93245,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/scene/og-point-bottleneck_wm.mp4",
+  "bytes": 147933,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/scene/pygame-foraging_gt.mp4",
+  "bytes": 27511,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/scene/pygame-foraging_wm.mp4",
+  "bytes": 115101,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/scene/pygame-point-maze-var4_gt.mp4",
+  "bytes": 66901,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/scene/pygame-point-maze-var4_wm.mp4",
+  "bytes": 116997,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/atari-boxing.mp4",
+  "bytes": 50720,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/atari-ms-pacman.mp4",
+  "bytes": 69699,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/atari-road-runner.mp4",
+  "bytes": 110972,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/bipedal-walker-hills.mp4",
+  "bytes": 241348,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/cartpole-swingup.mp4",
+  "bytes": 156523,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/cheetah-run.mp4",
+  "bytes": 341188,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/cup-catch.mp4",
+  "bytes": 223019,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/finger-turn-hard.mp4",
+  "bytes": 114301,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/hopper-hop.mp4",
+  "bytes": 97164,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/lunarlander-hover.mp4",
+  "bytes": 158912,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/ms-ant-run.mp4",
+  "bytes": 624623,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/ms-hopper-hop.mp4",
+  "bytes": 315116,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/mujoco-ant.mp4",
+  "bytes": 602394,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/mujoco-walker.mp4",
+  "bytes": 545989,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/mw-assembly.mp4",
+  "bytes": 244437,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/mw-pick-place.mp4",
+  "bytes": 197637,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/mw-soccer.mp4",
+  "bytes": 176401,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/mw-window-close.mp4",
+  "bytes": 279243,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/og-ant.mp4",
+  "bytes": 221650,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/og-point-maze.mp4",
+  "bytes": 124879,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/og-point-spiral.mp4",
+  "bytes": 89960,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-air-hockey.mp4",
+  "bytes": 73626,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-bird-attack.mp4",
+  "bytes": 87936,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-coinrun.mp4",
+  "bytes": 400121,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-dungeon-explorer1.mp4",
+  "bytes": 188286,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-foraging.mp4",
+  "bytes": 115101,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-highway.mp4",
+  "bytes": 238112,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-landing.mp4",
+  "bytes": 214256,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-point-maze-var1.mp4",
+  "bytes": 96431,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-pong.mp4",
+  "bytes": 23457,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-reacher-easy.mp4",
+  "bytes": 199163,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-rocket-collect.mp4",
+  "bytes": 188689,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-spaceship.mp4",
+  "bytes": 169412,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/pygame-whirlpool.mp4",
+  "bytes": 398210,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/quadruped-run.mp4",
+  "bytes": 446379,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/rd-open-slide.mp4",
+  "bytes": 257154,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/rd-push-green.mp4",
+  "bytes": 156107,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/reacher-hard.mp4",
+  "bytes": 56225,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://www.nicklashansen.com/mmbench2/videos/teaser/walker-run.mp4",
+  "bytes": 474299,
+  "status": 200,
+  "content_type": "video/mp4",
+  "referenced_by": "MMBench2 project page (Hansen & Wang 2026)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://zenodo.org/records/21475232/files/behaviour-cloning.gif",
+  "bytes": 763,
+  "status": 403,
+  "content_type": "text/html; charset=utf-8",
+  "referenced_by": "Zenodo record 21475232 (Open Dreamer)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://zenodo.org/records/21475232/files/coinrun-wm.mp4",
+  "bytes": 763,
+  "status": 403,
+  "content_type": "text/html; charset=utf-8",
+  "referenced_by": "Zenodo record 21475232 (Open Dreamer)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://zenodo.org/records/21475232/files/coinrun.gif",
+  "bytes": 763,
+  "status": 403,
+  "content_type": "text/html; charset=utf-8",
+  "referenced_by": "Zenodo record 21475232 (Open Dreamer)",
+  "archived_locally": false
+ },
+ {
+  "url": "https://zenodo.org/records/21475232/files/comparison.mp4",
+  "bytes": 763,
+  "status": 403,
+  "content_type": "text/html; charset=utf-8",
+  "referenced_by": "Zenodo record 21475232 (Open Dreamer)",
+  "archived_locally": false
+ }
+]

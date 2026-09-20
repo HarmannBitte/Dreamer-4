@@ -1,0 +1,6 @@
+remote: https://github.com/lucidrains/dreamer4.git
+branch: main
+commit: f1fbbb504f2d58bf084f0adb29cf0f950a327895
+date:   2026-09-03 10:03:04 -0700
+subject: fix a masking issue in next latent prediction and also fix handling of actor/critic embeds when the heads have depth / are transformers
+fetched: 2026-09-20T13:35:05Z (shallow clone, depth 1; .git removed to save space)

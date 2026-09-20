@@ -1,0 +1,453 @@
+[
+ {
+  "kind": "model",
+  "repo": "IamCreateAI/Dreamerv4-MC",
+  "url": "https://huggingface.co/IamCreateAI/Dreamerv4-MC",
+  "status": 200,
+  "downloads": 0,
+  "likes": 4,
+  "lastModified": "2026-01-30T06:00:02.000Z",
+  "license": "apache-2.0",
+  "n_files": 7,
+  "total_bytes": 4195807063,
+  "total_GB": 4.2,
+  "largest_files": [
+   {
+    "path": "dynamic/diffusion_pytorch_model.safetensors",
+    "MB": 3299.5
+   },
+   {
+    "path": "tokenizer/diffusion_pytorch_model.safetensors",
+    "MB": 896.3
+   },
+   {
+    "path": ".gitattributes",
+    "MB": 0.0
+   },
+   {
+    "path": "README.md",
+    "MB": 0.0
+   },
+   {
+    "path": "dynamic/.DS_Store",
+    "MB": 0.0
+   },
+   {
+    "path": "dynamic/config.json",
+    "MB": 0.0
+   },
+   {
+    "path": "tokenizer/config.json",
+    "MB": 0.0
+   }
+  ],
+  "readme_saved": true
+ },
+ {
+  "kind": "model",
+  "repo": "nicklashansen/dreamer4",
+  "url": "https://huggingface.co/nicklashansen/dreamer4",
+  "status": 200,
+  "downloads": 18,
+  "likes": 0,
+  "lastModified": "2026-01-20T19:38:04.000Z",
+  "license": "mit",
+  "n_files": 5,
+  "total_bytes": 768529270,
+  "total_GB": 0.77,
+  "largest_files": [
+   {
+    "path": "dynamics.pt",
+    "MB": 511.9
+   },
+   {
+    "path": "tokenizer.pt",
+    "MB": 256.7
+   },
+   {
+    "path": ".gitattributes",
+    "MB": 0.0
+   },
+   {
+    "path": "README.md",
+    "MB": 0.0
+   },
+   {
+    "path": "config.json",
+    "MB": 0.0
+   }
+  ],
+  "readme_saved": true
+ },
+ {
+  "kind": "model",
+  "repo": "nicklashansen/mmbench2-models",
+  "url": "https://huggingface.co/nicklashansen/mmbench2-models",
+  "status": 200,
+  "downloads": 89,
+  "likes": 2,
+  "lastModified": "2026-07-09T20:34:34.000Z",
+  "license": "mit",
+  "n_files": 9,
+  "total_bytes": 4274498083,
+  "total_GB": 4.27,
+  "largest_files": [
+   {
+    "path": "base/dynamics.pt",
+    "MB": 1017.9
+   },
+   {
+    "path": "combined/dynamics.pt",
+    "MB": 1017.9
+   },
+   {
+    "path": "coverage_aware/dynamics.pt",
+    "MB": 1017.9
+   },
+   {
+    "path": "base/tokenizer.pt",
+    "MB": 407.0
+   },
+   {
+    "path": "combined/tokenizer.pt",
+    "MB": 407.0
+   },
+   {
+    "path": "coverage_aware/tokenizer.pt",
+    "MB": 407.0
+   },
+   {
+    "path": ".gitattributes",
+    "MB": 0.0
+   },
+   {
+    "path": "README.md",
+    "MB": 0.0
+   },
+   {
+    "path": "config.json",
+    "MB": 0.0
+   }
+  ],
+  "readme_saved": true
+ },
+ {
+  "kind": "model",
+  "repo": "vijayabhaskarev/dreamer-v4",
+  "url": "https://huggingface.co/vijayabhaskarev/dreamer-v4",
+  "status": 200,
+  "downloads": 0,
+  "likes": 0,
+  "lastModified": "2026-08-08T05:33:05.000Z",
+  "license": "mit",
+  "n_files": 14,
+  "total_bytes": 2930182476,
+  "total_GB": 2.93,
+  "largest_files": [
+   {
+    "path": "ball_in_cup/agent_bc.pt",
+    "MB": 506.7
+   },
+   {
+    "path": "ball_in_cup/seeds/bc_seed11.pt",
+    "MB": 506.7
+   },
+   {
+    "path": "ball_in_cup/seeds/bc_seed12.pt",
+    "MB": 506.7
+   },
+   {
+    "path": "ball_in_cup/seeds/bc_seed13.pt",
+    "MB": 506.7
+   },
+   {
+    "path": "ball_in_cup/world_model.pt",
+    "MB": 490.9
+   },
+   {
+    "path": "ball_in_cup/tokenizer.pt",
+    "MB": 299.8
+   },
+   {
+    "path": "ball_in_cup/seeds/imagination_rl_seed1.pt",
+    "MB": 21.1
+   },
+   {
+    "path": "ball_in_cup/seeds/imagination_rl_seed2.pt",
+    "MB": 21.1
+   },
+   {
+    "path": "ball_in_cup/seeds/imagination_rl_seed3.pt",
+    "MB": 21.1
+   },
+   {
+    "path": "ball_in_cup/seeds/imagination_rl_seed4.pt",
+    "MB": 21.1
+   },
+   {
+    "path": "ball_in_cup/seeds/imagination_rl_seed5.pt",
+    "MB": 21.1
+   },
+   {
+    "path": "ball_in_cup/agent_imagination_rl.pt",
+    "MB": 7.0
+   }
+  ],
+  "readme_saved": true
+ },
+ {
+  "kind": "dataset",
+  "repo": "nicklashansen/dreamer4",
+  "url": "https://huggingface.co/datasets/nicklashansen/dreamer4",
+  "status": 200,
+  "downloads": 816,
+  "likes": 2,
+  "lastModified": "2026-01-18T21:23:00.000Z",
+  "license": "mit",
+  "n_files": 1078,
+  "total_bytes": 30909503452,
+  "total_GB": 30.91,
+  "largest_files": [
+   {
+    "path": "expert/quadruped-run-0.png",
+    "MB": 120.1
+   },
+   {
+    "path": "expert/quadruped-run-1.png",
+    "MB": 119.8
+   },
+   {
+    "path": "mixed-small/quadruped-run-0.png",
+    "MB": 107.9
+   },
+   {
+    "path": "mixed-small/quadruped-run-1.png",
+    "MB": 104.8
+   },
+   {
+    "path": "mixed-small/quadruped-walk-0.png",
+    "MB": 96.7
+   },
+   {
+    "path": "mixed-small/quadruped-walk-1.png",
+    "MB": 95.3
+   },
+   {
+    "path": "expert/quadruped-walk-1.png",
+    "MB": 84.2
+   },
+   {
+    "path": "expert/quadruped-walk-0.png",
+    "MB": 83.8
+   },
+   {
+    "path": "mixed-small/walker-run-0.png",
+    "MB": 75.2
+   },
+   {
+    "path": "mixed-small/walker-run-1.png",
+    "MB": 75.2
+   },
+   {
+    "path": "mixed-large/walker-walk-17.png",
+    "MB": 73.4
+   },
+   {
+    "path": "mixed-large/walker-run-22.png",
+    "MB": 73.3
+   }
+  ],
+  "readme_saved": true
+ },
+ {
+  "kind": "dataset",
+  "repo": "nicklashansen/mmbench2",
+  "url": "https://huggingface.co/datasets/nicklashansen/mmbench2",
+  "status": 200,
+  "downloads": 1870,
+  "likes": 1,
+  "lastModified": "2026-07-09T20:34:06.000Z",
+  "license": "cc-by-4.0",
+  "n_files": 7658,
+  "total_bytes": 113861318603,
+  "total_GB": 113.86,
+  "largest_files": [
+   {
+    "path": "test/quadruped-run-0.png",
+    "MB": 121.6
+   },
+   {
+    "path": "test/quadruped-run-1.png",
+    "MB": 121.5
+   },
+   {
+    "path": "expert/quadruped-run-0.png",
+    "MB": 120.1
+   },
+   {
+    "path": "expert/quadruped-run-1.png",
+    "MB": 119.8
+   },
+   {
+    "path": "mixed-large/atari-alien.pt",
+    "MB": 117.9
+   },
+   {
+    "path": "mixed-large/atari-assault.pt",
+    "MB": 117.9
+   },
+   {
+    "path": "mixed-large/atari-asterix.pt",
+    "MB": 117.9
+   },
+   {
+    "path": "mixed-large/atari-atlantis.pt",
+    "MB": 117.9
+   },
+   {
+    "path": "mixed-large/atari-bank-heist.pt",
+    "MB": 117.9
+   },
+   {
+    "path": "mixed-large/atari-battle-zone.pt",
+    "MB": 117.9
+   },
+   {
+    "path": "mixed-large/atari-beamrider.pt",
+    "MB": 117.9
+   },
+   {
+    "path": "mixed-large/atari-boxing.pt",
+    "MB": 117.9
+   }
+  ],
+  "readme_saved": true
+ },
+ {
+  "kind": "dataset",
+  "repo": "zhwang4ai/OpenAI-Minecraft-Contractor",
+  "url": "https://huggingface.co/datasets/zhwang4ai/OpenAI-Minecraft-Contractor",
+  "status": 200,
+  "downloads": 34,
+  "likes": 5,
+  "lastModified": "2025-04-16T08:43:32.000Z",
+  "license": "mit",
+  "n_files": 68012,
+  "total_bytes": 1687927857260,
+  "total_GB": 1687.93,
+  "largest_files": [
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-9ad6d5efb98c-20220306-173455.jsonl",
+    "MB": 244.0
+   },
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-9c7520260ef9-20220302-173734.jsonl",
+    "MB": 244.0
+   },
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-f153ac423f61-20220305-110533.jsonl",
+    "MB": 243.8
+   },
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-f153ac423f61-20220305-105255.jsonl",
+    "MB": 243.6
+   },
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-c0380f24f326-20220302-172654.jsonl",
+    "MB": 243.2
+   },
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-f153ac423f61-20220305-104103.jsonl",
+    "MB": 243.2
+   },
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-f153ac423f61-20220228-021025.jsonl",
+    "MB": 243.0
+   },
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-9ad6d5efb98c-20220306-174600.jsonl",
+    "MB": 242.8
+   },
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-9ad6d5efb98c-20220306-175658.jsonl",
+    "MB": 242.4
+   },
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-01e4953da19b-20220301-063613.jsonl",
+    "MB": 241.5
+   },
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-9ad6d5efb98c-20220306-172457.jsonl",
+    "MB": 240.7
+   },
+   {
+    "path": "all_7xx_Apr_6/jsonl/gimpy-jade-panda-ebb6ffd4f126-20220227-131355.jsonl",
+    "MB": 238.5
+   }
+  ]
+ },
+ {
+  "kind": "dataset",
+  "repo": "p-doom/open_ai_minecraft_arrayrecords_chunked",
+  "url": "https://huggingface.co/datasets/p-doom/open_ai_minecraft_arrayrecords_chunked",
+  "status": 200,
+  "downloads": 195,
+  "likes": 9,
+  "lastModified": "2025-08-05T22:18:50.000Z",
+  "license": "cc0-1.0",
+  "n_files": 181,
+  "total_bytes": 1870513328828,
+  "total_GB": 1870.51,
+  "largest_files": [
+   {
+    "path": "shard_00157.tar",
+    "MB": 16696.1
+   },
+   {
+    "path": "shard_00158.tar",
+    "MB": 16575.0
+   },
+   {
+    "path": "shard_00156.tar",
+    "MB": 16489.5
+   },
+   {
+    "path": "shard_00159.tar",
+    "MB": 16350.2
+   },
+   {
+    "path": "shard_00165.tar",
+    "MB": 16264.1
+   },
+   {
+    "path": "shard_00160.tar",
+    "MB": 16235.7
+   },
+   {
+    "path": "shard_00166.tar",
+    "MB": 16109.3
+   },
+   {
+    "path": "shard_00167.tar",
+    "MB": 15890.0
+   },
+   {
+    "path": "shard_00169.tar",
+    "MB": 15763.2
+   },
+   {
+    "path": "shard_00168.tar",
+    "MB": 15642.6
+   },
+   {
+    "path": "shard_00161.tar",
+    "MB": 15598.6
+   },
+   {
+    "path": "shard_00174.tar",
+    "MB": 15355.1
+   }
+  ],
+  "readme_saved": true
+ }
+]

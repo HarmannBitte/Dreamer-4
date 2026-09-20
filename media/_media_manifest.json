@@ -1,0 +1,569 @@
+[
+ {
+  "file": "official_danijar_com/teaser.mp4",
+  "url": "https://danijar.com/asset/dreamer4/teaser.mp4",
+  "category": "teaser",
+  "description": "Project-page teaser video (top of danijar.com/project/dreamer4)",
+  "status": 200,
+  "bytes": 1789839,
+  "md5": "890d74a40c736402f98655b2d0e4040e"
+ },
+ {
+  "file": "official_danijar_com/benchmark.png",
+  "url": "https://danijar.com/asset/dreamer4/benchmark.png",
+  "category": "figure",
+  "description": "Benchmark figure shown under 'Diamonds from Offline Experience' (offline diamond challenge results)",
+  "status": 200,
+  "bytes": 313192,
+  "md5": "0acb9329ed0dc33185de44b6e54b6539"
+ },
+ {
+  "file": "official_danijar_com/imag__treechop1.mp4",
+  "url": "https://danijar.com/asset/dreamer4/imag/treechop1.mp4",
+  "category": "imagination",
+  "description": "Imagination Training \u2014 'Gather wood' rollout 1 (agent acting inside the world model)",
+  "status": 200,
+  "bytes": 542462,
+  "md5": "5617801545c5e833ad060f6231629327"
+ },
+ {
+  "file": "official_danijar_com/imag__treechop2.mp4",
+  "url": "https://danijar.com/asset/dreamer4/imag/treechop2.mp4",
+  "category": "imagination",
+  "description": "Imagination Training \u2014 'Gather wood' rollout 2 (agent acting inside the world model)",
+  "status": 200,
+  "bytes": 386600,
+  "md5": "4e519683046d436b98c68f7e3d036569"
+ },
+ {
+  "file": "official_danijar_com/imag__treechop3.mp4",
+  "url": "https://danijar.com/asset/dreamer4/imag/treechop3.mp4",
+  "category": "imagination",
+  "description": "Imagination Training \u2014 'Gather wood' rollout 3 (agent acting inside the world model)",
+  "status": 200,
+  "bytes": 604990,
+  "md5": "f7603287e98ad2bea0024e9ed14b5aee"
+ },
+ {
+  "file": "official_danijar_com/imag__cobble1.mp4",
+  "url": "https://danijar.com/asset/dreamer4/imag/cobble1.mp4",
+  "category": "imagination",
+  "description": "Imagination Training \u2014 'Mine stone' rollout 1",
+  "status": 200,
+  "bytes": 516771,
+  "md5": "36f115766f564446d6bc44d39c8fba7e"
+ },
+ {
+  "file": "official_danijar_com/imag__cobble2.mp4",
+  "url": "https://danijar.com/asset/dreamer4/imag/cobble2.mp4",
+  "category": "imagination",
+  "description": "Imagination Training \u2014 'Mine stone' rollout 2",
+  "status": 200,
+  "bytes": 254397,
+  "md5": "18f796dab5dc4182de24a1761618b074"
+ },
+ {
+  "file": "official_danijar_com/imag__cobble3.mp4",
+  "url": "https://danijar.com/asset/dreamer4/imag/cobble3.mp4",
+  "category": "imagination",
+  "description": "Imagination Training \u2014 'Mine stone' rollout 3",
+  "status": 200,
+  "bytes": 473986,
+  "md5": "6155ff8a0d07773e335fe83d2a2fa61e"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task00.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task00.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 00 'Build 3x3 wall from planks' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 846889,
+  "md5": "8904a262d252be94084bc2a57bee71a6"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task00.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task00.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 00 'Build 3x3 wall from planks' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 1110563,
+  "md5": "f22a5d5e53830f221f196e51048591a4"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task00.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task00.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 00 'Build 3x3 wall from planks' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 614115,
+  "md5": "a4bb7be642fc4cce8ccd1f6f464362f4"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task01.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task01.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 01 'Eat apple' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 136224,
+  "md5": "5a699bdf997f90a63dfb57df4fe501ff"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task01.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task01.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 01 'Eat apple' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 1187449,
+  "md5": "5cdef64f09dd9e558c7e1b07dc8d1e6c"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task01.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task01.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 01 'Eat apple' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 262773,
+  "md5": "e097c99ebc2ff760d2b61caa0a2aa182"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task02.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task02.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 02 'Place three torches' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 216699,
+  "md5": "97300c82ae963946164d810eef37e94b"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task02.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task02.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 02 'Place three torches' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 63997,
+  "md5": "7bf6fcf412462299ce0df69cd8b3b5e6"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task02.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task02.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 02 'Place three torches' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 153897,
+  "md5": "58873229674a08be96d344b9eb45108a"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task03.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task03.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 03 'Chop tree' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 495104,
+  "md5": "23af469af5b4efbd244ee572a30f6607"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task03.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task03.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 03 'Chop tree' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 622795,
+  "md5": "f234c5780c7a9d107dd2029d0ea7c157"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task03.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task03.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 03 'Chop tree' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 286639,
+  "md5": "5e90f58f2bf39fcc105b36b8aea53a09"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task04.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task04.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 04 'Dig 3x3 pit with shovel' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 839783,
+  "md5": "d8c1c5ba5f6d5b522baff7ecfa6fab55"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task04.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task04.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 04 'Dig 3x3 pit with shovel' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 553876,
+  "md5": "0b68409f41916b316515fd0644e2d24e"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task04.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task04.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 04 'Dig 3x3 pit with shovel' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 531985,
+  "md5": "2cfc177f1fc269c4390bd91bf23109fe"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task05.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task05.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 05 'Craft wooden pickaxe' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 165135,
+  "md5": "1a02beb8a981885d9faa64226495d37a"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task05.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task05.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 05 'Craft wooden pickaxe' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 610105,
+  "md5": "51dfcfb98feb734c32779bc03e5ed796"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task05.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task05.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 05 'Craft wooden pickaxe' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 362709,
+  "md5": "dc7e706c539eb4f16fb6e4fab05f6c2a"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task06.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task06.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 06 'Use furnace and exit' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 101459,
+  "md5": "22a6dfbdd458332dd3f5b027fd01ae3b"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task06.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task06.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 06 'Use furnace and exit' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 185951,
+  "md5": "66265a5502cfb93a1dba0db938867fe5"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task06.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task06.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 06 'Use furnace and exit' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 62878,
+  "md5": "1b290e3101a065a54bd18454b49f304e"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task07.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task07.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 07 'Place and open workbench' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 387975,
+  "md5": "8771a2213cffdd82210f1c61791c98c6"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task07.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task07.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 07 'Place and open workbench' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 430422,
+  "md5": "f82846a50cdc6544f1524a46e027f2fa"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task07.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task07.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 07 'Place and open workbench' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 105587,
+  "md5": "a071b1be186483424c9a8b3e1e4551bb"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task08.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task08.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 08 'Kill zombies' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 380771,
+  "md5": "0bf7c98a0db7b3729706383f379b2590"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task08.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task08.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 08 'Kill zombies' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 223431,
+  "md5": "3af41b8e7b371603aa9237a58df22357"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task08.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task08.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 08 'Kill zombies' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 94847,
+  "md5": "8db3ef9a665df1c5b99770937fedbc08"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task09.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task09.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 09 'Mine diamonds' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 280220,
+  "md5": "4f4d611239bfa98b58b315c00ce56bce"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task09.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task09.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 09 'Mine diamonds' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 294563,
+  "md5": "e6566b43185587fdd0df56b14cca9b3d"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task09.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task09.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 09 'Mine diamonds' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 160923,
+  "md5": "c9487f8f6bbe64fced5dccbb27051ee0"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task10.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task10.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 10 'Complete window' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 544689,
+  "md5": "7359ae1c2c73b037b33eb1dd21179911"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task10.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task10.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 10 'Complete window' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 621718,
+  "md5": "a2a3688414b1a417f3c7f4b46af1e846"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task10.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task10.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 10 'Complete window' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 224425,
+  "md5": "1aedcae20dec6492a93ebb6bdac50b9e"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task11.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task11.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 11 'Place and ride boat' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 633432,
+  "md5": "89aecbf5fb1b90355a19a9690d2e8948"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task11.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task11.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 11 'Place and ride boat' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 143314,
+  "md5": "661bcb00bd37a7f99e7d12564718a04c"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task11.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task11.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 11 'Place and ride boat' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 446074,
+  "md5": "13d43fa31b9fb8ba67af5cf9d52ad0d4"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task12.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task12.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 12 'Enter portal' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 760553,
+  "md5": "2498cbb146d58f26c0dd2a4d4f16b81e"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task12.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task12.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 12 'Enter portal' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 318176,
+  "md5": "ebc7bf98f1f36d99c7c88cb07e8f11bd"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task12.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task12.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 12 'Enter portal' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 415467,
+  "md5": "4845a53fef489cd4cd3be25adbceef94"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task13.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task13.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 13 'Place door and walk outside' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 176745,
+  "md5": "a73b206a5b4703866161658db3d1841b"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task13.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task13.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 13 'Place door and walk outside' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 445384,
+  "md5": "9d3e3b140bdfe2a42731139cc04424d2"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task13.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task13.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 13 'Place door and walk outside' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 159399,
+  "md5": "45d490b0d6536694fad6dac495c053b1"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task14.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task14.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 14 'Place bed in house and sleep' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 472540,
+  "md5": "17218cdec8d53333ef22b7372ade5271"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task14.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task14.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 14 'Place bed in house and sleep' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 721775,
+  "md5": "680f03fd4e7a2d129e955a79caf1271f"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task14.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task14.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 14 'Place bed in house and sleep' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 545301,
+  "md5": "ad45320c3af276102fed77fcefa63962"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task15.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task15.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 15 'Plant reed and pour water' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 340741,
+  "md5": "34a7041e3b11c24a76951491fac124aa"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task15.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task15.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 15 'Plant reed and pour water' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 402279,
+  "md5": "9620b4f30adee93de711999ca0a6b4f2"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task15.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task15.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 15 'Plant reed and pour water' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 477157,
+  "md5": "372093ce073816105fba5ea80bb5b933"
+ },
+ {
+  "file": "official_danijar_com/human__dreamer__task16.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/dreamer/task16.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 16 'Turn 360 and enter house' \u2014 Dreamer 4",
+  "status": 200,
+  "bytes": 160140,
+  "md5": "637754abbe7c5e5a5a44d1cbae4fcfb7"
+ },
+ {
+  "file": "official_danijar_com/human__lucid__task16.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/lucid/task16.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 16 'Turn 360 and enter house' \u2014 Lucid-v1 (baseline)",
+  "status": 200,
+  "bytes": 601144,
+  "md5": "49d872d7c374495a45e8e1e5dd84f681"
+ },
+ {
+  "file": "official_danijar_com/human__oasis__task16.mp4",
+  "url": "https://danijar.com/asset/dreamer4/human/oasis/task16.mp4",
+  "category": "human_interaction",
+  "description": "Human Interaction task 16 'Turn 360 and enter house' \u2014 Oasis (baseline)",
+  "status": 200,
+  "bytes": 355670,
+  "md5": "390bc91bb0f87a2c8c7b0c65724c7136"
+ },
+ {
+  "file": "official_danijar_com/realworld__soar1.mp4",
+  "url": "https://danijar.com/asset/dreamer4/realworld/soar1.mp4",
+  "category": "real_world",
+  "description": "Real World Video \u2014 counterfactual human actions, Interaction 1 (SO-ARM robot arm video model)",
+  "status": 200,
+  "bytes": 554288,
+  "md5": "dbe045dfd0bd552042e888f7aaa70401"
+ },
+ {
+  "file": "official_danijar_com/realworld__soar2.mp4",
+  "url": "https://danijar.com/asset/dreamer4/realworld/soar2.mp4",
+  "category": "real_world",
+  "description": "Real World Video \u2014 counterfactual human actions, Interaction 2 (SO-ARM robot arm video model)",
+  "status": 200,
+  "bytes": 269009,
+  "md5": "0948490bbfbd292ae73197bb70ac8e5a"
+ },
+ {
+  "file": "official_danijar_com/realworld__soar3.mp4",
+  "url": "https://danijar.com/asset/dreamer4/realworld/soar3.mp4",
+  "category": "real_world",
+  "description": "Real World Video \u2014 counterfactual human actions, Interaction 3 (SO-ARM robot arm video model)",
+  "status": 200,
+  "bytes": 403476,
+  "md5": "d4dccee0fbba4e8d2176022019d8cc0d"
+ },
+ {
+  "file": "x_twitter/danijarh_1973072288351396320_announcement_video_1280x720.mp4",
+  "url": "https://video.twimg.com/amplify_video/1973071536891502597/vid/avc1/1280x720/_hfNoSEUCtlY_uC_.mp4",
+  "category": "x_announcement",
+  "description": "Video attached to Danijar Hafner's Dreamer 4 announcement tweet (x.com/danijarh/status/1973072288351396320), 1280x720 rendition",
+  "status": 200,
+  "bytes": 1904200,
+  "md5": "5f32770f194720561521be002bd3c432"
+ }
+]

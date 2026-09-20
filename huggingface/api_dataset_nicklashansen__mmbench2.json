@@ -1,0 +1,3042 @@
+{
+ "_id": "6a3c3eb3cbe754aaaa458782",
+ "id": "nicklashansen/mmbench2",
+ "author": "nicklashansen",
+ "sha": "55508e4fcb507488dab3c1bbb684f32f91067862",
+ "lastModified": "2026-07-09T20:34:06.000Z",
+ "private": false,
+ "gated": false,
+ "disabled": false,
+ "tags": [
+  "task_categories:reinforcement-learning",
+  "task_categories:robotics",
+  "license:cc-by-4.0",
+  "size_categories:10K<n<100K",
+  "arxiv:2606.27326",
+  "arxiv:2511.19584",
+  "arxiv:2509.24527",
+  "region:us",
+  "world-models",
+  "continuous-control",
+  "video-prediction",
+  "robotics",
+  "dreamer"
+ ],
+ "description": "\n\n\n\t\n\t\t\n\t\n\t\n\t\tMMBench2\n\t\n\nHallucination in World Models is Predictable and Preventable\n\nNicklas Hansen &nbsp;\u00b7&nbsp; Xiaolong Wang &nbsp;\u00b7&nbsp; UC San Diego\n\n\n\n\n\n\n\nMMBench2 is a large-scale dataset for visual world modeling, accompanying the paper Hallucination in World Models is Predictable and Preventable. It spans 210 continuous control tasks across 10 domains (DMControl, DMControl Extended, Meta-World, ManiSkill3, MuJoCo, MiniArcade, Box2D, RoboDesk, OGBench, and Atari) comprising 65,600\u2026 See the full description on the dataset page: https://huggingface.co/datasets/nicklashansen/mmbench2.",
+ "downloads": 1870,
+ "likes": 1,
+ "cardData": {
+  "license": "cc-by-4.0",
+  "task_categories": [
+   "reinforcement-learning",
+   "robotics"
+  ],
+  "tags": [
+   "world-models",
+   "continuous-control",
+   "video-prediction",
+   "robotics",
+   "dreamer"
+  ],
+  "pretty_name": "MMBench2",
+  "size_categories": [
+   "10K<n<100K"
+  ],
+  "viewer": false
+ },
+ "siblings": [
+  {
+   "rfilename": ".gitattributes",
+   "blobId": "bed0738c7eeb449bca98b5d2f33c89a1ee56349a",
+   "size": 2504
+  },
+  {
+   "rfilename": "README.md",
+   "blobId": "e8984f7cf9eba15b83b3b7d27d84de58a222bd8e",
+   "size": 5100
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-0.png",
+   "blobId": "bdd7030162f9ec696f6c9551f62888aae98ceaac",
+   "size": 14531301,
+   "lfs": {
+    "sha256": "0705428f45cd8c9e6f0960ae59dc109bcb4df017c6fd0d9a7040610fae723261",
+    "size": 14531301,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-1.png",
+   "blobId": "91607534f4689288068d01da55a63d49b6c0f7f4",
+   "size": 14717353,
+   "lfs": {
+    "sha256": "47c94befa26ee562a02456c4c2b6d629c31e19d098e115fcb86853120fc9fcc8",
+    "size": 14717353,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-2.png",
+   "blobId": "ba6c40e6f08be04b36d07a2d79d17b79ef311be7",
+   "size": 14608353,
+   "lfs": {
+    "sha256": "6a8bf2bf3a6b9c7d6269fd5020a2683a44d6dd8c0bbc9066410186a4eca9f140",
+    "size": 14608353,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-3.png",
+   "blobId": "9f5059b7857eb816e867ffe2143c841fc41e1f51",
+   "size": 14736421,
+   "lfs": {
+    "sha256": "6de5e6a3762f40aa3048cd48dcb4e75d8da0b3b47fb06575c9854474f81faf35",
+    "size": 14736421,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-4.png",
+   "blobId": "305e3f757892b93e3761d89b519bca7a54cd374c",
+   "size": 14616243,
+   "lfs": {
+    "sha256": "f625f762661012c6846bf8cffe92479441dfbd19a5a5aa057e99d49b86496a73",
+    "size": 14616243,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-5.png",
+   "blobId": "adc72bdc4d74f0a1c042f7d1e1723ed0486c165e",
+   "size": 14708945,
+   "lfs": {
+    "sha256": "4617d8e0b06a4191026d40b7640a3ec163a25208920466aad1ae9bd8dd5cb097",
+    "size": 14708945,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-6.png",
+   "blobId": "1d4bb30ee246426b75cfa6edd21c7e3a396cbaed",
+   "size": 3700855,
+   "lfs": {
+    "sha256": "c16131ea2e115fa318951b46f5904a4c59778561699c0703861f79c558e8b6cb",
+    "size": 3700855,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-var1-0.png",
+   "blobId": "67c4c4b2e9fad677d317d1b285ef5e228f88275c",
+   "size": 9077624,
+   "lfs": {
+    "sha256": "03b56b6f741a15cd326ad0970d0e5cbfdc9b67cbc0d03d0d5d5df7f298ca4109",
+    "size": 9077624,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-var1-1.png",
+   "blobId": "cb02734187632daf4ac07e758dcf28cb08e7e5d6",
+   "size": 9319175,
+   "lfs": {
+    "sha256": "47ed92c3e1f7f03debac1ff4e3524ce77b7f0e4273c6481d6815773c33a73188",
+    "size": 9319175,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-var1-2.png",
+   "blobId": "d237ffb186cc3af99113178e90806d917059ffaa",
+   "size": 9270978,
+   "lfs": {
+    "sha256": "a3e3c9ae04fc8a9640ffcb16e2849a31c1718380a717afe10daf1e9513f48989",
+    "size": 9270978,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-var1-3.png",
+   "blobId": "7bf05d676b1224648c2025cbe6dcc555918ea676",
+   "size": 9220581,
+   "lfs": {
+    "sha256": "48958512c7b68d243a05eb2cff268e69aa256c8b65e4cee700936630f0649722",
+    "size": 9220581,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-var1-4.png",
+   "blobId": "fd7accfa19c621afad53321733c4c0cb7f1f43e4",
+   "size": 9218118,
+   "lfs": {
+    "sha256": "361bf2005bd6b9f837a701423785e982c02ce4c5f48dc2e08e5c6fb86dfa3f17",
+    "size": 9218118,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-var1-5.png",
+   "blobId": "d387427272e58002ef684aed886e996a0d9cac54",
+   "size": 8911919,
+   "lfs": {
+    "sha256": "220cadf692b75b676a7a85cf22050bebabecfe651a46b2628f97a03b7dea9431",
+    "size": 8911919,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-var1-6.png",
+   "blobId": "377fecf17941b79d2212a1adbf393028763d6bf1",
+   "size": 2325005,
+   "lfs": {
+    "sha256": "c7a619592f70d5ad44d38032982a19ba1df3dfbf30b896925fd7eda7c163ac38",
+    "size": 2325005,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch-var1.pt",
+   "blobId": "584437ea7f1c0947c0271e694f08d831a44adc7c",
+   "size": 1931235,
+   "lfs": {
+    "sha256": "6338eaca8e4361c66fcf266978ba7f4e9e8aa431e45c11f5f94554f479cb6fe3",
+    "size": 1931235,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/cup-catch.pt",
+   "blobId": "0477c3cacf8eb902c9cb64dbad9883efd5761caf",
+   "size": 1931185,
+   "lfs": {
+    "sha256": "b86bef60746ee18caea9825dbf4d3e78a73e9dbd426338132912ed12c0e58e40",
+    "size": 1931185,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-0.png",
+   "blobId": "5773f3a9f2c86d394851271f4b42b972e69a4ebb",
+   "size": 15895912,
+   "lfs": {
+    "sha256": "91e85d65c0508661dd3aee5f6b292fbc6ff68b8659ae5ee0036dbbe608e4eab2",
+    "size": 15895912,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-1.png",
+   "blobId": "db0d639c498b8efc7cd46ac500103bc015be868c",
+   "size": 17629742,
+   "lfs": {
+    "sha256": "a028b1510aff202173f36c8cb886e657647c10eaeaf06d9215e3b0be1181afcd",
+    "size": 17629742,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-2.png",
+   "blobId": "65392197a75e9cba19941a8bf3038e870d18e941",
+   "size": 15670259,
+   "lfs": {
+    "sha256": "dd02d7ce65f3ae5ff623e6a312fcea8e1ab0e7565fc94f3ca5d64dd959b51bec",
+    "size": 15670259,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-3.png",
+   "blobId": "ced8fed88923efe807c4e7c2d3a21afbd536e1c8",
+   "size": 16036611,
+   "lfs": {
+    "sha256": "e26489418d36073d560c2b18dd64df7f7972779e811a41f934cef83b36329324",
+    "size": 16036611,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-4.png",
+   "blobId": "1e500bfca5e22df8aeeabc8922a56d0ba9445258",
+   "size": 16823215,
+   "lfs": {
+    "sha256": "9fddf7f274f5c1c140d979aac876cc9f9b61c95b96b05a87c5d321171e429f5a",
+    "size": 16823215,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-5.png",
+   "blobId": "7846ad78bedd7077cf9c7c2d97827f53a77bd258",
+   "size": 15529597,
+   "lfs": {
+    "sha256": "9d7e0ba6e98278b48f845175800c1faba075e7adf0cee79cec8ef65c65ab9087",
+    "size": 15529597,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-6.png",
+   "blobId": "51810a6458515d4023ca032468ccc4bf8db76224",
+   "size": 4078330,
+   "lfs": {
+    "sha256": "10d1a33fe384e2b0e549756e72e037c731cb3b0bd7f4e3303fde4156698b8f71",
+    "size": 4078330,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-var1-0.png",
+   "blobId": "01b500c00cabbb9c094b2e0e61619ba2953b8f7c",
+   "size": 16057763,
+   "lfs": {
+    "sha256": "07cec233607661ef2fcc1628c372caa5b5d83f7db9baa09af06715398a140c1b",
+    "size": 16057763,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-var1-1.png",
+   "blobId": "933df5fff76e0aa570ab3c6c0246c384305d6a8d",
+   "size": 14714790,
+   "lfs": {
+    "sha256": "d0e171c6c9ca11ef0655a8dffb8277256ba3a93c258accdc35fcc3a7359712fb",
+    "size": 14714790,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-var1-2.png",
+   "blobId": "05c4c9b929bf57653fefdf7c15e4eccb55359e30",
+   "size": 14870813,
+   "lfs": {
+    "sha256": "7ab3baa48f1fb36acab85106817993484fe6dda54853039af3f6e17287a02cb7",
+    "size": 14870813,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-var1-3.png",
+   "blobId": "f1c2741c6954cdf11cc139eefb65ea60d6973f6b",
+   "size": 14541967,
+   "lfs": {
+    "sha256": "a8d8322def21ff3176e86adaf806df018256b303c8b5c41bc88dc8486441c5e7",
+    "size": 14541967,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-var1-4.png",
+   "blobId": "2ed2ffec969f6b98cb385a8451a33ebde5320ac0",
+   "size": 15549679,
+   "lfs": {
+    "sha256": "637ea57c4c97479c120654a3c8333e10d6aab476665b9df8cc1d1ea33b4f6340",
+    "size": 15549679,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-var1-5.png",
+   "blobId": "5275608e2314a2aaa7406451160d59dabed81e1b",
+   "size": 15018392,
+   "lfs": {
+    "sha256": "a9c044b2237a3c2a77f421d14fed732efc3ff0408ec41fcd41dc4d492eb1e332",
+    "size": 15018392,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-var1-6.png",
+   "blobId": "5e82d7c23102125277b196437bf8c48266ae8b90",
+   "size": 3308987,
+   "lfs": {
+    "sha256": "0805db06b8d2bd96d893019b992f5f649c52bb891f96a127a6fa63b1fda184ca",
+    "size": 3308987,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy-var1.pt",
+   "blobId": "1bc004388886d014e363a7d5484df87f8cbadf6e",
+   "size": 1931305,
+   "lfs": {
+    "sha256": "db3e4c2287e053b5a2ba8e56987caad30d9231ac6f2e1c1795616748e7c97ae8",
+    "size": 1931305,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/finger-turn-easy.pt",
+   "blobId": "1d61fcd952a055f70a4254eb5565e1994a40edb1",
+   "size": 1931255,
+   "lfs": {
+    "sha256": "ff144c0291f20761cc5057a205ba4858020e52e07cee9bcd667375c9dcc6efe5",
+    "size": 1931255,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/lunarlander-hover-0.png",
+   "blobId": "55c1be0012bab60e64f27e476be7c1dd6360ddd3",
+   "size": 4339927,
+   "lfs": {
+    "sha256": "8aee6103d90f7f38536493c7913546ec9824633abae3cdb3a19a0efd84b488f1",
+    "size": 4339927,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/lunarlander-hover-1.png",
+   "blobId": "3c48e058477560eb8c453daca3c6e09602858708",
+   "size": 4050688,
+   "lfs": {
+    "sha256": "203c3ae78ffffa0d6ee5d561c0e55c7ba095bb28f1ee576a17e43053bbf45aa9",
+    "size": 4050688,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/lunarlander-hover-2.png",
+   "blobId": "dd588a184e50587737a763b453d86c910e79fad8",
+   "size": 3842725,
+   "lfs": {
+    "sha256": "259b024bc5173e3db3ba4e0c9f4752e18de8022a1679818890accb9efc851aae",
+    "size": 3842725,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/lunarlander-hover-3.png",
+   "blobId": "80356548978099b9051ce0929fe22a11c066b578",
+   "size": 838704,
+   "lfs": {
+    "sha256": "0d1cf2f07525dde0f185981dd333ed3cee0e4df4082ca7c154777c621908533a",
+    "size": 838704,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/lunarlander-hover.pt",
+   "blobId": "1b7dab758bba7e234736677a9ff7fda3117ba9f3",
+   "size": 968769,
+   "lfs": {
+    "sha256": "de98e601db189c8f18fa42f9e193f345058bc20955d040d2a721d47422c04997",
+    "size": 968769,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/ms-push-banana-0.png",
+   "blobId": "43fc18e25ac1e2fce5bd55669d15a14d6e51d9e1",
+   "size": 7902864,
+   "lfs": {
+    "sha256": "327d258d4028b4ae959a513beb45bfe65f0c0dbec8cab25758d7b0d693b2c032",
+    "size": 7902864,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/ms-push-banana.pt",
+   "blobId": "1fc367fbeed2dfad4ee96d15909cf2668feba062",
+   "size": 102499,
+   "lfs": {
+    "sha256": "69924ed679f773948ac6948b5d4f1cf347bd36fc556e7d6b1fbc383a71694a52",
+    "size": 102499,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/ms-push-cube-0.png",
+   "blobId": "4f4e3f1b993efb8dcb668c42395c154503ec1984",
+   "size": 7744724,
+   "lfs": {
+    "sha256": "a3b04c699d2ca9154bdcf9b5b607b387bf22e3b9549e800021942259df3d6ff8",
+    "size": 7744724,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/ms-push-cube.pt",
+   "blobId": "fc423b1bb5c8c38ce8136ad6a7dcdf13e3ec6962",
+   "size": 102479,
+   "lfs": {
+    "sha256": "6590aba519aa10ad16e265c9700d982d00dac7b027b397ed5e921f0b0645f89c",
+    "size": 102479,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/mw-push-0.png",
+   "blobId": "c34a0392ac995dbd6a3ec266c406fb0831990274",
+   "size": 46075940,
+   "lfs": {
+    "sha256": "f1473b98bdc478c9ca78efd8c1bb0e767d5486035f312d2cdd12d752e311bb52",
+    "size": 46075940,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/mw-push-1.png",
+   "blobId": "8ef73c216e297ec9c4e4695ef686e2560ebe4482",
+   "size": 12074547,
+   "lfs": {
+    "sha256": "55ab47ca03fa64580ed37caa78f6db8665ebffaeb37bf229d12e5608595e8b45",
+    "size": 12074547,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/mw-push.pt",
+   "blobId": "e42e2008398bd1c5c576deeaa65e37ce4d72fe67",
+   "size": 391069,
+   "lfs": {
+    "sha256": "36431b988511e06b10b6fbcbf54b02c7e9fe6eb51d8c67c1a4607b04be046702",
+    "size": 391069,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-bottleneck-0.png",
+   "blobId": "66f4e2cfdae01308b7ac122328be4aeb22e1db5e",
+   "size": 23269877,
+   "lfs": {
+    "sha256": "a609127a02316a133df11e98def552ff6a5643b28c2a1a81c644d34e7f444410",
+    "size": 23269877,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-bottleneck-1.png",
+   "blobId": "6b4bbf29eb1d7fc5035bef09e06f7b42299f84be",
+   "size": 5909093,
+   "lfs": {
+    "sha256": "6d7fcd225c286b10db139bd31e9df81c630605294f42c908ce72f86448831ada",
+    "size": 5909093,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-bottleneck.pt",
+   "blobId": "5514760e403f53484a4577c5a935a300dae0d232",
+   "size": 391317,
+   "lfs": {
+    "sha256": "e373a87f80a1195853041e200ae20bda95845196c0078bde2223318612e3e12b",
+    "size": 391317,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-maze-0.png",
+   "blobId": "7207e8a657595b27ba558ddcbcc01b17fe1931d0",
+   "size": 20642153,
+   "lfs": {
+    "sha256": "a271d24058d032b31ac70048423bc9f63cfd6a2e7655ded511072c10a0cd44f0",
+    "size": 20642153,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-maze-1.png",
+   "blobId": "da55e6f2a8dc0f8dea98082e41ff1eab2191d31e",
+   "size": 5286465,
+   "lfs": {
+    "sha256": "f2d469ddd82b4f6e19c0c5267d1f9b86fe29cced03c60369fed95fe353fdf5b4",
+    "size": 5286465,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-maze.pt",
+   "blobId": "77775a7019251666189ba43212fdbdc1ffce12fc",
+   "size": 391257,
+   "lfs": {
+    "sha256": "e786412e0949e2bf354207733c0515a3a5cbe550c39c480289b428cc85fbad9f",
+    "size": 391257,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-var1-0.png",
+   "blobId": "84ef9a85e501eda10938ec512452a9252e9db7a7",
+   "size": 24120497,
+   "lfs": {
+    "sha256": "5eb3f4bfe595559d82cf183d4cf8067fabf619e6d2f89aff58ea7f13dd77f748",
+    "size": 24120497,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-var1-1.png",
+   "blobId": "ab4eb2a77a4ac9e302476f2cfb2d080bb6b8cfcb",
+   "size": 6583925,
+   "lfs": {
+    "sha256": "4fa3e7538174b3c9623e59237c2c99a82e4d4c116105fe77c54d2a295130d669",
+    "size": 6583925,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-var1.pt",
+   "blobId": "de089b2e03a7cb9f409bfeb0e48b1ce2949548d2",
+   "size": 391257,
+   "lfs": {
+    "sha256": "55c9f33d6b3728ded090749287efdd59d6e5ef81fd25ef3b6dc43540f94918fb",
+    "size": 391257,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-var2-0.png",
+   "blobId": "b150d42b4e25ad2b462a71f476cef94ddf558c08",
+   "size": 21202729,
+   "lfs": {
+    "sha256": "4d0e07b108c980569cc6fa6d7dbd93ddb147c4bdf7c44a97c56c93bfc89dc385",
+    "size": 21202729,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-var2-1.png",
+   "blobId": "c5f1c5e3a682dfbc761f6e43c1e1437d689dc2e7",
+   "size": 5015990,
+   "lfs": {
+    "sha256": "5fe607f8f7aad3b11a7552bedf51279ab5d528f1d9327faea5ee6404a39542b8",
+    "size": 5015990,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/og-point-var2.pt",
+   "blobId": "74f27e9c0a4694f2be6acd70c3c5191ad269de4d",
+   "size": 391257,
+   "lfs": {
+    "sha256": "49c3b1a89366a1ae82bc092f066ca6d3c1af14cfefcd64fd09d6400a6c5b7caf",
+    "size": 391257,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-bird-attack-0.png",
+   "blobId": "33822ea20d072a208071753444f588a5bfd7c299",
+   "size": 1997705,
+   "lfs": {
+    "sha256": "ade1d27882eb007ab1a5e9f60902d0cb43c94b058f78a8d4103b1a262f024579",
+    "size": 1997705,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-bird-attack-1.png",
+   "blobId": "3ff9e1c332734b824c6ed78563e015976eb542aa",
+   "size": 1955552,
+   "lfs": {
+    "sha256": "cc61f22d55c822df4738ed38537e26541e6dd20ac5553692692103e590e3ff3a",
+    "size": 1955552,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-bird-attack-2.png",
+   "blobId": "09443ca3e4ffaa2584a7e50f85d194bebd0d0011",
+   "size": 2016129,
+   "lfs": {
+    "sha256": "bf40a8e273e712463fd8f4bd71e85f120cc97e8a4e4e9e32649097eaf1c6a897",
+    "size": 2016129,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-bird-attack-3.png",
+   "blobId": "41a2e7150709c381c6923736d752b300e0aa7fc9",
+   "size": 1984317,
+   "lfs": {
+    "sha256": "2e38c484fadbadb622f7ea2337c7a35d5d97e18dfd07777cb167103af52cf386",
+    "size": 1984317,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-bird-attack-4.png",
+   "blobId": "e109721bb1409c6ce832de235f7f679e800476d3",
+   "size": 1976129,
+   "lfs": {
+    "sha256": "caad70a07ea476d9aa3a47987376a7d5f4c50601fa07d74cab291bd6f8852190",
+    "size": 1976129,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-bird-attack-5.png",
+   "blobId": "a76facfd2baae5c19049b1f64e48f5daefbe82c2",
+   "size": 1953200,
+   "lfs": {
+    "sha256": "72d84c79e259e369a260092b0438d1607ea2f6e9090259097704194c9fe1f41e",
+    "size": 1953200,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-bird-attack-6.png",
+   "blobId": "7547294a605238fe26a7e01943a684389d9aa0d0",
+   "size": 511929,
+   "lfs": {
+    "sha256": "0321841602506895e4b91a718e57f3c2fce39c13f19ad070877bd66085903fd7",
+    "size": 511929,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-bird-attack.pt",
+   "blobId": "f5cc3739fd0d3876672272d3325ffcbf08e94f96",
+   "size": 1931275,
+   "lfs": {
+    "sha256": "9fc3107a91422d32425e947fd5a88cf5ed063bdab24401f22780d497d601aca2",
+    "size": 1931275,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-dungeon-explorer1-0.png",
+   "blobId": "c06edc4eb46c6ff74f2fcbb9692409dff103b9ab",
+   "size": 5953153,
+   "lfs": {
+    "sha256": "8e3f1df203041a11ac9193aa9d83284a8d91420839c66833855db86723aa6c11",
+    "size": 5953153,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-dungeon-explorer1-1.png",
+   "blobId": "514de757d20595e9858e9c9e14c2b70b88f9d2b9",
+   "size": 6233539,
+   "lfs": {
+    "sha256": "b07a2bdac30b711c17a9f9c6dce3e62ffcf14181f7f6091b0d9657c02769b6e0",
+    "size": 6233539,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-dungeon-explorer1-2.png",
+   "blobId": "ffb8e848ac988c11e2383872868dde116cafc8d3",
+   "size": 6078153,
+   "lfs": {
+    "sha256": "1ca17c7766a1d6761d62d37c84d2205527e36997b35ec839dd2995757dfe77c2",
+    "size": 6078153,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-dungeon-explorer1-3.png",
+   "blobId": "a11e1c5c96faefff93da6b6599b4262af07f5677",
+   "size": 793143,
+   "lfs": {
+    "sha256": "be471d3bfe1be2fe532241dcc6e2d2cbcf9e913dbbbf177f47c2ce67e69b03c2",
+    "size": 793143,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-dungeon-explorer1.pt",
+   "blobId": "a121fdeef601606a1191663bd1ee91ecdda3dd95",
+   "size": 968967,
+   "lfs": {
+    "sha256": "8568a2912322449a6a1b5b1fad5c41a448da0e174e91c5f24f3d4951ffbd9183",
+    "size": 968967,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-foraging-0.png",
+   "blobId": "0c9639a2d9bd219ba3d103418a39b70588ea9a6c",
+   "size": 2025429,
+   "lfs": {
+    "sha256": "f86bd4a6733ab5af6f555a7843e57746b6000dede98f4786e49c7a713af2346a",
+    "size": 2025429,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-foraging-1.png",
+   "blobId": "16de2c1f6588263b23fdad95d53cbb35075a891c",
+   "size": 2002860,
+   "lfs": {
+    "sha256": "bda9b9135c1776e40ed8c9ecea53f6b13f024dd8ae80f980800d54d181cec9a3",
+    "size": 2002860,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-foraging-2.png",
+   "blobId": "81582ac8247ce8c8430158bceba13ed7eac7bca2",
+   "size": 2050707,
+   "lfs": {
+    "sha256": "7db23b2b9dc162aea15bd7ffd930844bc03b180fb94e1f1541bc42891a283ef2",
+    "size": 2050707,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-foraging-3.png",
+   "blobId": "a54c54b45647e6a7372cb9b09feb1ca8c6f5184e",
+   "size": 2036963,
+   "lfs": {
+    "sha256": "4190d3680590ea845ad5c432da1667ff40d0ea774138f94b1cb7733564f6b835",
+    "size": 2036963,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-foraging-4.png",
+   "blobId": "f07bf6ba776530aab372ff5b26ec999a068c5f24",
+   "size": 2052050,
+   "lfs": {
+    "sha256": "a7f2fa3bbb3de2cb66a59a63c31ac1d6183eb83fa286a1d483661b0fe187147e",
+    "size": 2052050,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-foraging-5.png",
+   "blobId": "10b4528fe605b192d6a674c44d3af74c96204fec",
+   "size": 2079615,
+   "lfs": {
+    "sha256": "691acf4e24afb3fc70309d7b28d20861e2ac609f5c62fa0c3b95bdad318a302d",
+    "size": 2079615,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-foraging-6.png",
+   "blobId": "029ec80ce7f86d115ebf9a7e76d477ee74bc1454",
+   "size": 509320,
+   "lfs": {
+    "sha256": "79fcf46b3962e1555e368e54f48646e132e055e25cdab66fe3235196c692367c",
+    "size": 509320,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-foraging.pt",
+   "blobId": "8d0f9a0e37fb815da4d5d820dbee26fa7d935a99",
+   "size": 1931245,
+   "lfs": {
+    "sha256": "e1dbfcf9e5e0c8e4da0457095ac2066e9343a2a1ce9c8aa7ff47ebbb42d8b85c",
+    "size": 1931245,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-point-maze-var1-0.png",
+   "blobId": "c489d1e9f15276cbe5c01baf4487547c2c3b3dfe",
+   "size": 5310273,
+   "lfs": {
+    "sha256": "92f2aef3543885d69d660e8247c4d8bbcd0034a87654d8c05d1aacee3fcf7ffa",
+    "size": 5310273,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-point-maze-var1-1.png",
+   "blobId": "4ff7e6554780bffd72919dfd59fad9f3d257cc69",
+   "size": 5189809,
+   "lfs": {
+    "sha256": "b1b6431dbb992eb42a64e42de1ed1b172812372ebb636835d4c65d96a8912ac4",
+    "size": 5189809,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-point-maze-var1-2.png",
+   "blobId": "302925a30e1b21c526739337e05a18adb9d52ce5",
+   "size": 2820476,
+   "lfs": {
+    "sha256": "fd68991c24319caf8dc18a7b55f9847bdefa784a3772ad836e10ff61f2450f4a",
+    "size": 2820476,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-point-maze-var1.pt",
+   "blobId": "18d0bb2d4fa5748010636c589922b0aff6785c5f",
+   "size": 776435,
+   "lfs": {
+    "sha256": "d65e36d0c7ea532dd98747b56bb8d447e52f49fa0cf7b09213261f4347f8882c",
+    "size": 776435,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-point-maze-var4-0.png",
+   "blobId": "cafa44881be70a9c6caba9a7bdcce0cab5b6e6e4",
+   "size": 5377314,
+   "lfs": {
+    "sha256": "4457319552618c2d5dc6addbb94a36f8a8989f494bb5cc81732c86cdb9aa4e31",
+    "size": 5377314,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-point-maze-var4-1.png",
+   "blobId": "53db9e66ce4258ec5fe8925831f8ca1aa908fe65",
+   "size": 5523745,
+   "lfs": {
+    "sha256": "2e6104b2f9e933ed6713296812f439578e90c9ecf97e56ff5a5cb335af7e87ad",
+    "size": 5523745,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-point-maze-var4-2.png",
+   "blobId": "a376df04e445b80a48b263b2743a779ab238cb4f",
+   "size": 2757663,
+   "lfs": {
+    "sha256": "f54f0ea3ab4aaa27fc5876b16dd3959ff5d62a3410c667cab2d1ea2449e7960d",
+    "size": 2757663,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-point-maze-var4.pt",
+   "blobId": "2460cb9424ea02f9ece64a9847abc4c1d923b306",
+   "size": 776435,
+   "lfs": {
+    "sha256": "9a0867b305ce6c33f5a127311838313ce48dcc1bd6bea17ea27d827024f6f82a",
+    "size": 776435,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-pong-0.png",
+   "blobId": "05842ed9b8f2da0079aad74915ca0e3a103615d6",
+   "size": 908572,
+   "lfs": {
+    "sha256": "d6a9f516cb363fb2b93e1036da379c90f79c08d334305bbcdfe4cdc503d7e4fc",
+    "size": 908572,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-pong-1.png",
+   "blobId": "cbd20895e71ea06344715dcc5f6ff9be8fdc23de",
+   "size": 903406,
+   "lfs": {
+    "sha256": "168a7038f824fa14dcaf89461351d5fa4a579bf710054321c678f6019c37a0ad",
+    "size": 903406,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-pong-2.png",
+   "blobId": "3ece08e86f2901e0c22cc70bb0bb6a991841626b",
+   "size": 890796,
+   "lfs": {
+    "sha256": "dc649e87efab8fa1cc9b79fcb9e0debda1327026af1f2e83560102058227cd1c",
+    "size": 890796,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-pong-3.png",
+   "blobId": "86077dcfd5eda7c95f214c2193925fd9a4cddc3f",
+   "size": 894134,
+   "lfs": {
+    "sha256": "761d517ff5f0e740ea1db28ac80f19950db32a348e31f74b21c6aff67b34899f",
+    "size": 894134,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-pong-4.png",
+   "blobId": "853ea6808db2b56cd727fa78e1a807b9a42fe2de",
+   "size": 910313,
+   "lfs": {
+    "sha256": "6ea88f5875ee8ffabad0f6e0929497f70af42b06df00434be1e138fe284b0192",
+    "size": 910313,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-pong-5.png",
+   "blobId": "c1d9519536153ecf723c912a3f56562d525849c1",
+   "size": 900933,
+   "lfs": {
+    "sha256": "4511c879cf7ee21bfc009d80f465f2c047de8d61a352d7dc83e67be63bc49025",
+    "size": 900933,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-pong-6.png",
+   "blobId": "28ac1aee47b6e15fef171b53fbc01c58cf421b7a",
+   "size": 225766,
+   "lfs": {
+    "sha256": "486c456cafd8f93e84175d51cb17f14814cfdc322ae6e9de5ec58029df6a2c14",
+    "size": 225766,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-pong.pt",
+   "blobId": "58604f16e4bdac6bc635f98ff49c995330d91b6a",
+   "size": 1931205,
+   "lfs": {
+    "sha256": "c6f5cfb1571baee7c168e5720b372682cd6d952cfe2f6186d1f78ae87152104e",
+    "size": 1931205,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-reacher-easy-0.png",
+   "blobId": "1aa3cd9bb93d53ad1537e9b024222a0810f63afb",
+   "size": 7325582,
+   "lfs": {
+    "sha256": "38f43df0984d06cc0531505fbf6c5f57efaa7de61b940481a95738471782a366",
+    "size": 7325582,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-reacher-easy-1.png",
+   "blobId": "b4f08f9ed42fda8f1737d753ab60cd42e7c84bac",
+   "size": 7224239,
+   "lfs": {
+    "sha256": "46726577fa2e6c5d570e240d1276af8a9c7844e518acf19ee2bd74a49295df53",
+    "size": 7224239,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-reacher-easy-2.png",
+   "blobId": "36e48f7c8ad5cbfa2154f910fac0f22604718beb",
+   "size": 3769082,
+   "lfs": {
+    "sha256": "ef8c4e81637a077cd3cd14b6abcb8dd65de4e2fe25a25916c42aea9fbc7924da",
+    "size": 3769082,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-reacher-easy.pt",
+   "blobId": "b98ae7f05ef7e462594a9f4a318512b498d70972",
+   "size": 776341,
+   "lfs": {
+    "sha256": "83884045c0eaa9ed2ad6d839d70b92a07c9204f9eb020c2c6bfc4fcda3ae04b9",
+    "size": 776341,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-whirlpool-0.png",
+   "blobId": "1c3ce2dc6267c3c8c8add6bf38584a21580a6b76",
+   "size": 20599260,
+   "lfs": {
+    "sha256": "754c85e21ab7d3c963a2483ce95db7936c28715040c2caef4f1966754a1bd0d6",
+    "size": 20599260,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-whirlpool-1.png",
+   "blobId": "c2a0793199e441a0be133c812cf28b0175d780bd",
+   "size": 20635578,
+   "lfs": {
+    "sha256": "9aa3813b62097b14f25516ad17e0f60e7f68b4d45bd182e7b09ab5f8192a2fab",
+    "size": 20635578,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-whirlpool-2.png",
+   "blobId": "9c487140a4be2c8c91783ea2d463904510a52ccf",
+   "size": 20267317,
+   "lfs": {
+    "sha256": "7e2b2d56f5fa8e510364d263d2b555747eb61ad08272816db039197f309c9fce",
+    "size": 20267317,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-whirlpool-3.png",
+   "blobId": "bbbdecb58146e38ac80cedda57622f804327dd54",
+   "size": 20602753,
+   "lfs": {
+    "sha256": "5d198f96101c92b6144aa88e097e1500bc75e97f890850fbace01d7a904eae1f",
+    "size": 20602753,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-whirlpool-4.png",
+   "blobId": "8c54e172d3c421540a64d1d80611da342ec9d430",
+   "size": 20481870,
+   "lfs": {
+    "sha256": "bb8544458abb2ff0bac0f02459e967814b63aac47fad9f100bec90ac8b404579",
+    "size": 20481870,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-whirlpool-5.png",
+   "blobId": "84c023b3d5ed51b567aba52dd564c358d51e06da",
+   "size": 21576688,
+   "lfs": {
+    "sha256": "788ea7bed7398ba2d149defc9de4912327cffc66e5896cb51927ab362faaf12e",
+    "size": 21576688,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-whirlpool-6.png",
+   "blobId": "acaaf15e760b5eca0a0d1d08cd9ba3d0820e04f5",
+   "size": 5143479,
+   "lfs": {
+    "sha256": "5978665504ce2609ca7b185e5ba81e9c28012c298c03a0a2c4d51c4727a4bc9f",
+    "size": 5143479,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_curiosity_u_r_norm/pygame-whirlpool.pt",
+   "blobId": "3c86755d6093308ded480d7f4beaf23716ef7145",
+   "size": 1931255,
+   "lfs": {
+    "sha256": "d781ce1fa18a56d24a94beaa7d99e27b987d79c973f57d03c2b0178d86537759",
+    "size": 1931255,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-0.png",
+   "blobId": "bb95a86027d835e3228ca90bb84c8654f15a65f0",
+   "size": 9618290,
+   "lfs": {
+    "sha256": "aa361ed87176e567b3b672c2a6ca29911c7a1a5eaa305cc6036d290a3dbe6956",
+    "size": 9618290,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-1.png",
+   "blobId": "6badbc0af2f50f6080e57c10f584b297147af7d1",
+   "size": 9468993,
+   "lfs": {
+    "sha256": "0ee0a960f7820e9f886f7e323f8071f69570ff6c63cc28ed6d34df802f5b2657",
+    "size": 9468993,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-2.png",
+   "blobId": "d05ae80e1fdcf4a367f0ff7b2dafe3f013e2a605",
+   "size": 9561476,
+   "lfs": {
+    "sha256": "9cb47b8b0b46858a335d94c28de6190e3c4ebe9b3627a098ce54a2901aa8f07c",
+    "size": 9561476,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-3.png",
+   "blobId": "40568c278f667582f23488ddf00144369e31de5a",
+   "size": 9628468,
+   "lfs": {
+    "sha256": "9b7e10762e0ddbcb42930764873b4fd50ce3f574c3d27f56a2ce594c202f26bc",
+    "size": 9628468,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-4.png",
+   "blobId": "102b87b2fc2dd027df05853c465f71c967aa42b5",
+   "size": 9597963,
+   "lfs": {
+    "sha256": "3eb0b454446927e93a4a8fee869217be05075b71a41075a0c5ec9582585a3a7f",
+    "size": 9597963,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-5.png",
+   "blobId": "9b1dbcf7b062596e0bd7d3fe658813521d6c0c51",
+   "size": 9494740,
+   "lfs": {
+    "sha256": "d1988ef4f986b6da683152655ae140a62ef0f6a3914a8736e97d3da88133360e",
+    "size": 9494740,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-6.png",
+   "blobId": "fad2fd67f1135e3cf3f0094860a498693603949c",
+   "size": 2425521,
+   "lfs": {
+    "sha256": "5ee115f0893a7a9314bd13dd4eb1589d19f0807c3c70abffafb2a847c788a3b0",
+    "size": 2425521,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-var1-0.png",
+   "blobId": "c784386bfa64443bcf967eea8bac5b9c45119da1",
+   "size": 8044968,
+   "lfs": {
+    "sha256": "d723b83fcdae74c5a5d3a7b0e27a4061e0d9ac01d5258ff12e692f8834f81083",
+    "size": 8044968,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-var1-1.png",
+   "blobId": "9c8b96fd0f352ef503d9ac8187402f4d74d0be2e",
+   "size": 8030321,
+   "lfs": {
+    "sha256": "4a58859ec6c8909614356e5a3840010526b81b1d8adcbeecfa4663fbff49b3a5",
+    "size": 8030321,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-var1-2.png",
+   "blobId": "b087528c8cff9d30e70b839bb2f840370ba7501b",
+   "size": 8039817,
+   "lfs": {
+    "sha256": "84294377f3cdc66cf711e01809f4dc0bb9b138eba89936ab7dee3f996401f3a4",
+    "size": 8039817,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-var1-3.png",
+   "blobId": "e7b8a7a826b5a20ba5c934a7fe8abdecff4b95fc",
+   "size": 8023265,
+   "lfs": {
+    "sha256": "9e955d606b0ab852f09e74a7860bf555b8e68f349d51abf93146504af9c5705e",
+    "size": 8023265,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-var1-4.png",
+   "blobId": "2d76623f5a4719b728e6f20e8e8f13763df36670",
+   "size": 8045792,
+   "lfs": {
+    "sha256": "46aeb93792b80f8356bba679d123586ea337b8f56320bfa4727f0b12842396b8",
+    "size": 8045792,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-var1-5.png",
+   "blobId": "92d589f57cf9cf179976d93e42c805903090e90a",
+   "size": 8008170,
+   "lfs": {
+    "sha256": "0c89cabec43da0b1520f738231aedb6705412475ffb3e54d177c60e99cca7cab",
+    "size": 8008170,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-var1-6.png",
+   "blobId": "72062acfed5aec7b5dadee0cbaa439e923bb6900",
+   "size": 2009458,
+   "lfs": {
+    "sha256": "b8dcd241d03f8c7a72733bd7bc0b7d43ad9047bcafd2d235774982805ef3d8ff",
+    "size": 2009458,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch-var1.pt",
+   "blobId": "fa04e96d69da80d88bf06b0a57030fa3dee8a1e5",
+   "size": 14757350,
+   "lfs": {
+    "sha256": "e4736079e71f8d9d6a45cfd3af05551f374ba27cd677c26e55b9011012d03da6",
+    "size": 14757350,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/cup-catch.pt",
+   "blobId": "029d4e004ccf28ca098197cc2087265ac54da0b7",
+   "size": 14757295,
+   "lfs": {
+    "sha256": "2ba30d5fe862710ead58d8d31d72e5ced93559168951a44d32b94740ecb48e6b",
+    "size": 14757295,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-0.png",
+   "blobId": "fa04ab0d9ccf764719ed273384b5f8d79fe288eb",
+   "size": 14872026,
+   "lfs": {
+    "sha256": "f22e5fe41d3e0bd5c24e569ce5490d68324116c5d45c2ef82f39efc3ed9cf6a2",
+    "size": 14872026,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-1.png",
+   "blobId": "48734d78d5da09f1f20bbf915f736f2d18f8839a",
+   "size": 15050581,
+   "lfs": {
+    "sha256": "170a96c172662c7479397da6a46dc9619c6481502f7b1c2254393483e1ed9b7d",
+    "size": 15050581,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-2.png",
+   "blobId": "589397c1a462f6a748efcf28951f071a769cf9d6",
+   "size": 15669852,
+   "lfs": {
+    "sha256": "f759154f9344ad457bbe430f67605c19feb0d0b587ddf9825c1f6ef3692d153c",
+    "size": 15669852,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-3.png",
+   "blobId": "9b6cbc4317b0484f24bcad412cbdc22a8fb400e4",
+   "size": 15145233,
+   "lfs": {
+    "sha256": "9ac5d3e9ad8e406e7a9b8237fee266fd7640009d89fb35451a753ab734946ed4",
+    "size": 15145233,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-4.png",
+   "blobId": "63ec9ddd11e816127510801f50115448cb246bd8",
+   "size": 15112206,
+   "lfs": {
+    "sha256": "31117cfa54136a6b48a1ec67393a7bb947d1af3b56613017251171aab5cd7717",
+    "size": 15112206,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-5.png",
+   "blobId": "cde0e71f429292ada3a2006334d6d4ecc2550cb6",
+   "size": 14750481,
+   "lfs": {
+    "sha256": "45f2e8293e22de9f64d90f04431137d1b788f212682320e9a0e6df7bfe68f9a2",
+    "size": 14750481,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-6.png",
+   "blobId": "a6ddcac7063ec0c9d6ca4d8f76a4e3e6fcb579e4",
+   "size": 3837192,
+   "lfs": {
+    "sha256": "1ceffa45d90b0e1c1f5c3e18b71f36c82d9193822d1cca69fbaab53d8f3707c2",
+    "size": 3837192,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-var1-0.png",
+   "blobId": "43c87a53732e9818e55b7f0b44789cfe4fac9025",
+   "size": 13792923,
+   "lfs": {
+    "sha256": "6e07f33e30917637addf2cd25435b3435482ed456d26c91b09f18057a0ff1286",
+    "size": 13792923,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-var1-1.png",
+   "blobId": "b492551515e7c77cf07b9c433613353db9bbd293",
+   "size": 15307918,
+   "lfs": {
+    "sha256": "059a5cccc4492664ca4310b36db72e4616be01c902b62940b4ce4c80a4b00375",
+    "size": 15307918,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-var1-2.png",
+   "blobId": "d2cbd64cd39b9e85413c3904fdad40eb36d3d096",
+   "size": 14151178,
+   "lfs": {
+    "sha256": "5ac18ab2b9b6005d5837f883bbce4e6f8c1d471b3d0dcb13b9f2b99f88ef75f9",
+    "size": 14151178,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-var1-3.png",
+   "blobId": "2cfb72b0c064e935b0fecedf869d9730aa7683f7",
+   "size": 14239340,
+   "lfs": {
+    "sha256": "07504c179c34f629ad20f7ec45c675a543617c11d975e149851b9da2e9d62bfc",
+    "size": 14239340,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-var1-4.png",
+   "blobId": "36fe72519891f60e05f4a71b3a965b62273b5362",
+   "size": 13509152,
+   "lfs": {
+    "sha256": "742e9162dccd6bcf0363f284c43d6d9b319b33dd11da60e65d944c61cf3bcc88",
+    "size": 13509152,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-var1-5.png",
+   "blobId": "b140c3489e2f671a84145269db7952096882cf20",
+   "size": 15117271,
+   "lfs": {
+    "sha256": "d560e4b99eaff728960ac8f54ea36b6b6c44a06c87c9858430b3195f4350e2a9",
+    "size": 15117271,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-var1-6.png",
+   "blobId": "b6223e9e49cb6df6819920358f10d9017f540235",
+   "size": 3519471,
+   "lfs": {
+    "sha256": "6dd91d551aa261e6034874510449fb576f983c3bc8260793082fd3ba5f522f60",
+    "size": 3519471,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy-var1.pt",
+   "blobId": "858020d333726c797d921591798b58b1c13114a6",
+   "size": 14757491,
+   "lfs": {
+    "sha256": "ee4ae0d735c3c7fc03ac0df61f4fc4b791fb16cedcc179c66136ff5a78c5c0ea",
+    "size": 14757491,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/finger-turn-easy.pt",
+   "blobId": "751cf83b3f33c07dcf9bd4d064e46d6b265aea11",
+   "size": 14757436,
+   "lfs": {
+    "sha256": "77aa30632377dc8b8005faabc05358ceef1d6dc95a4d8126cb65cbb085549e88",
+    "size": 14757436,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/lunarlander-hover-0.png",
+   "blobId": "0b3593832896238e88f4b454473687a0f627f763",
+   "size": 6856460,
+   "lfs": {
+    "sha256": "512f352ecc09f03f00945c0ddd84a65514dd05a3446f32d176461d9e96d66f14",
+    "size": 6856460,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/lunarlander-hover-1.png",
+   "blobId": "02bb10e3d59593194a90e9b2974bbedc87f98b93",
+   "size": 6917224,
+   "lfs": {
+    "sha256": "1bd6ae5844399f760c7625def9a0adee58cd4d143da964b671854e7cdd5dde05",
+    "size": 6917224,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/lunarlander-hover-2.png",
+   "blobId": "5709f2b57bf813e0d1818d6e6c9909d67f9de5f7",
+   "size": 6886298,
+   "lfs": {
+    "sha256": "65c30c86abc15ee79abae196089d5ad16f6aae8025943f85521143a746824160",
+    "size": 6886298,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/lunarlander-hover-3.png",
+   "blobId": "d1ea1c0cae47489566814d70861f80174d43a0a6",
+   "size": 887134,
+   "lfs": {
+    "sha256": "ab6f7d35c3b8de4a2f5f90ec675259583ff6d339ce3c8658c365f16ac5aafefc",
+    "size": 887134,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/lunarlander-hover.pt",
+   "blobId": "e3d7ffa25f376e232264261b46e1036559d88322",
+   "size": 7394951,
+   "lfs": {
+    "sha256": "3e5a62c4aef9c148caf9e2c1576511a10e94fa8e7abbe282cfa831841c670400",
+    "size": 7394951,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/ms-push-banana-0.png",
+   "blobId": "f14fef07615d6490e974931ee4a411c58231434c",
+   "size": 4593487,
+   "lfs": {
+    "sha256": "a36b3332da63154e03c4422c0f671513637b7a8d98e3c2496246a8154a70e6ae",
+    "size": 4593487,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/ms-push-banana.pt",
+   "blobId": "7cb0767a840db17c351fd6d08da972b9e9d31527",
+   "size": 768614,
+   "lfs": {
+    "sha256": "0ad16cfda25979ac234267434c98865958ed6fac3899306c587307ee2b1251f5",
+    "size": 768614,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/ms-push-cube-0.png",
+   "blobId": "682fac1d77af56e0bea642d4df58d167d74ccd3b",
+   "size": 6679284,
+   "lfs": {
+    "sha256": "3949d1a90dd48820aa757b425df4f9c733f91199bc901cd3ce1938c9a885e467",
+    "size": 6679284,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/ms-push-cube.pt",
+   "blobId": "ce6b971b62efa96c07c9e7ad33a352bd09b5b35e",
+   "size": 768592,
+   "lfs": {
+    "sha256": "078b21e18e77e6a135ab90a0866a1b2d279eca12ad2f9b8982d7f09332b1a8e1",
+    "size": 768592,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/mw-push-0.png",
+   "blobId": "27420f665ae9d339e87fa500106e752431eb5d27",
+   "size": 43928300,
+   "lfs": {
+    "sha256": "544f34ce88265e1a8754c375b1838881fe0d7880cbb364a0eb96c9d14373f413",
+    "size": 43928300,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/mw-push-1.png",
+   "blobId": "3c4638670f1c2c872265068ee60307080e44645b",
+   "size": 11236741,
+   "lfs": {
+    "sha256": "5d766a8eb8ec38df0c1669f1e91bfc602e69532313731d2a8fa1db024d6f74f0",
+    "size": 11236741,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/mw-push.pt",
+   "blobId": "8d55810f663b3bcc17a31eb6247e8405e9837d88",
+   "size": 2977113,
+   "lfs": {
+    "sha256": "41a359a39d186a06b16273d88440235fdb7412834dc062e3bbbe577bd4fb0469",
+    "size": 2977113,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-bottleneck-0.png",
+   "blobId": "06359ec0e330c69ba0e29d935ab44a396a81b8e8",
+   "size": 20103075,
+   "lfs": {
+    "sha256": "38b65208dbd2a2e91a3287f051d84e1c14d18a635a0e43b1451aa58d2a6df27b",
+    "size": 20103075,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-bottleneck-1.png",
+   "blobId": "138ce0940d6e65315e8ceb64abb1941c8825497e",
+   "size": 4968840,
+   "lfs": {
+    "sha256": "b77901b6fa197d7bcf9eeb5451bbf5af887469cee1682817c6d6bb09357e420e",
+    "size": 4968840,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-bottleneck.pt",
+   "blobId": "46266802dac7527cad29cd214261ebe088492d95",
+   "size": 2977501,
+   "lfs": {
+    "sha256": "00dd97c78fd14a3a9c4da09de7da3d934eb37faf3b76bb9e15b7497492f39639",
+    "size": 2977501,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-maze-0.png",
+   "blobId": "26826ea57cffc4511932d6eac863e85d21a7ca47",
+   "size": 18567126,
+   "lfs": {
+    "sha256": "09f03a58743809117dfda685a1e382ece3649a62baaa19daf5469d9e59505b86",
+    "size": 18567126,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-maze-1.png",
+   "blobId": "9e559161d1c3ed07ce5d15f2e68cccc9f822d16d",
+   "size": 4827017,
+   "lfs": {
+    "sha256": "69fd6da151ce44c77569a11d1cfcb69490332839d8dd54b7d930559d1cd0ae2f",
+    "size": 4827017,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-maze.pt",
+   "blobId": "756e376f836286d682751c94a6db1336ff0cac16",
+   "size": 2977307,
+   "lfs": {
+    "sha256": "7dd6f5c3dedb28cf17efc9013c85587faf3a678d085491eb2ef3dc639ed67fcf",
+    "size": 2977307,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-var1-0.png",
+   "blobId": "b5193b7d903c6180245f82b5100c895686d3715b",
+   "size": 20231960,
+   "lfs": {
+    "sha256": "e57792f4878717be76440513939cde296686c4137b9725e88173b86796c4f0d4",
+    "size": 20231960,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-var1-1.png",
+   "blobId": "711a0f76a15c4b3f134e8c1a86f3738e0439f185",
+   "size": 5418373,
+   "lfs": {
+    "sha256": "b7abcad3a0288b8eae8ae1bbf49532cf8c8ffe7db6ebad3a124430f5f039a9ae",
+    "size": 5418373,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-var1.pt",
+   "blobId": "f328b28269ea274c39c2ab1a3d24c33b5786eb1d",
+   "size": 2977307,
+   "lfs": {
+    "sha256": "b2b774417c334087070611e580280ce38cdc8f2a564471ee656ff04defcd5a7a",
+    "size": 2977307,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-var2-0.png",
+   "blobId": "8fd961a6eba06df91b06705520c87da5a8a62e51",
+   "size": 22096484,
+   "lfs": {
+    "sha256": "63786857a727fbfa1f3a98ce511e7a3fe84b706a446f231f73ee6df82e6e6e50",
+    "size": 22096484,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-var2-1.png",
+   "blobId": "267872017a1869706bf16cc5d4896cd2e2c49f10",
+   "size": 5449002,
+   "lfs": {
+    "sha256": "2b17fc5dc46c27bee192066b48c8922ad704f9e624d9362ff823178fd283dd33",
+    "size": 5449002,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/og-point-var2.pt",
+   "blobId": "182bacf3f36bce4450aad6bdbb784e74323aeeff",
+   "size": 2977307,
+   "lfs": {
+    "sha256": "7d6d096efb9dc8a59b3f55e4fd18ddf23faeb76b1b38abd5879f5d65518820e7",
+    "size": 2977307,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-bird-attack-0.png",
+   "blobId": "34af5d1741fe12efd54d647573f5395dd67aea37",
+   "size": 1638687,
+   "lfs": {
+    "sha256": "11c58c059d172cce6e682590b5310dfd6dc6ef7aaf9fd03474801f81f886acd8",
+    "size": 1638687,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-bird-attack-1.png",
+   "blobId": "753b01f0209faf86cc6c5a2f5ddde8496895b82b",
+   "size": 1629004,
+   "lfs": {
+    "sha256": "b5ca80b4c6cab74df1072a4d11e1cd5297716ef5e74c86c2ab6ad32e0a45f71a",
+    "size": 1629004,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-bird-attack-2.png",
+   "blobId": "6e2e89a0c504dfa774156c115fe6dd8013ad78b7",
+   "size": 1631733,
+   "lfs": {
+    "sha256": "62d235cb713f9da15f53d01c58896c1c1904e3d7d2abb1d82f6e280615c1c4f8",
+    "size": 1631733,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-bird-attack-3.png",
+   "blobId": "48e904b39af7bdebf8a4051728e262d2a7152b19",
+   "size": 1608092,
+   "lfs": {
+    "sha256": "1ff976974231237e463bf4a785639f044512052ad26eaea0c887c71780fba71f",
+    "size": 1608092,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-bird-attack-4.png",
+   "blobId": "be8dd30f1d42f5b5bb1df505b5486171145fe695",
+   "size": 1635019,
+   "lfs": {
+    "sha256": "69aace9b3ae550fbc3d392582d121f8638250e4f72548d3142529d2b65d0f1a0",
+    "size": 1635019,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-bird-attack-5.png",
+   "blobId": "242ff0aac32e02e20c53db94257cb9b540d6d0f7",
+   "size": 1614297,
+   "lfs": {
+    "sha256": "eac969f5ef4b2694084d304349d5eb264fecb11fdfc111b99785c690ae235873",
+    "size": 1614297,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-bird-attack-6.png",
+   "blobId": "e78cb9f3a273fa993a64461d042c15fa8048ad1d",
+   "size": 408766,
+   "lfs": {
+    "sha256": "04e25f87c693d53187be2b5cdc753610d588c244a65bdb9a5ede665d2b4f7638",
+    "size": 408766,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-bird-attack.pt",
+   "blobId": "108c20893b5dbe3ca3ad9871495915d6bb8b7f4f",
+   "size": 14757458,
+   "lfs": {
+    "sha256": "672a9d94897ad1fab2705048b41c8e857069a5c83baa5c157972af2477d37c5c",
+    "size": 14757458,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-dungeon-explorer1-0.png",
+   "blobId": "7eb64f45c70588aadeae187cbe71a5ff669f70f2",
+   "size": 10607966,
+   "lfs": {
+    "sha256": "546d249662c0591bcc5022cb73d502b2711e498a345af663daaf133da058eee3",
+    "size": 10607966,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-dungeon-explorer1-1.png",
+   "blobId": "8cb2787535c0d05167beeb0d5caaf5271d8c51d4",
+   "size": 10351475,
+   "lfs": {
+    "sha256": "4943e9d6d3c0072a684769139debda877167dfa50822b57311d4efa8ad8159a1",
+    "size": 10351475,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-dungeon-explorer1-2.png",
+   "blobId": "d3cb99d6dcad4c7bbf354a49b5d033687aeef739",
+   "size": 10114125,
+   "lfs": {
+    "sha256": "d77d81f81d7cc0094e0ce053e2a119c717af4dc9f5c44630a17e974cbeb72021",
+    "size": 10114125,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-dungeon-explorer1-3.png",
+   "blobId": "2acac24554bb618c95ca8195c7787e77f7b23d90",
+   "size": 1366459,
+   "lfs": {
+    "sha256": "938d1863b34fce8fecb244af9661dbc26e88172130f380cfcff8d3c9989338db",
+    "size": 1366459,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-dungeon-explorer1.pt",
+   "blobId": "99a574ef7b95b7aa7040cf553cf08df9e2fe65e8",
+   "size": 7395156,
+   "lfs": {
+    "sha256": "1e703b6b49bd8d2b2bcd7d8d09e1cbb0620fa64c79de8343c052bc34ef1f8377",
+    "size": 7395156,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-foraging-0.png",
+   "blobId": "35b69f138ab555774d2524c61da0a00467d82839",
+   "size": 2034747,
+   "lfs": {
+    "sha256": "9ac38f0f23cc2310107854b62f912b2d3d7e36326beaa73aaf67eb984e1212be",
+    "size": 2034747,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-foraging-1.png",
+   "blobId": "d7fd895c0d7650ed3770dfe4872a5c7a17acd03f",
+   "size": 2021294,
+   "lfs": {
+    "sha256": "bc87d8694699e6788d835d3f7e624358d7da483ea8e93d7fe2ee9ff10962fc4b",
+    "size": 2021294,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-foraging-2.png",
+   "blobId": "3f7176831db7489c9c3ccf125dd80ad8fc0ac3e0",
+   "size": 2060713,
+   "lfs": {
+    "sha256": "443696465e1053029d877b6e25ce1772cc7c802202bd8ddc3b3ab3c3581eed78",
+    "size": 2060713,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-foraging-3.png",
+   "blobId": "8f7a4785d418940dc088c0c4952969f9d4838632",
+   "size": 1949517,
+   "lfs": {
+    "sha256": "4074dc881f83e0880ebe56aa0a36c8e3b42e1af38ed377f7e3c18a0ca0ee494f",
+    "size": 1949517,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-foraging-4.png",
+   "blobId": "fe75bfc644da26fe421cdc3e29f4d089336e6fd1",
+   "size": 2040492,
+   "lfs": {
+    "sha256": "faa1d79a337a5fa306e67b30192352ea0f813991607eeeaf55a071195ac81bdd",
+    "size": 2040492,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-foraging-5.png",
+   "blobId": "f987b2e706c6673da01b0c28a28dfd78de338034",
+   "size": 1936899,
+   "lfs": {
+    "sha256": "30b9ce4c98da1e160509acaf7915b1d72bd5951567c3c8f92baccb26bf8cde7e",
+    "size": 1936899,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-foraging-6.png",
+   "blobId": "8746049a609d806e9ec9e0e9ac2bd2ae181137a8",
+   "size": 535254,
+   "lfs": {
+    "sha256": "86f8329a293ab606c408585d740257db9af64872f63c000f9304206caa75413b",
+    "size": 535254,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-foraging.pt",
+   "blobId": "557ec2a636b3aaff927b5dcf1212d31191fbc461",
+   "size": 14757425,
+   "lfs": {
+    "sha256": "789ed409accfdb7d1d953f6fda5649fca5ea04da610b86759b0220ca437dc1c1",
+    "size": 14757425,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-point-maze-var1-0.png",
+   "blobId": "885b53fcfdec3c86aec847769e7abf3d054ddc8a",
+   "size": 3991724,
+   "lfs": {
+    "sha256": "39db36e7e9ed7f37e48d69f76ecb94257313418c41f3421de0aec30e1c3f34e4",
+    "size": 3991724,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-point-maze-var1-1.png",
+   "blobId": "d876a9c4df7d5e4441ea7a3021a6ecacc7a32725",
+   "size": 3948884,
+   "lfs": {
+    "sha256": "0ccc49b1130f2d4ea8215ef9b6ef194dc8caecada7102a4d81af88069b599a7d",
+    "size": 3948884,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-point-maze-var1-2.png",
+   "blobId": "08c7bccdb70ac87714530039f38e32ff0bc2dab3",
+   "size": 2052600,
+   "lfs": {
+    "sha256": "2b928c0a0a455f7deaa8209c32680dc08524fecbc96f8676b25a8842d1d258fd",
+    "size": 2052600,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-point-maze-var1.pt",
+   "blobId": "956a2391b06c8483e6bb43b2be5687639f89c5ed",
+   "size": 5922622,
+   "lfs": {
+    "sha256": "2c42493249d2137036c5676565bf35193c35bf4b3c57b7a291454a162024f8e7",
+    "size": 5922622,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-point-maze-var4-0.png",
+   "blobId": "00d522e95f2f0af7ba5f4b9715c40100a34a22e9",
+   "size": 4153551,
+   "lfs": {
+    "sha256": "f9ef6fb6add71193df16fe016e84e2909029ad2052d87207fca05acd1f03372e",
+    "size": 4153551,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-point-maze-var4-1.png",
+   "blobId": "84e4f4f71fc70baa22a614a137c9d1318ff673e1",
+   "size": 3982824,
+   "lfs": {
+    "sha256": "749721e7b4bd1b290a83beab83880337d396bfbbf4b0ea63c53a746705ef1ded",
+    "size": 3982824,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-point-maze-var4-2.png",
+   "blobId": "1106762f4b4b88e6e95492a98becb886b8da41a5",
+   "size": 2090562,
+   "lfs": {
+    "sha256": "12cc775f14907ea33c8eceecec14dc0b9161647cb155ac64e7113c994ebb5dd6",
+    "size": 2090562,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-point-maze-var4.pt",
+   "blobId": "ba83ffc797ac86b752c4924846d2598ea446b2c7",
+   "size": 5922622,
+   "lfs": {
+    "sha256": "5331b831c0fb4bfb1ac31bcc3b5b88aeb126d4923702d44b396ff64c6d050edd",
+    "size": 5922622,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-pong-0.png",
+   "blobId": "e3ca1ec85b208d50a8af55f65a6bc6e735b4af31",
+   "size": 898952,
+   "lfs": {
+    "sha256": "e24af8948b09004dbe07f14cb36082b01b730200f1b15adf83fc43670ded8719",
+    "size": 898952,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-pong-1.png",
+   "blobId": "8cd75b6d0dfa27204054057378efba5b06236e9c",
+   "size": 907720,
+   "lfs": {
+    "sha256": "e41f518920e315867ccfa44e6e62f0233e9a7a6ff62922ae293621ad7cabedb6",
+    "size": 907720,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-pong-2.png",
+   "blobId": "8e452ecd45d2ebafbb95dc33c0991a09696d3412",
+   "size": 899049,
+   "lfs": {
+    "sha256": "953dc139dcef3c71f8d2995cde65eadf852dc6ba1760cc758cd2a27f6da14003",
+    "size": 899049,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-pong-3.png",
+   "blobId": "818b90d7672e984227c743fb303ed2fd7bde692e",
+   "size": 898003,
+   "lfs": {
+    "sha256": "148a052a02ca2f91c59b88e133c41fce5b722985c8bde38301c6b23080392299",
+    "size": 898003,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-pong-4.png",
+   "blobId": "2fa23b52bf07795c7016f2e34e2463d7da6a3129",
+   "size": 901934,
+   "lfs": {
+    "sha256": "710c537af5c62c1f4431691a6ac9cd40f4bee2d689c23a062e04f06b4447f4e2",
+    "size": 901934,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-pong-5.png",
+   "blobId": "a654796df10e9670d953ca894d70fa7f583403cd",
+   "size": 904231,
+   "lfs": {
+    "sha256": "08990a8d6fbfa583743cab1606385e200401f57f283533c8cc7934d3d350921d",
+    "size": 904231,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-pong-6.png",
+   "blobId": "1233b6fef4d4402d077f4758a6f7cac51b6f17aa",
+   "size": 229910,
+   "lfs": {
+    "sha256": "244f3b6f3931d5e23b337d77bc7899daf721e1f396f1b1d4dd0d34fb7805ea42",
+    "size": 229910,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-pong.pt",
+   "blobId": "7a13929bc5d9b78fa72c8852710b66b7034ced39",
+   "size": 14757317,
+   "lfs": {
+    "sha256": "790bf6324e2edd721191976031a0b224f2246b4e74ce9a235008528f7f59f4f9",
+    "size": 14757317,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-reacher-easy-0.png",
+   "blobId": "739e217a3a1dfe1563d5dd571cee5a52a3f46842",
+   "size": 6287289,
+   "lfs": {
+    "sha256": "161ecd9ff759aea48f1cee03abeefb1c84bea648fcbc634f681f9d140b2439a1",
+    "size": 6287289,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-reacher-easy-1.png",
+   "blobId": "619ba1925aad1df52ac944cf20022853a87da016",
+   "size": 6222620,
+   "lfs": {
+    "sha256": "a0d3ec464596f10d3f1030b1d46a7c49e7e11188e436f6d10beb2381b56df327",
+    "size": 6222620,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-reacher-easy-2.png",
+   "blobId": "cceab6cc0d53a0e754280a40c70f1addf3d31cd2",
+   "size": 3181887,
+   "lfs": {
+    "sha256": "d124bc3bf127bada9622ce91b3c66cebd70e355f0ee1fcd4e6d5748be7d8959a",
+    "size": 3181887,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-reacher-easy.pt",
+   "blobId": "cfed48519a912e23ebc8837f262e6cbc680f15a9",
+   "size": 5922525,
+   "lfs": {
+    "sha256": "2aeefec74964012c1157f39c675284c2d8353a2c6232dfd9db81705b91a94586",
+    "size": 5922525,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-whirlpool-0.png",
+   "blobId": "c6dc1b8c2beee096a5e1680eb2e0a71115573cbb",
+   "size": 18407476,
+   "lfs": {
+    "sha256": "a28535a639813e34865abf27bfd88b627e453abe883aae5666890f08aa21cdb3",
+    "size": 18407476,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-whirlpool-1.png",
+   "blobId": "b8bf67ab868d7095515332c7fba84c92e6f173e4",
+   "size": 18158504,
+   "lfs": {
+    "sha256": "887ad89ceef081c18d6ab7957b4fe2db3865f4ceec3dc7807bb732e05a3bdbeb",
+    "size": 18158504,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-whirlpool-2.png",
+   "blobId": "eb7dab23769001d8e2da84d6448687d62ae472b2",
+   "size": 18334249,
+   "lfs": {
+    "sha256": "cd331b925fbe681a3fdc2ad1bb29bf83e56f9b61f3bfbdd9a0449f31f2779889",
+    "size": 18334249,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-whirlpool-3.png",
+   "blobId": "b912f779aeb3beb10a4b6467992330a20d1f04d7",
+   "size": 18314274,
+   "lfs": {
+    "sha256": "85a6bb30da3dc8bce2c9c1799e00ab1d6f5adbe06401a5519d43337e46d299a9",
+    "size": 18314274,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-whirlpool-4.png",
+   "blobId": "549f2cb99b5d18f1a7926b56c38973994f024a67",
+   "size": 18303393,
+   "lfs": {
+    "sha256": "00e5f366f061f0a3c8f4cb27cd87c1830d3a18753d712a4bc3ac9f8971201ac2",
+    "size": 18303393,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-whirlpool-5.png",
+   "blobId": "154db57760f72775f236195a3424f70ed7ed2118",
+   "size": 18383416,
+   "lfs": {
+    "sha256": "7becc0fc1791c1639f36b8db64f4dd36d42eb79683753e76e9c4567f763195c3",
+    "size": 18383416,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-whirlpool-6.png",
+   "blobId": "0e9a63b58da2b9b13fc05d7ac909499a45c5e3fd",
+   "size": 4590581,
+   "lfs": {
+    "sha256": "00592a9c8c835df98c61b8179ea7ad057aea7af7875cee0d086ce3f7c9da1541",
+    "size": 4590581,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_expert/pygame-whirlpool.pt",
+   "blobId": "421bbfc7fbc95fe833a15a85d2e5a80be6052224",
+   "size": 14757436,
+   "lfs": {
+    "sha256": "24a5e31a9c957497ff2285c802a3aea83490c6e9694a28cf0c6a21a97ffca105",
+    "size": 14757436,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-0.png",
+   "blobId": "1e7884e68dbb3440e27816ae6f5993b55a3a5400",
+   "size": 13964385,
+   "lfs": {
+    "sha256": "969cbd22205dcce87c363d319bca5af83a626dccb96cf54654df8eacfa7279c8",
+    "size": 13964385,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-1.png",
+   "blobId": "0b46b0cc135c16c83f43e0dd3282c9ea61c9f8a7",
+   "size": 13691933,
+   "lfs": {
+    "sha256": "701f3a5685f3d59541dd33057e2c18831bd61f2beed3fc7e1497c9bf7a950d34",
+    "size": 13691933,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-2.png",
+   "blobId": "83860074fce971c88f57ed8c9224a9161ebc9ed3",
+   "size": 14171030,
+   "lfs": {
+    "sha256": "8038db96d0c7df27a24b02cffbe30ec7ceccdd8a8d4efbdf2c51fe2d73f311bb",
+    "size": 14171030,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-3.png",
+   "blobId": "a343c048ef532f9d4262992e2c34707f78ea0ba2",
+   "size": 14268950,
+   "lfs": {
+    "sha256": "890d253910c81b5a9f9b4ab9ac4f3dda7a012331b8057f6a87334d8f79356ee1",
+    "size": 14268950,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-4.png",
+   "blobId": "e564b462cbead02b84504991b2092d5a1887e369",
+   "size": 14232668,
+   "lfs": {
+    "sha256": "ac6a4505208c690b1bd2255ebccc2da2e7ec218c65fec56f82d2e1b257431683",
+    "size": 14232668,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-5.png",
+   "blobId": "6bdb4911a052a0e4924daa1eb479a8bbe9198b2f",
+   "size": 14038107,
+   "lfs": {
+    "sha256": "76a50cad289a20a30de896a66a11d485c23759a105701ba5ac877d927077c3d5",
+    "size": 14038107,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-6.png",
+   "blobId": "3e0f39e06409c63abc6b4542167c169fe8b4dcc2",
+   "size": 3699573,
+   "lfs": {
+    "sha256": "3cdd1a8f5dc3feca37134cbabf97864554eadaada57a18f14e2faaf90e204842",
+    "size": 3699573,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-var1-0.png",
+   "blobId": "57b5f60d98ba1c132259b457e4d720246f8def09",
+   "size": 8464288,
+   "lfs": {
+    "sha256": "d560de35db510dd9f2a723e712c3cffa8e8ff2ec09e34c3b0df1f275776790b7",
+    "size": 8464288,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-var1-1.png",
+   "blobId": "1c582ecd2ebbeb7196f29d2d2e7c46cc3da44a61",
+   "size": 8901298,
+   "lfs": {
+    "sha256": "125e2eec7b292d6a553d8f61e8b9cd0d1f956da442b6ea3a01daab68502e9dcb",
+    "size": 8901298,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-var1-2.png",
+   "blobId": "86d323811e6047d7e152204eaf2dddef913f5f7c",
+   "size": 9103319,
+   "lfs": {
+    "sha256": "5a562ffa747c312db3c39cae0136f4a64f3897945e51337d11d2bcc19e0dc6b5",
+    "size": 9103319,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-var1-3.png",
+   "blobId": "08eb87102633b0d80057e064ddfd07c45423fce0",
+   "size": 9352164,
+   "lfs": {
+    "sha256": "c76acbeb4192d8234629a36b17812863e8aec3eaf6554e91925c503a2e48b90f",
+    "size": 9352164,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-var1-4.png",
+   "blobId": "8b7d1de1cdc4ad3f8b58db2a28cfeb6001983dab",
+   "size": 9117176,
+   "lfs": {
+    "sha256": "fb07f2736556a676a6b76f99ea97a810a7fac35ca510c3c37af452c847bdd252",
+    "size": 9117176,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-var1-5.png",
+   "blobId": "df684eb80aaa09dbf05e897cc9627d165dbe812f",
+   "size": 9108502,
+   "lfs": {
+    "sha256": "ccf96d4116b763e90e47b7fd3051e56cd9c1249a027bcbba2e298bf5c836ff67",
+    "size": 9108502,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-var1-6.png",
+   "blobId": "97d04c0cef7317d45a6b3da341b0a4d5e3215318",
+   "size": 2124756,
+   "lfs": {
+    "sha256": "d8a533019e91b2b6f3495e8b459a1e3bc5a995e65104d2bd1d98fec63667c8c2",
+    "size": 2124756,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch-var1.pt",
+   "blobId": "4627b299cf8a23e8b0feec47ae56305b9e2db5ef",
+   "size": 1931235,
+   "lfs": {
+    "sha256": "59dbcfbac62e1758ef0c271e2c961e19b36cca33170a3d71d1fc2093e792e766",
+    "size": 1931235,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/cup-catch.pt",
+   "blobId": "7a1ec9aee0b130f15950c3faea8b4f774b62adab",
+   "size": 1931185,
+   "lfs": {
+    "sha256": "5a615bd4e135914e3289a5518f5e4f3bb6f83cac8524177e533b65a5b7a2ab25",
+    "size": 1931185,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-0.png",
+   "blobId": "be9e187830d7701918602e52b65f089a19b0d235",
+   "size": 19301542,
+   "lfs": {
+    "sha256": "cd49de6ad1de860c2f9c19a7151bc57afd4e31a952546d2c031e2744a18bb3c9",
+    "size": 19301542,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-1.png",
+   "blobId": "e905eeb2efdd9556df2daa78613743a97e05c7cd",
+   "size": 20359877,
+   "lfs": {
+    "sha256": "0e7649a2d142b02d39173b93519e557e4d00465a0aecd06f2e2cd17c146790d8",
+    "size": 20359877,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-2.png",
+   "blobId": "7f09c97c8937fead73d4099af4eb499e561c9f00",
+   "size": 19460412,
+   "lfs": {
+    "sha256": "34ba31d1bf770e6feecc3de301d3579e3740c2828f0407c7167de1a03c34dc18",
+    "size": 19460412,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-3.png",
+   "blobId": "017f16c8caf0e48c84716265758ec618dea63f78",
+   "size": 19150028,
+   "lfs": {
+    "sha256": "ee3ec9796b42454be6db290c4bff3bbc91af885b58d7ae349668bf742dd5ee8a",
+    "size": 19150028,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-4.png",
+   "blobId": "8f12eb9e0dde0c0e7bfabcf259ed49d7a51d7b15",
+   "size": 19694131,
+   "lfs": {
+    "sha256": "a7e88a443ac8a0b8c2846c71a29808f6d3fbe9e2c5219e8e362c188f7c61c36d",
+    "size": 19694131,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-5.png",
+   "blobId": "212f87444f1b5400e67a69e57381987aa35c9d24",
+   "size": 19066707,
+   "lfs": {
+    "sha256": "6739c29f9928a10cca69ebd03f9082334d4c7eccba6638a629f2a9b1e6470f1b",
+    "size": 19066707,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-6.png",
+   "blobId": "bebe9b76ef7bf6f00f2c4191b528599928d87b26",
+   "size": 4931417,
+   "lfs": {
+    "sha256": "ce2f830892503f36a87c2c7f93a651eb3d79fced325b9435e0e613694c077eee",
+    "size": 4931417,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-var1-0.png",
+   "blobId": "7471e90ef6f84ca2dfb41830bda78a6b822e95fa",
+   "size": 16658158,
+   "lfs": {
+    "sha256": "93347478dbbcd2169dda9af40c2d2eb6c41f68d49f64b954c46eca54ada66655",
+    "size": 16658158,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-var1-1.png",
+   "blobId": "44a2aaf9cf8e58617363ffc1cd4050906f5fa148",
+   "size": 17100493,
+   "lfs": {
+    "sha256": "5c25939a3992a4935ca0c815aa2fb355e019a54fbaa2e87c9aecb7135739180a",
+    "size": 17100493,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-var1-2.png",
+   "blobId": "5f9bb4534bad3f9b5414875616b0c6675af4be2c",
+   "size": 16733314,
+   "lfs": {
+    "sha256": "ce22f328adee711436cc47c6c20e193c9763e406b94596da319b10a4cfa4cdb1",
+    "size": 16733314,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-var1-3.png",
+   "blobId": "3bf43bb558b3913e13e830b53bda00a0b3a186fa",
+   "size": 16415499,
+   "lfs": {
+    "sha256": "a8241bfab6d00a884794d2b411ee7632c412a130694f174fb4d57c139eec14a4",
+    "size": 16415499,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-var1-4.png",
+   "blobId": "821f79c1edc992356090f1a9851c6361fc0bd938",
+   "size": 16170742,
+   "lfs": {
+    "sha256": "a28d2332232c0ebbcdc68a60e2bd2db86a636bcafbbcd753776831881b8ac67d",
+    "size": 16170742,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-var1-5.png",
+   "blobId": "a53f7301b1ba9d0a4c050d8fb2e39fdab86d2c4e",
+   "size": 15781353,
+   "lfs": {
+    "sha256": "38c0a90cc7f49463a00c22efff8dd8dbc01d00671eb55fab04a6b51f236e6f54",
+    "size": 15781353,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-var1-6.png",
+   "blobId": "bef48e67fa42b012ad00869e1932b16034fc3f1d",
+   "size": 4110247,
+   "lfs": {
+    "sha256": "05485436a2fe88e28667fcc75ca9214baf15345b12c38f8d547a2d30c3bb1276",
+    "size": 4110247,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy-var1.pt",
+   "blobId": "3481174c1c94380c1d2dae4b053fbac309c2faf5",
+   "size": 1931305,
+   "lfs": {
+    "sha256": "e99a6c2b24d06b91aea7f8a2ab9970d63ed4d37419a5058533a85f980e8bc61c",
+    "size": 1931305,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/finger-turn-easy.pt",
+   "blobId": "9cd387f10ca52bcdce87c2e0f35aac0718b78a5b",
+   "size": 1931255,
+   "lfs": {
+    "sha256": "6af0703134fe204f6faf1b76cea68766f67d8e69c494d651bcf55a2ed9a6f132",
+    "size": 1931255,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/lunarlander-hover-0.png",
+   "blobId": "e002ba85770fe2dd2470dd56c21a5a26d9f92657",
+   "size": 5892206,
+   "lfs": {
+    "sha256": "bb94243f837d1b6a956efc45952b08ca05545c9b08754cce510f6bc36b371ab1",
+    "size": 5892206,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/lunarlander-hover-1.png",
+   "blobId": "0b03447c717c2a1c3719405fd77d619fcb94ef0b",
+   "size": 6825672,
+   "lfs": {
+    "sha256": "02527f3e9fa82bc55e289a6dc850c7697bc92d3fed3917844c51dce74ba7829a",
+    "size": 6825672,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/lunarlander-hover-2.png",
+   "blobId": "3b50a2899c7ef49ee597e8b5d2ad6870ab2423c1",
+   "size": 6283399,
+   "lfs": {
+    "sha256": "5c0ead39753d261852f63bf1b7938fae0ee458182065e6005acc93cb874ac071",
+    "size": 6283399,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/lunarlander-hover-3.png",
+   "blobId": "b5fbba16210bfc264136db283e48cdc4b433e11b",
+   "size": 1018978,
+   "lfs": {
+    "sha256": "2ed2d1a45eb1dedf926c6099dea5b9ee846ba9f3b08febc97a39c41e86a78b2b",
+    "size": 1018978,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/lunarlander-hover.pt",
+   "blobId": "e6bd297c92a98a39c4bc62193ccd64284c1d3337",
+   "size": 968769,
+   "lfs": {
+    "sha256": "2ba38a54efa5fff9746c3542310d164503406832c79362aedcdd639bfe977e3d",
+    "size": 968769,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/ms-push-banana-0.png",
+   "blobId": "0de790cf43a3c1659d12a5ae47a8cd886b0d25ab",
+   "size": 6893013,
+   "lfs": {
+    "sha256": "41b33f54614777f2093a5652d2e6824bb70a62b2863d9eb9110e5de9bd03fc89",
+    "size": 6893013,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/ms-push-banana.pt",
+   "blobId": "3a42e5a74406dd2630db96f231a225735d437897",
+   "size": 102499,
+   "lfs": {
+    "sha256": "b33cdfa5c2876e50ab75cd62ccf6710c429fc2ac090b4282a133a1585e18d694",
+    "size": 102499,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/ms-push-cube-0.png",
+   "blobId": "f51e08b8522fa8f8c0c3e2819109651b56ee140f",
+   "size": 7305196,
+   "lfs": {
+    "sha256": "584de279b3a15fb531f50700a7ce7af9206b83a521244e77921ee383cd505251",
+    "size": 7305196,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/ms-push-cube.pt",
+   "blobId": "f3ee0686fa22b50a9e64c26f1063313863d0355d",
+   "size": 102479,
+   "lfs": {
+    "sha256": "ca990b96489aafee8f67f63cd9b2fb94f69fbbb370ea793221a1df83c2aeb49b",
+    "size": 102479,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/mw-push-0.png",
+   "blobId": "f14c8513b2bb80b898cb511d2b0a6a46f599616a",
+   "size": 47104957,
+   "lfs": {
+    "sha256": "7e1eccf5d5f1239530ae5d5710a4a0cb4fa0170c7cddbdc5b04c09d1896ecc9b",
+    "size": 47104957,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/mw-push-1.png",
+   "blobId": "343399e7f3b0719a6a79ef738f2f840e50dd1dd0",
+   "size": 12401538,
+   "lfs": {
+    "sha256": "3858c4e8ee7d94d0002970d55ac16365848118998cb40549e0c3e8ff827657de",
+    "size": 12401538,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/mw-push.pt",
+   "blobId": "c7a876a6ff8f72479d237b702695228ecb685654",
+   "size": 391069,
+   "lfs": {
+    "sha256": "620556517870a184bccdcad025caf758d25f020527970d1a209f976c505d980c",
+    "size": 391069,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-bottleneck-0.png",
+   "blobId": "b11f5368426c11b5e582ae8269e38afdc76ff08c",
+   "size": 28458920,
+   "lfs": {
+    "sha256": "6ec49175bbb6fd8556954ca7fcae96493a3fc557076f5ed35531ac8ffdc97e22",
+    "size": 28458920,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-bottleneck-1.png",
+   "blobId": "68e1f875c5ca02f519fabf33676191daeff4a3cb",
+   "size": 7069410,
+   "lfs": {
+    "sha256": "47598ecf24a122070aa977edf54e64cf297e8729a21201abb4c8ec0cc8cd923f",
+    "size": 7069410,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-bottleneck.pt",
+   "blobId": "8636816ba77263c360d64f071c74eeb2c6cbb93c",
+   "size": 391317,
+   "lfs": {
+    "sha256": "a11e81653dff51814dbcf925c768a53577686e2e17e9b5709202a471d2fb6b89",
+    "size": 391317,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-maze-0.png",
+   "blobId": "5acfb58c52d866dc32fc3403effdc931fb5323ec",
+   "size": 25951512,
+   "lfs": {
+    "sha256": "03ec6d6e7872820ff85131289063807900349a4d7676c7226b3c4cea7aa4d1b3",
+    "size": 25951512,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-maze-1.png",
+   "blobId": "c2a409b49ad7c76b105f9365135c044034ccb8fc",
+   "size": 6351541,
+   "lfs": {
+    "sha256": "ec52b0330697170cc62c05ffca36dddeb0cffa95ba634502edfd38052d1445d8",
+    "size": 6351541,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-maze.pt",
+   "blobId": "3600d65270acd72c1115a3294c3a2b7aac4338ea",
+   "size": 391257,
+   "lfs": {
+    "sha256": "2b7b5f9865e0e6c561f2abb4bfe3eddf1be43171e92bf0d8448409168af3a216",
+    "size": 391257,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-var1-0.png",
+   "blobId": "6ec544dec04afa5aa76f9196d77996680883fb8e",
+   "size": 26945768,
+   "lfs": {
+    "sha256": "55a7cbdf18cbbfe2452da262cf7225dabb538516ae3b3116e692297a7bea5992",
+    "size": 26945768,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-var1-1.png",
+   "blobId": "2853e59cab600adcd445e0a6381645db73c85020",
+   "size": 6406315,
+   "lfs": {
+    "sha256": "5e826272d84f85e46093a3a8d7df9ec005abcae9a968e154313ff59f59a2478a",
+    "size": 6406315,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-var1.pt",
+   "blobId": "4f699d9c24e22998d38064a366c8f95ebb79386d",
+   "size": 391257,
+   "lfs": {
+    "sha256": "5bd67b035c48e4bc0d4d3d22404f99614df78c5445a2977aa368bcbb3c87349c",
+    "size": 391257,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-var2-0.png",
+   "blobId": "4c59ef0479e3a870967d579589b13d991e030d0e",
+   "size": 28217915,
+   "lfs": {
+    "sha256": "f707ff1f4eb405362f1a4bff23e6aa8e297e2a00327ddda6d0966416bff4a768",
+    "size": 28217915,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-var2-1.png",
+   "blobId": "2050b81865a662f534b4b2108a80276170b692ca",
+   "size": 7628769,
+   "lfs": {
+    "sha256": "a5715e391fe8df6e5f26c9a22d58dc09a31db42cd4781b454d08a7a7c906fa9b",
+    "size": 7628769,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/og-point-var2.pt",
+   "blobId": "878212f25c702c78d3c91666c7ef6c1fe794a28b",
+   "size": 391257,
+   "lfs": {
+    "sha256": "c87c130f1975f943555c5a94cb1618e8d5c96445f6926b0815c377ce5901c532",
+    "size": 391257,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-bird-attack-0.png",
+   "blobId": "bdb629b82d67d76a6f881ec4e313a03466206ef5",
+   "size": 1711736,
+   "lfs": {
+    "sha256": "a579f832a10c3f0f46fa5463bd85f78317e7fed7f45c98eb5e3ffcb2354bea1e",
+    "size": 1711736,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-bird-attack-1.png",
+   "blobId": "c5cf8b0baa3b20491556255d0a9d02df3f29fda1",
+   "size": 1753884,
+   "lfs": {
+    "sha256": "5ef5e2a31c0d8a70c7f8b75d2481e0f77e301fd9de2c4fa04082c49f63d2f75b",
+    "size": 1753884,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-bird-attack-2.png",
+   "blobId": "9304ed641055aa4fb8f549a550284fcbbf0a92e6",
+   "size": 1897802,
+   "lfs": {
+    "sha256": "0d83f5f4339ce50787c0235ddbd2f3d236ab9bc3767b3f4bca26dc18b922ba3f",
+    "size": 1897802,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-bird-attack-3.png",
+   "blobId": "6d8d5ad47d614630f810b971c2dbd02b63ff9551",
+   "size": 1782513,
+   "lfs": {
+    "sha256": "1e0633149c066bcb36fa5a20c9c254423702a2edd08e48ddc61b00a622748e34",
+    "size": 1782513,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-bird-attack-4.png",
+   "blobId": "bef74d5f10b885b5e8ee1cae25689fbc707cb306",
+   "size": 1777472,
+   "lfs": {
+    "sha256": "00e941a18a6f04fc32d54c7180a75d90744d54f8f42c22d7b55295e5f1aee113",
+    "size": 1777472,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-bird-attack-5.png",
+   "blobId": "66029bdf73c41bbbf59fdab9f0d3dcbac317f56a",
+   "size": 1728821,
+   "lfs": {
+    "sha256": "fc4ed70a33f536b9f416e18a3fa654f411baece382698366abd7876b568b2588",
+    "size": 1728821,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-bird-attack-6.png",
+   "blobId": "fa63328cab55234d2cfa6c89db73d533ce3c79ec",
+   "size": 416423,
+   "lfs": {
+    "sha256": "0e0bee378252f9988bf28d87efb3c8b248541f7705d4f0578d88735e2e52fdd3",
+    "size": 416423,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-bird-attack.pt",
+   "blobId": "ed9ce08723f281b69f4efa4038cdcf4fe460206d",
+   "size": 1931275,
+   "lfs": {
+    "sha256": "3f17261d7e5daab463298387e41512d0c1ade251852469d7e8c33d96330e9dcc",
+    "size": 1931275,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-dungeon-explorer1-0.png",
+   "blobId": "1704f2e8a9ebefcf3dcb9e7a47d128ead68dcc1a",
+   "size": 7989895,
+   "lfs": {
+    "sha256": "ab331abbcbea2efefe67737088b389eb6a09f0aee2601b4588e4fb31f1f03a01",
+    "size": 7989895,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-dungeon-explorer1-1.png",
+   "blobId": "eedd0d5a3bbda8f69f7f65f62d4cefbb01ed8634",
+   "size": 9194195,
+   "lfs": {
+    "sha256": "e9280ac09f92bc39ae7e5416de60421ab595c33daf2a17ad8743a33e7ca94d2e",
+    "size": 9194195,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-dungeon-explorer1-2.png",
+   "blobId": "dc105111660658b6e6aa81ffa3ec9801510e4d76",
+   "size": 8571423,
+   "lfs": {
+    "sha256": "bed8bce6f21330e7afb89c4a41e2922dc35e9bf62c8c991dff8599779ea1d933",
+    "size": 8571423,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-dungeon-explorer1-3.png",
+   "blobId": "07a253270b6c4e7cc658a880d85851b65e0d910b",
+   "size": 1213797,
+   "lfs": {
+    "sha256": "b738157837b62d19ac33855cdda7d14a66be7837cf5a9ce0154d23bcc1b11160",
+    "size": 1213797,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-dungeon-explorer1.pt",
+   "blobId": "e33ab3809c31a3d3f8ae50782ca3bf8b1259013c",
+   "size": 968967,
+   "lfs": {
+    "sha256": "b9453a785b3ded42cf1b0cabe4164be3ec1bc97624e80b84257dcc7de69448c6",
+    "size": 968967,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-foraging-0.png",
+   "blobId": "9d04178fd4abce284ceb94bd1b0d37990bad67ac",
+   "size": 2361775,
+   "lfs": {
+    "sha256": "c4b0ce0172238b07feb24697042891476d9b01241670ade62c45934992114523",
+    "size": 2361775,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-foraging-1.png",
+   "blobId": "cd98897d595b7946d71a3867e1391de00204d7aa",
+   "size": 2444292,
+   "lfs": {
+    "sha256": "61ce9eee57f99fd0868c71d053d7219b09738bd3131fb793256ea3da520588f0",
+    "size": 2444292,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-foraging-2.png",
+   "blobId": "f60a9e741859e5d4ee094c692cf957c0823bc366",
+   "size": 2461592,
+   "lfs": {
+    "sha256": "5edac273b419ad059cafaeda232c9a9301b95076ff1c5f6af70e385bc28f9cd3",
+    "size": 2461592,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-foraging-3.png",
+   "blobId": "f3ab05c85bbca55976b510f8fb4a6b4a366a692b",
+   "size": 2464410,
+   "lfs": {
+    "sha256": "8fbeb5422b0f759c22b1aacc9bb5c92ba72c5a7a930d53a92e71143432bc7abf",
+    "size": 2464410,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-foraging-4.png",
+   "blobId": "7f66f7c663da82d4c61f09516d810a160265e076",
+   "size": 2481604,
+   "lfs": {
+    "sha256": "bcb3837fe9efb09c79d30482b2e2e275ba7b5074bc54347c58b0e64ac820276a",
+    "size": 2481604,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-foraging-5.png",
+   "blobId": "d9e84964b9139ba418ae161ae62d3c514bf03dc3",
+   "size": 2393290,
+   "lfs": {
+    "sha256": "5cdeeca5128340c06231812a273ee3d56c6db3cfe1f8a7fd306c465ace2f1c56",
+    "size": 2393290,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-foraging-6.png",
+   "blobId": "2a3d78fc82518223902c03d832f91da2857aac07",
+   "size": 561656,
+   "lfs": {
+    "sha256": "b8ab9690779354b7f42138a765c9094ee18e78704c5e5bae8c1b94d7f9fb2f7e",
+    "size": 561656,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-foraging.pt",
+   "blobId": "f8a7112837f9ebb8f1c74c46d3556ec1f1924b10",
+   "size": 1931245,
+   "lfs": {
+    "sha256": "8691923a15d78f43f190ca99047f87c2fcd33cf868f9f22acafc0cb02c8b994c",
+    "size": 1931245,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-point-maze-var1-0.png",
+   "blobId": "6363f36c844ddfe4bcca4be477fb973d04787dbf",
+   "size": 7136281,
+   "lfs": {
+    "sha256": "23660a9871fd30cf6a4df31e021a1ccbd0b5a3f0d6625c7719b4e298497e9639",
+    "size": 7136281,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-point-maze-var1-1.png",
+   "blobId": "84a695190df34fd913a62246287dd6cb0257fbd5",
+   "size": 7112707,
+   "lfs": {
+    "sha256": "30cceca72f49211d7363f6a64b1e1aebfe240663ed222216bb0a6cfb4f449b2c",
+    "size": 7112707,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-point-maze-var1-2.png",
+   "blobId": "4399ed49febab48ce66fde89afce81b6600b0b9c",
+   "size": 3788602,
+   "lfs": {
+    "sha256": "7e315ebcbcb0363e44810e9dea7b2d26bdca4ec5674256db219a7a69ce731197",
+    "size": 3788602,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-point-maze-var1.pt",
+   "blobId": "0f00306a9b91cb3d0dfb790ddece5d600d37b196",
+   "size": 776435,
+   "lfs": {
+    "sha256": "699a972dbb683a2e26f382d9790877aa8f3658047e6591204018321ed035dc49",
+    "size": 776435,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-point-maze-var4-0.png",
+   "blobId": "b2973a53183764e869cfe3707bea7546fee976ff",
+   "size": 6586045,
+   "lfs": {
+    "sha256": "bfe67fde51c1df2dd6e8bc6894d8c447b6f00ebfcdf66e3955f96554c4ab085a",
+    "size": 6586045,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-point-maze-var4-1.png",
+   "blobId": "659f0acae527e5206d0d81f8aff038f1338484d3",
+   "size": 7165127,
+   "lfs": {
+    "sha256": "f6397061e9e5a84cba367f427c927849c995aaede365a786f279518abceeb5cb",
+    "size": 7165127,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-point-maze-var4-2.png",
+   "blobId": "2c3323715936516638598141f5d6342aa92ae845",
+   "size": 3895057,
+   "lfs": {
+    "sha256": "6ef682f23bd882967cb59e945acce82c58b6aa7c42738eb329887ea8c3bf8abe",
+    "size": 3895057,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-point-maze-var4.pt",
+   "blobId": "de4af1786e234daaf7cbba77b65a185ecbd63344",
+   "size": 776435,
+   "lfs": {
+    "sha256": "f1ddadbe77880df5ae85cbf590f076e777069227d75766cd7c27d49792f36f7a",
+    "size": 776435,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-pong-0.png",
+   "blobId": "d17fd3ace98af5c584d500cef81c93c55beae60c",
+   "size": 889941,
+   "lfs": {
+    "sha256": "d1c77d345e6440d7d5de895f1ecb620255840223fb0f10f3a848204b8ddf37df",
+    "size": 889941,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-pong-1.png",
+   "blobId": "62739cdbf260563080f8099ba32e66378567fa31",
+   "size": 906550,
+   "lfs": {
+    "sha256": "096bb03bde02650e5f676429a700dde1895266c21ca65ef681491320f62cf69c",
+    "size": 906550,
+    "pointerSize": 131
+   }
+  },
+  {
+   "rfilename": "active_human/pygame-pong-2.png",
+   "blobId": "569a281a02123e4f180b01b9663a09aeb7eefff4",
+   "size": 896115,
+   "lfs": {
+    "sha256": "9b618365e6481cc2b6e740f7937826618a0d546d8dc6c9944fb659f338f7ec80",
+    "size": 896115,
+    "pointerSize": 131
+   }
+  }
+ ],
+ "createdAt": "2026-06-24T20:31:47.000Z",
+ "usedStorage": 113843638697,
+ "_note": "siblings list truncated locally to first 300 of 7658 files (full listing at the HF API URL)"
+}

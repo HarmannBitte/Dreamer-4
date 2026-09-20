@@ -1,0 +1,966 @@
+"""Core transformer layers for the Dreamer V4 tokenizer."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Optional, Tuple
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# flex_attention (PyTorch 2.5+) — fused kernels with custom score transforms.
+# Falls back to the manual path on older PyTorch.
+_USE_FLEX_ATTN = False
+try:
+    from torch.nn.attention.flex_attention import (
+        flex_attention as _flex_attention,
+    )
+    _flex_attention = torch.compile(_flex_attention)
+    _USE_FLEX_ATTN = True
+except ImportError:
+    pass
+
+_SOFT_CAP = 30.0 #TODO Add to config
+
+# Module-level flag controlling whether attention-score soft-capping is applied.
+# Default True = paper §3.4 spec. Iter 46 (2026-05-27): MaskedAutoencoderTokenizer
+# sets this to False at construction time based on `config.use_attention_soft_cap`
+# to match Hansen's verified-working reference (which omits soft-cap entirely).
+# Set via `set_soft_cap_enabled(False)` BEFORE constructing the model.
+_SOFT_CAP_ENABLED = True
+
+
+def set_soft_cap_enabled(enabled: bool) -> None:
+    """Toggle attention soft-capping globally for the module.
+    Must be called BEFORE model construction since flex_attention compiles its
+    score_mod at first call. Hansen's reference omits this entirely; setting
+    False matches that deviation.
+    """
+    global _SOFT_CAP_ENABLED
+    _SOFT_CAP_ENABLED = enabled
+
+
+def _soft_cap_mod(score, b, h, q_idx, kv_idx):
+    """Score mod: soft cap only (no mask, no causal)."""
+    return _SOFT_CAP * torch.tanh(score / _SOFT_CAP)
+
+
+def _soft_cap_causal_mod(score, b, h, q_idx, kv_idx):
+    """Score mod: soft cap + standard causal (L_q == L_k)."""
+    score = _SOFT_CAP * torch.tanh(score / _SOFT_CAP)
+    return torch.where(q_idx >= kv_idx, score, float("-inf"))
+
+
+def _make_soft_cap_mask_mod(mask: torch.Tensor):
+    """Build a score_mod that applies soft capping + an additive float mask."""
+    if mask.ndim == 2:
+        def score_mod(score, b, h, q_idx, kv_idx):
+            score = _SOFT_CAP * torch.tanh(score / _SOFT_CAP)
+            return score + mask[q_idx, kv_idx]
+        return score_mod
+    # (B, 1, L_q, L_k) — broadcast over heads
+    def score_mod(score, b, h, q_idx, kv_idx):
+        score = _SOFT_CAP * torch.tanh(score / _SOFT_CAP)
+        return score + mask[b, 0, q_idx, kv_idx]
+    return score_mod
+
+class DropPath(nn.Module):
+    """Drop paths (Stochastic Depth) per sample"""
+    def __init__(self, p=0.0):
+        super().__init__()
+        self.p = p
+
+    def forward(self, x):
+        if not self.training or self.p == 0:
+            return x
+        keep_prob = 1 - self.p
+        shape = (x.shape[0],) + (1,) * (x.ndim - 1)  # (B, 1, 1, ...)
+        random_tensor = torch.rand(shape, device=x.device, dtype=x.dtype) < keep_prob
+        return x / keep_prob * random_tensor
+
+
+class RotaryPositionEmbedding(nn.Module):
+
+    def __init__(self, dim: int, max_positions: int = 512, base: float = 10000.0):
+        """
+        Args:
+            dim: Dimension per head (head_dim).
+            max_positions: Maximum sequence length to precompute embeddings for.
+            base: Base for frequency computation (default 10000 per RoPE paper).
+        """
+        super().__init__()
+        assert dim % 2 == 0, f"RoPE dim must be even, got {dim}"
+        self.dim = dim
+        self.max_positions = max_positions
+        self.base = base
+        
+        inv_freq = 1.0 / (base ** (torch.arange(0, dim, 2).float() / dim))
+        self.register_buffer("inv_freq", inv_freq, persistent=False)
+        
+        self._cos_cached: Optional[torch.Tensor] = None
+        self._sin_cached: Optional[torch.Tensor] = None
+        self._cached_seq_len: int = 0
+    
+    def _update_cache(self, seq_len: int, device: torch.device, dtype: torch.dtype):
+        """Update cos/sin cache if needed."""
+        if seq_len > self._cached_seq_len or self._cos_cached is None:
+            self._cached_seq_len = max(seq_len, self.max_positions)
+            
+            t = torch.arange(self._cached_seq_len, device=device, dtype=dtype)
+            
+            freqs = torch.outer(t, self.inv_freq.to(device=device, dtype=dtype))
+            
+            # Duplicate for both sin and cos application: (seq_len, dim)
+            emb = torch.cat([freqs, freqs], dim=-1)
+            
+            # Cache: (1, seq_len, 1, dim) for broadcasting with (B, L, H, D)
+            self._cos_cached = emb.cos()[None, :, None, :]
+            self._sin_cached = emb.sin()[None, :, None, :]
+    
+    def forward(
+        self, 
+        seq_len: int, 
+        device: torch.device, 
+        dtype: torch.dtype
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Get cos and sin embeddings for positions [0, seq_len).
+        
+        Args:
+            seq_len: Sequence length
+            device: Target device
+            dtype: Target dtype
+            
+        Returns:
+            (cos, sin) tensors of shape (1, seq_len, 1, dim)
+        """
+        self._update_cache(seq_len, device, dtype)
+        return (
+            self._cos_cached[:, :seq_len, :, :].to(dtype),
+            self._sin_cached[:, :seq_len, :, :].to(dtype),
+        )
+
+
+def rotate_half(x: torch.Tensor) -> torch.Tensor:
+    """
+    Rotates half the hidden dims of the input.
+    [x1, x2, x3, x4, ...] -> [-x_{d/2+1}, -x_{d/2+2}, ..., x1, x2, ...]
+    
+    This is used for the RoPE rotation formula.
+    """
+    x1 = x[..., : x.shape[-1] // 2]
+    x2 = x[..., x.shape[-1] // 2 :]
+    return torch.cat([-x2, x1], dim=-1)
+
+
+def apply_rotary_pos_emb(
+    q: torch.Tensor, 
+    k: torch.Tensor, 
+    cos: torch.Tensor, 
+    sin: torch.Tensor
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Apply Rotary Position Embedding to Q and K tensors.
+    
+    Formula for each position m and dimension pair:
+        q_rot = q * cos(m*theta) + rotate_half(q) * sin(m*theta)
+        k_rot = k * cos(m*theta) + rotate_half(k) * sin(m*theta)
+    
+    Args:
+        q: Query tensor of shape (B, H, L, D) or (B, L, H, D)
+        k: Key tensor of shape (B, H, L, D) or (B, L, H, D)  
+        cos: Cosine embeddings of shape (1, L, 1, D)
+        sin: Sine embeddings of shape (1, L, 1, D)
+        
+    Returns:
+        (q_rotated, k_rotated) with same shapes as inputs
+    """
+    # q, k are (B, H, L, D) - need to match cos/sin (1, L, 1, D)
+    # Transpose to (B, L, H, D) for broadcasting, then transpose back
+    q_embed = (q.transpose(1, 2) * cos) + (rotate_half(q.transpose(1, 2)) * sin)
+    k_embed = (k.transpose(1, 2) * cos) + (rotate_half(k.transpose(1, 2)) * sin)
+    
+    return q_embed.transpose(1, 2), k_embed.transpose(1, 2)
+
+
+def apply_rotary_pos_emb_with_indices(
+    x: torch.Tensor,  # (B, H, L, D)
+    cos: torch.Tensor,  # (1, max_pos, 1, D)
+    sin: torch.Tensor,  # (1, max_pos, 1, D)
+    position_ids: torch.Tensor,  # (L,) integer indices
+) -> torch.Tensor:
+
+    """
+    Apply RoPE using explicit position indices (not sequential 0,1,2,...).    
+
+    This is needed for latent cross-attention where tokens from different
+    frames need RoPE based on their frame index, not their sequence position.    
+
+    Args:
+        x: Input tensor (B, H, L, D)
+        cos, sin: RoPE embeddings (1, max_pos, 1, D)
+        position_ids: Integer indices for each position (L,)       
+
+    Returns:
+        x with RoPE applied based on position_ids
+    """
+    cos_indexed = cos[:, position_ids, :, :]
+    sin_indexed = sin[:, position_ids, :, :]
+    x = x.transpose(1,2)
+    x_embed =  (x * cos_indexed) + (rotate_half(x) * sin_indexed)
+    return x_embed.transpose(1,2)
+
+
+
+@dataclass
+class AttentionMask:
+    """
+    Wrapper for handling masks in Scaled Dot Product Attention.
+    For Flash Attention (SDPA), a boolean mask (True = -inf, False = 0) is preferred.
+    """
+    is_causal: bool = False
+    mask: Optional[torch.Tensor] = None  # Expected shape: (L, L) or (B, 1, L, L)
+    _float_mask_cache: Optional[torch.Tensor] = field(default=None, repr=False)
+
+    def apply_to_sdpa(self, size: tuple) -> Optional[torch.Tensor]:
+        """Returns the mask argument formatted for F.scaled_dot_product_attention."""
+        if self.mask is not None:
+            if self.mask.dtype == torch.bool:
+                # Cache the float conversion — avoids re-allocation every attention call
+                if self._float_mask_cache is None:
+                    self._float_mask_cache = torch.zeros_like(
+                        self.mask, dtype=torch.float32
+                    ).masked_fill_(self.mask, float("-inf"))
+                return self._float_mask_cache
+            return self.mask
+        return None
+
+
+class QKNorm(nn.Module):
+    """Per-head RMS normalization for Q and K (Dehghani et al., 2023).
+
+    Applied after projection + reshape but before RoPE, so positional
+    information is not normalized away.  Shapes: q (B, H, L, D), k (B, Hkv, L, D).
+    """
+
+    def __init__(self, head_dim: int):
+        super().__init__()
+        self.q_norm = nn.RMSNorm(head_dim)
+        self.k_norm = nn.RMSNorm(head_dim)
+
+    def forward(self, q: torch.Tensor, k: torch.Tensor):
+        return self.q_norm(q), self.k_norm(k)
+
+
+def _attention_with_soft_cap(
+    q: torch.Tensor,
+    k: torch.Tensor,
+    v: torch.Tensor,
+    attn_mask: Optional[torch.Tensor] = None,
+    dropout_p: float = 0.0,
+    is_causal: bool = False,
+    cap: float = 30.0,
+    training: bool = True,
+) -> torch.Tensor:
+    """Scaled dot-product attention with logit soft capping (Gemma 2).
+
+    Backend dispatch:
+      - **flex_attention** (PyTorch ≥ 2.5): Fused Triton kernels via
+        ``torch.compile``. Memory-efficient tiled computation — never
+        materialises the full (L_q × L_k) attention matrix.
+      - **Manual fallback**: matmul → tanh → softmax → matmul. Used when
+        flex_attention is unavailable, when dropout is requested (flex
+        does not support it), or when ``attn_mask`` is non-None.
+    """
+    # ── Iter 46 soft-cap disable path ────────────────────────────────
+    # When _SOFT_CAP_ENABLED is False, bypass both the flex_attention
+    # score_mod (which always applies soft-cap) and the manual cap line
+    # below. Use plain SDPA — matches Hansen exactly.
+    if not _SOFT_CAP_ENABLED:
+        return F.scaled_dot_product_attention(
+            q, k, v,
+            attn_mask=attn_mask,
+            dropout_p=dropout_p if training else 0.0,
+            is_causal=is_causal,
+        )
+
+    # ── flex_attention fast path with score_mod ──────────────────────
+    # Note: flex_attention + torch.compile cannot trace score_mod closures
+    # that capture real tensors (e.g. attn_mask), so we only use the fast
+    # path for mask-free / causal-only cases.
+    if _USE_FLEX_ATTN and dropout_p == 0.0 and attn_mask is None:
+        score_mod = _soft_cap_causal_mod if is_causal else _soft_cap_mod
+        return _flex_attention(q, k, v, score_mod=score_mod)
+
+    # ── Manual fallback (mask / dropout / no flex_attention) ─────────
+    scale = q.shape[-1] ** -0.5
+    scores = torch.matmul(q * scale, k.transpose(-2, -1))  # (B, H, Lq, Lk)
+    scores = cap * torch.tanh(scores / cap)
+    if attn_mask is not None:
+        scores = scores + attn_mask
+    if is_causal:
+        L_q, L_k = scores.shape[-2], scores.shape[-1]
+        causal = torch.triu(
+            torch.full((L_q, L_k), float("-inf"), device=scores.device, dtype=scores.dtype),
+            diagonal=L_k - L_q + 1,
+        )
+        scores = scores + causal
+    weights = F.softmax(scores, dim=-1)
+    if dropout_p > 0.0 and training:
+        weights = F.dropout(weights, p=dropout_p)
+    return torch.matmul(weights, v)
+
+
+class MultiheadSelfAttention(nn.Module): #TODO Remove it after final implementation
+    def __init__(self, embed_dim: int, num_heads: int, dropout: float = 0.0):
+        super().__init__()
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+        self.head_dim = embed_dim // num_heads
+        assert self.head_dim * num_heads == embed_dim 
+
+        self.qkv = nn.Linear(embed_dim, embed_dim * 3, bias=True) #TODO Is it really efficient? Need to do more research on this later.
+        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x: torch.Tensor, attn_mask: AttentionMask) -> torch.Tensor:
+        B, L, C = x.shape
+        qkv = self.qkv(x)
+        
+        # Reshape to (B, L, 3, H, D) -> Permute to (3, B, H, L, D)
+        qkv = qkv.reshape(B, L, 3, self.num_heads, self.head_dim).permute(2, 0, 3, 1, 4)
+        q, k, v = qkv[0], qkv[1], qkv[2]
+
+        # Get mask for SDPA
+        sdpa_mask = attn_mask.apply_to_sdpa((B, self.num_heads, L, L))
+
+        out = F.scaled_dot_product_attention(
+            q, k, v,
+            attn_mask=sdpa_mask,
+            dropout_p=self.dropout.p if self.training else 0.0,
+            is_causal=attn_mask.is_causal if sdpa_mask is None else False 
+        )
+
+        out = out.transpose(1, 2).reshape(B, L, C)
+        out = self.out_proj(out)
+        return out
+
+
+class LatentCrossAttention(nn.Module):
+    """
+    Cross-attention for latent tokens in DreamerV4 tokenizer with GQA support.
+    
+    Latent tokens attend to ALL tokens (latents + patches) with block causal masking.
+    This allows latents to compress information from patches across frames.
+        
+    Q: from latents only
+    K, V: from all tokens (latents + patches)
+    """
+    
+    def __init__(
+        self, 
+        embed_dim: int, 
+        num_heads: int, 
+        num_kv_heads: Optional[int] = None,
+        dropout: float = 0.0,
+        rope_temporal: Optional[RotaryPositionEmbedding] = None
+    ):
+        super().__init__()
+        self.rope = rope_temporal
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+        self.num_kv_heads = num_kv_heads if num_kv_heads is not None else num_heads
+        self.head_dim = embed_dim // num_heads
+        
+        assert self.head_dim * num_heads == embed_dim
+        assert num_heads % self.num_kv_heads == 0
+        
+        self.num_queries_per_kv = num_heads // self.num_kv_heads
+        
+        self.q_proj = nn.Linear(embed_dim, num_heads * self.head_dim, bias=True)
+        self.k_proj = nn.Linear(embed_dim, self.num_kv_heads * self.head_dim, bias=True)
+        self.v_proj = nn.Linear(embed_dim, self.num_kv_heads * self.head_dim, bias=True)
+        self.qk_norm = QKNorm(self.head_dim)
+
+        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
+        self.dropout = nn.Dropout(dropout)
+
+        # Cached frame indices for RoPE — avoids per-call torch.arange + cat
+        self._cached_rope_key = None
+        self._cached_q_frame_idx = None
+        self._cached_k_frame_idx = None
+
+    def forward(
+        self,
+        latents: torch.Tensor,
+        context: torch.Tensor,
+        num_frames: int,
+        attn_mask: Optional[AttentionMask] = None,
+
+    ) -> torch.Tensor:
+        """
+        Args:
+            latents: Latent tokens (B, L, D) - these are the queries
+            context: All tokens [latents + patches] (B, L+T*N, D) - these are K, V
+            attn_mask: Block causal mask for latent-to-all attention
+
+        Returns:
+            Updated latent tokens (B, L, D)
+        """
+        B, L_q, C = latents.shape
+        _, L_kv, _ = context.shape
+
+        q = self.q_proj(latents)
+        k = self.k_proj(context)
+        v = self.v_proj(context)
+
+        q = q.view(B, L_q, self.num_heads, self.head_dim).transpose(1, 2)  # (B, H, L_q, D)
+        k = k.view(B, L_kv, self.num_kv_heads, self.head_dim).transpose(1, 2)  # (B, Hkv, L_kv, D)
+        v = v.view(B, L_kv, self.num_kv_heads, self.head_dim).transpose(1, 2)  # (B, Hkv, L_kv, D)
+
+        q, k = self.qk_norm(q, k)
+
+        if self.rope is not None and num_frames > 1:
+            cache_key = (L_q, L_kv, num_frames)
+            if self._cached_rope_key != cache_key:
+                num_patches = L_kv - L_q
+                # Global token indices: latents at 0..L_q-1, patches at L_q..L_q+num_patches-1.
+                # Previous floor-div indexing (// latents_per_frame) gave all L tokens within a
+                # frame the SAME RoPE position, causing post-attention latent collapse.
+                # NOTE: requires self.rope.max_positions >= L_q + num_patches (set in tokenizer.py).
+                # TODO: rename self.rope (currently named rope_temporal) — it now encodes mixed
+                # sequence position rather than time-only.
+                self._cached_q_frame_idx = torch.arange(L_q, device=q.device)
+                k_latent_idx = torch.arange(L_q, device=k.device)
+                k_patches_idx = torch.arange(L_q, L_q + num_patches, device=k.device)
+                self._cached_k_frame_idx = torch.cat([k_latent_idx, k_patches_idx])
+                self._cached_rope_key = cache_key
+
+            # Pass max position index we'll lookup (NOT num_frames). RotaryPositionEmbedding.forward
+            # returns a slice of size seq_len from the cache; if we ask for only num_frames=4
+            # positions, position_ids up to L_kv-1 will be OOB.
+            # L_kv = L_q + num_patches by construction (context = [latents, patches]).
+            cos, sin = self.rope(L_kv, latents.device, latents.dtype)
+
+            q = apply_rotary_pos_emb_with_indices(q, cos, sin, self._cached_q_frame_idx)
+            k = apply_rotary_pos_emb_with_indices(k, cos, sin, self._cached_k_frame_idx)
+
+
+        if self.num_kv_heads < self.num_heads:
+            k = k.repeat_interleave(self.num_queries_per_kv, dim=1)
+            v = v.repeat_interleave(self.num_queries_per_kv, dim=1)
+        
+        sdpa_mask = None
+        if attn_mask is not None:
+            sdpa_mask = attn_mask.apply_to_sdpa((B, self.num_heads, L_q, L_kv))
+
+        out = _attention_with_soft_cap(
+            q, k, v,
+            attn_mask=sdpa_mask,
+            dropout_p=self.dropout.p if self.training else 0.0,
+            training=self.training,
+        )
+
+        out = out.transpose(1, 2).reshape(B, L_q, C)
+        out = self.out_proj(out)
+        return out
+
+
+class PatchToLatentCrossAttention(nn.Module):
+    """
+    Cross-attention for decoder patches to read from latent tokens (DreamerV4 decoder) with GQA support.
+    
+    Per DreamerV4 paper: "each decoder modality attends within itself and to the latents"
+    
+    GQA: When num_kv_heads < num_heads, multiple query heads share the same K/V heads.
+    
+    Q: from patches (decoder queries)
+    K, V: from latent tokens (z_latents)
+    
+    This allows the decoder to reconstruct images by reading compressed info from latents.
+    """
+    
+    def __init__(
+        self, 
+        embed_dim: int, 
+        num_heads: int, 
+        num_kv_heads: Optional[int] = None,
+        dropout: float = 0.0,
+        rope_temporal: Optional[RotaryPositionEmbedding] = None
+    ):
+        super().__init__()
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+        self.num_kv_heads = num_kv_heads if num_kv_heads is not None else num_heads
+        self.head_dim = embed_dim // num_heads
+        self.rope = rope_temporal
+        
+        assert self.head_dim * num_heads == embed_dim, "embed_dim must be divisible by num_heads"
+        assert num_heads % self.num_kv_heads == 0, "num_heads must be divisible by num_kv_heads"
+        
+        self.num_queries_per_kv = num_heads // self.num_kv_heads
+        
+        self.q_proj = nn.Linear(embed_dim, num_heads * self.head_dim, bias=True)
+        self.k_proj = nn.Linear(embed_dim, self.num_kv_heads * self.head_dim, bias=True)
+        self.v_proj = nn.Linear(embed_dim, self.num_kv_heads * self.head_dim, bias=True)
+        self.qk_norm = QKNorm(self.head_dim)
+        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
+        self.dropout = nn.Dropout(dropout)
+
+        # Cached frame indices for RoPE — avoids per-call torch.arange
+        self._cached_rope_key = None
+        self._cached_q_frame_idx = None
+        self._cached_k_frame_idx = None
+
+    def forward(
+        self,
+        patches: torch.Tensor,
+        latents: torch.Tensor,
+        num_frames: int,
+    ) -> torch.Tensor:
+        """
+        Args:
+            patches: Decoder query tokens (B, T*N, D) - these are the queries
+            latents: Latent tokens (B, L, D) - these are K, V
+
+        Returns:
+            Updated patch tokens (B, T*N, D)
+        """
+        B, L_q, C = patches.shape
+        _, L_kv, _ = latents.shape
+
+        q = self.q_proj(patches)
+        k = self.k_proj(latents)
+        v = self.v_proj(latents)
+
+        q = q.view(B, L_q, self.num_heads, self.head_dim).transpose(1, 2)  # (B, H, L_q, D)
+        k = k.view(B, L_kv, self.num_kv_heads, self.head_dim).transpose(1, 2)  # (B, Hkv, L_kv, D)
+        v = v.view(B, L_kv, self.num_kv_heads, self.head_dim).transpose(1, 2)  # (B, Hkv, L_kv, D)
+
+        q, k = self.qk_norm(q, k)
+
+        if self.rope is not None and num_frames > 1:
+            cache_key = (L_q, L_kv, num_frames)
+            if self._cached_rope_key != cache_key:
+                # Symmetric to encoder's LatentCrossAttention: latents (K) at positions 0..L_kv-1,
+                # patches (Q) at positions L_kv..L_kv+L_q-1. Preserves the same relative offsets
+                # between latent and patch tokens that the encoder uses, so QK relationships
+                # transfer cleanly between encode and decode phases.
+                self._cached_q_frame_idx = torch.arange(L_kv, L_kv + L_q, device=q.device)
+                self._cached_k_frame_idx = torch.arange(L_kv, device=k.device)
+                self._cached_rope_key = cache_key
+
+            # Pass max position index we'll lookup (NOT num_frames). Mirrors the same
+            # fix applied in LatentCrossAttention.forward — see note there.
+            rope_seq_len = L_kv + L_q
+            cos, sin = self.rope(rope_seq_len, q.device, q.dtype)
+            q = apply_rotary_pos_emb_with_indices(q, cos, sin, self._cached_q_frame_idx)
+            k = apply_rotary_pos_emb_with_indices(k, cos, sin, self._cached_k_frame_idx)
+            
+        if self.num_kv_heads < self.num_heads:
+            k = k.repeat_interleave(self.num_queries_per_kv, dim=1)
+            v = v.repeat_interleave(self.num_queries_per_kv, dim=1)
+        
+        # No mask needed - all patches can attend to all latents freely
+        out = _attention_with_soft_cap(
+            q, k, v,
+            dropout_p=self.dropout.p if self.training else 0.0,
+            training=self.training,
+        )
+
+        out = out.transpose(1, 2).reshape(B, L_q, C)
+        out = self.out_proj(out)
+        return out
+
+
+class SpatialAttention(nn.Module):
+    """
+    Spatial Attention with GQA support.
+    
+    Patches within the same frame attend to each other.
+    GQA: When num_kv_heads < num_heads, multiple query heads share the same K/V heads.
+    """
+    
+    def __init__(
+        self, 
+        embed_dim: int, 
+        num_heads: int, 
+        num_kv_heads: Optional[int] = None,
+        dropout: float = 0.0,
+        rope: Optional[RotaryPositionEmbedding] = None,
+    ):
+        super().__init__()
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+        self.num_kv_heads = num_kv_heads if num_kv_heads is not None else num_heads
+        self.head_dim = embed_dim // num_heads
+        self.rope = rope
+        
+        assert self.head_dim * num_heads == embed_dim, "embed_dim must be divisible by num_heads"
+        assert num_heads % self.num_kv_heads == 0, "num_heads must be divisible by num_kv_heads"
+        
+        self.num_queries_per_kv = num_heads // self.num_kv_heads
+        
+        self.q_proj = nn.Linear(embed_dim, num_heads * self.head_dim, bias=True)
+        self.k_proj = nn.Linear(embed_dim, self.num_kv_heads * self.head_dim, bias=True)
+        self.v_proj = nn.Linear(embed_dim, self.num_kv_heads * self.head_dim, bias=True)
+        self.qk_norm = QKNorm(self.head_dim)
+
+        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x: torch.Tensor, num_frames: int,
+                attn_mask: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """
+        Args:
+            x: (B, T * tokens_per_frame, C)
+            num_frames: T
+            attn_mask: Optional (N, N) float mask for asymmetric attention
+                       (e.g. agent tokens). 0.0 = attend, -inf = block.
+                       Broadcasts over batch and head dims.
+        """
+        B, L, C = x.shape
+        patches_per_frame = L // num_frames   #TODO rename the variables to be generic for both tokenizer and dynamic model
+
+        x = x.view(B * num_frames, patches_per_frame, C)
+        BT = B * num_frames
+        N = patches_per_frame
+
+        q = self.q_proj(x)  # (BT, N, num_heads * head_dim)
+        k = self.k_proj(x)  # (BT, N, num_kv_heads * head_dim)
+        v = self.v_proj(x)  # (BT, N, num_kv_heads * head_dim)
+
+        q = q.view(BT, N, self.num_heads, self.head_dim).transpose(1, 2)  # (BT, H, N, D)
+        k = k.view(BT, N, self.num_kv_heads, self.head_dim).transpose(1, 2)  # (BT, Hkv, N, D)
+        v = v.view(BT, N, self.num_kv_heads, self.head_dim).transpose(1, 2)  # (BT, Hkv, N, D)
+
+        q, k = self.qk_norm(q, k)
+
+        if self.rope is not None:
+            cos, sin = self.rope(N, q.device, q.dtype)
+            q, k = apply_rotary_pos_emb(q, k, cos, sin)
+
+        if self.num_kv_heads < self.num_heads:
+            k = k.repeat_interleave(self.num_queries_per_kv, dim=1)
+            v = v.repeat_interleave(self.num_queries_per_kv, dim=1)
+
+        # Expand spatial mask for broadcasting: (N, N) -> (1, 1, N, N)
+        mask_4d = attn_mask.unsqueeze(0).unsqueeze(0) if attn_mask is not None else None
+
+        out = _attention_with_soft_cap(
+            q, k, v,
+            attn_mask=mask_4d,
+            dropout_p=self.dropout.p if self.training else 0.0,
+            training=self.training,
+        )
+        
+        out = out.transpose(1, 2).reshape(BT, N, C)
+        out = out.view(B, L, C)
+        
+        out = self.out_proj(out)
+        return out
+
+
+class TemporalAttention(nn.Module):
+    """
+    Temporal Attention with GQA support: Attends to the same spatial position across all frames.
+    
+    For video input with T frames and N patches per frame, each patch token
+    at spatial position i attends to all patches at position i across all T frames.
+    This creates N independent attention computations, each over T tokens.
+    
+    GQA: When num_kv_heads < num_heads, multiple query heads share the same K/V heads.
+    
+    Input shape: (B, T*N, D) where T=frames, N=patches_per_frame
+    """
+    
+    def __init__(
+        self, 
+        embed_dim: int, 
+        num_heads: int, 
+        num_kv_heads: Optional[int] = None,
+        dropout: float = 0.0,
+        rope: Optional[RotaryPositionEmbedding] = None,
+    ):
+        super().__init__()
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+        self.num_kv_heads = num_kv_heads if num_kv_heads is not None else num_heads
+        self.head_dim = embed_dim // num_heads
+        self.rope = rope
+        
+        assert self.head_dim * num_heads == embed_dim, "embed_dim must be divisible by num_heads"
+        assert num_heads % self.num_kv_heads == 0, "num_heads must be divisible by num_kv_heads"
+        
+        self.num_queries_per_kv = num_heads // self.num_kv_heads
+        
+        self.q_proj = nn.Linear(embed_dim, num_heads * self.head_dim, bias=True)
+        self.k_proj = nn.Linear(embed_dim, self.num_kv_heads * self.head_dim, bias=True)
+        self.v_proj = nn.Linear(embed_dim, self.num_kv_heads * self.head_dim, bias=True)
+        self.qk_norm = QKNorm(self.head_dim)
+
+        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        num_frames: int,
+        attn_mask: Optional[AttentionMask] = None
+    ) -> torch.Tensor:
+        """
+        Args:
+            x: Input tensor of shape (B, T*N, D)
+            num_frames: Number of frames T
+            attn_mask: Optional attention mask (e.g., causal masking across time)
+
+        Returns:
+            Output tensor of shape (B, T*N, D)
+        """
+        B, L, C = x.shape
+        T = num_frames
+        patches_per_frame = L // T
+        N = patches_per_frame
+
+        # Reshape to (B, T, N, D) then transpose to (B, N, T, D)
+        # This groups same spatial positions across frames
+        x = x.view(B, T, N, C).transpose(1, 2).contiguous()  # (B, N, T, D)
+        x = x.view(B * N, T, C)  # (B*N, T, D) - each spatial position is a sequence
+        BN = B * N
+
+        # Project Q, K, V separately
+        q = self.q_proj(x)  # (BN, T, num_heads * head_dim)
+        k = self.k_proj(x)  # (BN, T, num_kv_heads * head_dim)
+        v = self.v_proj(x)  # (BN, T, num_kv_heads * head_dim)
+
+        # Reshape Q for multi-head attention
+        q = q.view(BN, T, self.num_heads, self.head_dim).transpose(1, 2)  # (BN, H, T, D)
+
+        # Reshape K, V with num_kv_heads
+        k = k.view(BN, T, self.num_kv_heads, self.head_dim).transpose(1, 2)  # (BN, Hkv, T, D)
+        v = v.view(BN, T, self.num_kv_heads, self.head_dim).transpose(1, 2)  # (BN, Hkv, T, D)
+
+        q, k = self.qk_norm(q, k)
+
+        # Apply RoPE to Q and K (before GQA head repetition for K)
+        if self.rope is not None:
+            cos, sin = self.rope(T, q.device, q.dtype)
+            q, k = apply_rotary_pos_emb(q, k, cos, sin)
+
+        # GQA: Repeat K, V heads to match Q heads if num_kv_heads < num_heads
+        if self.num_kv_heads < self.num_heads:
+            k = k.repeat_interleave(self.num_queries_per_kv, dim=1)
+            v = v.repeat_interleave(self.num_queries_per_kv, dim=1)
+
+        # Apply scaled dot product attention across frames for each spatial position
+        sdpa_mask = None
+        if attn_mask is not None:
+            sdpa_mask = attn_mask.apply_to_sdpa((BN, self.num_heads, T, T))
+
+        out = _attention_with_soft_cap(
+            q, k, v,
+            attn_mask=sdpa_mask,
+            dropout_p=self.dropout.p if self.training else 0.0,
+            is_causal=attn_mask.is_causal if (attn_mask is not None and sdpa_mask is None) else False,
+            training=self.training,
+        )
+        
+        # Reshape back: (BN, H, T, D) -> (BN, T, C) -> (B, N, T, D) -> (B, T, N, D) -> (B, T*N, D)
+        out = out.transpose(1, 2).reshape(BN, T, C)
+        out = out.view(B, N, T, C).transpose(1, 2).contiguous()  # (B, T, N, D)
+        out = out.view(B, L, C)
+        
+        out = self.out_proj(out)
+        return out
+
+
+
+
+class FeedForward(nn.Module):
+    def __init__(self, embed_dim: int, mlp_ratio: float, dropout: float):
+        super().__init__()
+        hidden_dim = int(embed_dim * mlp_ratio)
+        self.fc1 = nn.Linear(embed_dim, 2 * hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, embed_dim)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x_gate, x_val = self.fc1(x).chunk(2, dim=-1)
+        x = x_val * F.silu(x_gate) 
+        x = self.fc2(x)
+        x = self.dropout(x)
+        return x
+
+
+class TransformerBlock(nn.Module):
+    """
+    DreamerV4-style Transformer Block with factorized spatial-temporal attention.
+    
+    Architecture per DreamerV4 paper:
+    - Encoder: Latent tokens cross-attend to ALL tokens (latents + patches)
+              Patch tokens do spatial + temporal self-attention only
+    - Decoder: Latent tokens attend within themselves
+              Patch tokens do spatial + temporal self-attention AND cross-attend to latents
+    
+    Per the paper: "each decoder modality attends within itself and to the latents,
+                   while the latents only attend within themselves."
+    """
+    def __init__(
+        self,
+        embed_dim: int,
+        num_heads: int,
+        mlp_ratio: float,
+        dropout: float,
+        drop_path: float,
+        use_temporal: bool = False,
+        is_decoder: bool = False,
+        num_kv_heads: Optional[int] = None,
+        rope_spatial: Optional[RotaryPositionEmbedding] = None,
+        rope_temporal: Optional[RotaryPositionEmbedding] = None,
+    ):
+        super().__init__()
+        self.use_temporal = use_temporal
+        self.is_decoder = is_decoder
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+        self.num_kv_heads = num_kv_heads
+        
+        # For latent tokens: cross-attention to all tokens (encoder only)
+        if not is_decoder:
+            self.latent_norm = nn.RMSNorm(embed_dim)
+            self.context_norm = nn.RMSNorm(embed_dim)
+            self.latent_cross_attn = LatentCrossAttention(
+                embed_dim, num_heads, num_kv_heads=num_kv_heads, dropout=dropout, rope_temporal=rope_temporal
+            )
+        
+        # For decoder: patches cross-attend to latents
+        if is_decoder:
+            self.patch_to_latent_norm = nn.RMSNorm(embed_dim)
+            self.latent_kv_norm = nn.RMSNorm(embed_dim)
+            self.patch_to_latent_attn = PatchToLatentCrossAttention(
+                embed_dim, num_heads, num_kv_heads=num_kv_heads, dropout=dropout,  rope_temporal=rope_temporal
+            )
+        
+        # For patch tokens: spatial attention (with GQA and RoPE support)
+        self.norm1 = nn.RMSNorm(embed_dim)
+        self.spatial_attn = SpatialAttention(
+            embed_dim, num_heads, num_kv_heads=num_kv_heads, dropout=dropout,
+            rope=rope_spatial,
+        )
+        
+        # For patch tokens: temporal attention (every Nth layer, with GQA and RoPE support)
+        if use_temporal:
+            self.norm_temporal = nn.RMSNorm(embed_dim)
+            self.temporal_attn = TemporalAttention(
+                embed_dim, num_heads, num_kv_heads=num_kv_heads, dropout=dropout,
+                rope=rope_temporal,
+            )
+        
+        # Shared feed-forward
+        self.norm2 = nn.RMSNorm(embed_dim)
+        self.ff = FeedForward(embed_dim, mlp_ratio, dropout)
+        self.drop_path = DropPath(drop_path) if drop_path > 0 else nn.Identity()
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        num_frames: int,
+        temporal_mask: Optional[AttentionMask] = None,
+        latent_cross_mask: Optional[AttentionMask] = None,
+        num_latents: int = 0,
+        encoder_modality_mask: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
+        """
+        Args:
+            x: Input tensor (B, L+T*N, D) where L=num_latents
+            num_frames: Number of frames T
+            temporal_mask: Causal mask for temporal attention (T, T)
+            latent_cross_mask: Block causal mask for latent-to-all attention (L, L+T*N)
+            num_latents: Number of latent tokens at the start of sequence
+            encoder_modality_mask: Float mask (L_pf+N_pf, L_pf+N_pf) for encoder
+                spatial attention. Paper §3.1: latent queries see all; patch queries
+                see patches only. 0.0=attend, -inf=block. Encoder-only; decoder
+                already has patches-only spatial.
+        """
+        if num_latents > 0:
+            latents = x[:, :num_latents, :]
+            patches = x[:, num_latents:, :]
+
+            if self.is_decoder:
+                # DECODER: patches cross-attend to latents (read compressed info)
+                # Per paper §3.1: "each decoder modality attends within itself and to the latents"
+                # So decoder modality (patches) attends within itself (spatial+temporal below)
+                # AND to latents (this cross-attn). Latents themselves don't update in decoder.
+                patches = patches + self.drop_path(
+                    self.patch_to_latent_attn(
+                        self.patch_to_latent_norm(patches),
+                        self.latent_kv_norm(latents),
+                        num_frames
+                    )
+                )
+
+                # Decoder spatial/temporal: PATCHES ONLY (paper-correct decoder behavior).
+                patches = patches + self.drop_path(
+                    self.spatial_attn(self.norm1(patches), num_frames)
+                )
+                if self.use_temporal:
+                    patches = patches + self.drop_path(
+                        self.temporal_attn(self.norm_temporal(patches), num_frames, temporal_mask)
+                    )
+
+                x = torch.cat([latents, patches], dim=1)
+            else:
+                # ENCODER: latents cross-attend to all tokens (existing path).
+                context = torch.cat([latents, patches], dim=1)
+                latents = latents + self.drop_path(
+                    self.latent_cross_attn(
+                        self.latent_norm(latents),
+                        self.context_norm(context),
+                        num_frames,
+                        latent_cross_mask
+                    )
+                )
+
+                # Fix A canonical: Real Fix 2 = spatial + temporal on FULL [latents, patches]
+                # sequence. The latents-only-temporal variant (Iter 30) collapsed to rank 1.4
+                # with tanh, matching all 7 prior tanh experiments. Fix A's full-sequence
+                # temporal is the regime that produced rank 9.19 — the only working config.
+                B, D = latents.shape[0], latents.shape[-1]
+                latents_per_frame = num_latents // num_frames
+                patches_per_frame = patches.shape[1] // num_frames
+
+                latents_4d = latents.view(B, num_frames, latents_per_frame, D)
+                patches_4d = patches.view(B, num_frames, patches_per_frame, D)
+                per_frame = torch.cat([latents_4d, patches_4d], dim=2)  # (B, T, L+N, D)
+                x_full = per_frame.flatten(1, 2)                        # (B, T*(L+N), D)
+
+                # Paper §3.1: in the encoder, patch queries attend to patches
+                # only (not to latents); latent queries attend to all. The
+                # `encoder_modality_mask` enforces this on the per-frame
+                # (L+N, L+N) spatial attention map.
+                x_full = x_full + self.drop_path(
+                    self.spatial_attn(self.norm1(x_full), num_frames, encoder_modality_mask)
+                )
+                if self.use_temporal:
+                    x_full = x_full + self.drop_path(
+                        self.temporal_attn(self.norm_temporal(x_full), num_frames, temporal_mask)
+                    )
+
+                # De-layout back to [all_latents, all_patches] for the next block.
+                per_frame_back = x_full.view(B, num_frames, latents_per_frame + patches_per_frame, D)
+                latents = per_frame_back[:, :, :latents_per_frame, :].reshape(B, num_frames * latents_per_frame, D)
+                patches = per_frame_back[:, :, latents_per_frame:, :].reshape(B, num_frames * patches_per_frame, D)
+
+                x = torch.cat([latents, patches], dim=1)
+        else: #TODO May be remove this else block if not needed 
+            x = x + self.drop_path(self.spatial_attn(self.norm1(x), num_frames))
+            
+            if self.use_temporal:
+                x = x + self.drop_path(
+                    self.temporal_attn(self.norm_temporal(x), num_frames, temporal_mask)
+                )
+        
+        # 4. Feed-forward (applied to all tokens)
+        x = x + self.drop_path(self.ff(self.norm2(x)))
+        return x

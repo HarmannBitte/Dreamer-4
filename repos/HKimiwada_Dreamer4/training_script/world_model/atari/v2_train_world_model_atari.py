@@ -1,0 +1,262 @@
+import os
+import json
+import torch
+import torch.nn as nn
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.utils.data import DataLoader, Dataset, DistributedSampler
+from torch.amp import GradScaler, autocast
+from pathlib import Path
+from tqdm import tqdm
+import wandb
+import numpy as np
+
+from tokenizer.model.encoder_decoder import CausalTokenizer
+from tokenizer.patchify_mask import Patchifier
+from world_model.wm.dynamics_model_atari import WorldModel
+from world_model.wm.loss import flow_loss_v2
+
+# ---------------------------------------------------------------------------
+class AtariWMConfig:
+    # Dataset paths
+    latent_path = Path("data/atari/latent_sequences/video_full_frames.pt")
+    actions_jsonl = Path("data/atari/raw/actions.jsonl")
+    tokenizer_ckpt = Path("checkpoints/atari/tokenizer_v3/best_model.pt")
+    
+    # Model architecture
+    resize = (64, 64)
+    patch_size = 8         
+    n_latents = 64
+    input_dim = 3 * patch_size * patch_size
+    latent_dim = 256
+    embed_dim = 512        
+    action_dim = 4         
+    num_layers = 12        
+    num_heads = 8
+    Sa = 1                 
+    Sr = 8                 
+
+    # Training Params
+    batch_size = 16        
+    clip_length = 64       
+    stride = 32            
+    lr = 2e-4
+    max_steps = 100000     
+    warmup_steps = 5000    
+    visualize_interval = 500
+    
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    ckpt_dir = Path("checkpoints/world_model/atari_v6")
+
+# ---------------------------------------------------------------------------
+class AtariWorldModelDataset(Dataset):
+    def __init__(self, cfg):
+        print(f"[Dataset] Loading latents from {cfg.latent_path}...")
+        data = torch.load(cfg.latent_path, map_location="cpu")
+        self.latents = data["z"]  
+        
+        print(f"[Dataset] Loading actions from {cfg.actions_jsonl}...")
+        self.actions = []
+        with open(cfg.actions_jsonl, "r") as f:
+            for line in f:
+                entry = json.loads(line)
+                self.actions.append(entry["action"])
+        
+        # Ensure 1:1 alignment even if a few frames were dropped during sliding window
+        self.actions = torch.tensor(self.actions, dtype=torch.long)[:len(self.latents)]
+        
+        self.clip_length = cfg.clip_length
+        self.stride = cfg.stride
+        self.start_indices = list(range(0, len(self.latents) - self.clip_length, self.stride))
+
+    def __len__(self):
+        return len(self.start_indices)
+
+    def __getitem__(self, idx):
+        start = self.start_indices[idx]
+        end = start + self.clip_length
+        return {
+            "latents": self.latents[start:end],
+            "actions": self.actions[start:end],
+            "start_idx": start
+        }
+
+# ---------------------------------------------------------------------------
+class AtariDataBuilder(nn.Module):
+    def __init__(self, cfg):
+        super().__init__()
+        self.cfg = cfg
+        self.latent_proj = nn.Linear(cfg.latent_dim, cfg.embed_dim)
+        self.action_embed = nn.Embedding(cfg.action_dim, cfg.embed_dim)
+        self.action_norm = nn.LayerNorm(cfg.embed_dim)
+        self.register_embed = nn.Embedding(cfg.Sr, cfg.embed_dim)
+        self.shortcut_slot = nn.Parameter(torch.randn(cfg.embed_dim))
+        self.shortcut_mlp = nn.Sequential(
+            nn.Linear(2, cfg.embed_dim),
+            nn.SiLU(),
+            nn.Linear(cfg.embed_dim, cfg.embed_dim)
+        )
+
+    def forward(self, latents, actions, tau, d):
+        B, T, N, D = latents.shape
+        E = self.cfg.embed_dim
+        z_tokens = self.latent_proj(latents) 
+        a_tokens = self.action_embed(actions).unsqueeze(2) 
+        a_tokens = self.action_norm(a_tokens)
+        a_tokens = a_tokens * 5.0 # Scale action embeddings by 2.0x to increase signal volume for action tokens
+        reg_ids = torch.arange(self.cfg.Sr, device=latents.device)
+        reg_tokens = self.register_embed(reg_ids).view(1, 1, self.cfg.Sr, E).expand(B, T, -1, -1)
+        feat = torch.stack([tau, d.view(B, 1).expand(B, T)], dim=-1)
+        s_tokens = (self.shortcut_mlp(feat) + self.shortcut_slot).unsqueeze(2)
+        tokens = torch.cat([z_tokens, a_tokens, reg_tokens, s_tokens], dim=2) 
+        return tokens.view(B, T * (N + self.cfg.Sa + self.cfg.Sr + 1), E)
+
+# ---------------------------------------------------------------------------
+@torch.no_grad()
+def visualize_step(wm, builder, tokenizer, batch, cfg, step, device):
+    """Backported fixed visualization with Local Positional Context."""
+    wm_eval = wm.module if hasattr(wm, "module") else wm
+    builder_eval = builder.module if hasattr(builder, "module") else builder
+    wm_eval.eval(); builder_eval.eval(); tokenizer.eval()
+
+    # Slice to Batch size = 1
+    latents = batch["latents"][:1].to(device)
+    actions = batch["actions"][:1].to(device)
+    start_indices = batch["start_idx"][:1].to(device)
+    B, T, N, D = latents.shape
+
+    tau = torch.full((B, T), 0.5, device=device) # Denoising test
+    d = torch.full((B,), 0.25, device=device)
+    noise = torch.randn_like(latents)
+    z_corr = (1.0 - tau.unsqueeze(-1).unsqueeze(-1)) * noise + tau.unsqueeze(-1).unsqueeze(-1) * latents
+
+    tokens = builder_eval(z_corr, actions, tau, d)
+    wm_input = {"wm_input_tokens": tokens, "tau": tau, "d": d, "z_clean": latents, "z_corrupted": z_corr}
+    pred_z = wm_eval(wm_input, time_offsets=start_indices)
+
+    def decode_with_local_context(z_seq):
+        """Helper mirroring the 'Perfect' diagnostic logic."""
+        B_v, T_v, N_v, D_v = z_seq.shape
+        x = tokenizer.from_latent(z_seq) 
+        x = x.view(B_v, T_v * N_v, tokenizer.embed_dim)
+        # CRITICAL FIX: Local Positional Embedding Addition
+        x = x + tokenizer.pos_embed[:, :T_v * N_v, :]
+        x = tokenizer._run_stack(x, tokenizer.decoder, T=T_v, N=N_v)
+        x = x.view(B_v, T_v, N_v, tokenizer.embed_dim)
+        patches = tokenizer.output_proj(x)
+        full_frames = Patchifier(cfg.patch_size).unpatchify(patches.squeeze(0), cfg.resize, cfg.patch_size)
+        return full_frames[-4:] # Return last 4 frames for max context
+
+    gt_f = decode_with_local_context(latents)
+    pr_f = decode_with_local_context(pred_z)
+
+    rows = []
+    for i in range(4):
+        combined = torch.cat([gt_f[i].clamp(0,1), pr_f[i].clamp(0,1)], dim=-1)
+        img_np = (combined.permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8)
+        rows.append(img_np)
+    
+    final_grid = np.concatenate(rows, axis=0)
+    wandb.log({"reconstruction_diagnostic": wandb.Image(final_grid, caption=f"Step {step} (L:GT, R:Pred)"), "step": step})
+    wm_eval.train(); builder_eval.train()
+
+# ---------------------------------------------------------------------------
+def setup_ddp():
+    dist.init_process_group(backend="nccl")
+    rank = dist.get_rank()
+    local_rank = int(os.environ["LOCAL_RANK"])
+    torch.cuda.set_device(local_rank)
+    return rank, local_rank, dist.get_world_size()
+
+def main():
+    cfg = AtariWMConfig()
+    rank, local_rank, world_size = setup_ddp()
+    device = torch.device(f"cuda:{local_rank}")
+    is_main = rank == 0
+
+    if is_main:
+        wandb.init(project="latest-dreamer4-atari-wm", config=vars(cfg))
+        cfg.ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+    # 1. Models
+    tokenizer = CausalTokenizer(input_dim=cfg.input_dim, embed_dim=256, num_heads=8, num_layers=8, latent_dim=256)
+    tk_ckpt = torch.load(cfg.tokenizer_ckpt, map_location="cpu")
+    tokenizer.load_state_dict({k.replace("module.", ""): v for k, v in tk_ckpt["model_state"].items()})
+    tokenizer.to(device).eval()
+
+    builder = AtariDataBuilder(cfg).to(device)
+    wm = WorldModel(d_model=cfg.embed_dim, d_latent=cfg.latent_dim, num_layers=cfg.num_layers, 
+                    num_heads=cfg.num_heads, n_latents=cfg.n_latents, Sr=cfg.Sr, use_checkpoint=True).to(device)
+    
+    wm = DDP(wm, device_ids=[local_rank]); builder = DDP(builder, device_ids=[local_rank])
+    optimizer = torch.optim.AdamW(list(wm.parameters()) + list(builder.parameters()), lr=cfg.lr)
+    scaler = GradScaler(); global_step = 0; best_loss = float('inf'); epoch = 0
+
+    # 2. Data
+    dataset = AtariWorldModelDataset(cfg)
+    sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, shuffle=True)
+    loader = DataLoader(dataset, batch_size=cfg.batch_size, sampler=sampler, num_workers=4, pin_memory=True)
+
+    # 3. Training Loop
+    while global_step < cfg.max_steps:
+        sampler.set_epoch(epoch)
+        for batch in tqdm(loader, disable=not is_main, desc=f"Epoch {epoch}"):
+            if global_step >= cfg.max_steps: break
+            
+            latents = batch["latents"].to(device)
+            actions = batch["actions"].to(device)
+
+            dropout_mask = torch.rand(actions.shape[0], device=device) < 0.30
+            train_actions = actions.clone()
+            train_actions[dropout_mask] = 0 # 0 represents 'Stay Still' in Breakout
+
+            # --- UPDATED LOG-UNIFORM SAMPLING ---
+            # k_max represents the finest grain of your diffusion steps (usually 64 for Atari)
+            k_max = 64 
+            max_pow = int(np.log2(k_max)) # Result: 6
+
+            # Sample an exponent (0 to 6) for each batch element
+            pow_idx = torch.randint(0, max_pow + 1, (latents.shape[0],), device=device)
+
+            # Resulting d will be in {1/64, 2/64, 4/64, 8/64, 16/64, 32/64, 64/64}
+            d = (2.0 ** pow_idx.float()) / k_max
+
+            # Flow matching noise schedule
+            steps_per_seq = (1.0 / d).int() 
+            step_idx = torch.randint(0, 64, (latents.shape[0], latents.shape[1]), device=device) % steps_per_seq.unsqueeze(-1)
+            tau = step_idx.float() * d.unsqueeze(-1)
+            
+            noise = torch.randn_like(latents)
+            z_corr = (1.0 - tau.unsqueeze(-1).unsqueeze(-1)) * noise + tau.unsqueeze(-1).unsqueeze(-1) * latents
+
+            with autocast(device_type="cuda", dtype=torch.float16):
+                tokens = builder(z_corr, train_actions, tau, d)
+                wm_input = {"wm_input_tokens": tokens, "tau": tau, "d": d, "z_clean": latents, "z_corrupted": z_corr}
+                # Use batch indices for temporal anchoring
+                pred_z = wm(wm_input, time_offsets=batch["start_idx"].to(device))
+                loss = flow_loss_v2(pred_z, latents, tau, ramp_weight=True)
+
+            optimizer.zero_grad()
+            scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_(list(wm.parameters()) + list(builder.parameters()), max_norm=1.0)
+            scaler.step(optimizer)
+            scaler.update()
+
+            global_step += 1
+            if is_main and global_step % 10 == 0:
+                wandb.log({"loss": loss.item(), "step": global_step})
+                if loss.item() < best_loss:
+                    best_loss = loss.item()
+                    torch.save(wm.module.state_dict(), cfg.ckpt_dir / "best_wm.pt")
+
+            if is_main and global_step % cfg.visualize_interval == 0:
+                visualize_step(wm, builder, tokenizer, batch, cfg, global_step, device)
+        epoch += 1
+
+    if is_main: wandb.finish()
+    dist.destroy_process_group()
+
+if __name__ == "__main__":
+    print("Latest Version (with action embedding scaling + action embedding masking)")
+    main()

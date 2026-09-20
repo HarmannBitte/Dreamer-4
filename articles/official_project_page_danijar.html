@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Training Agents Inside of Scalable World&nbsp;Models</title>
+<meta name="description" content="Introducing Dreamer 4">
+<link rel="canonical" href="https://danijar.com/project/dreamer4/">
+<link rel="icon" href="/favicon.jpg">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+</head>
+<body class="layoutCol">
+<div class="headerContainer full">
+<header class="layoutRow wide">
+
+<a class="logo" href="/">Danijar</a>
+
+<nav class="layoutRow">
+<!--a href="/#research">Research</a-->
+<a href="/#featured-media">Media</a>
+<!--a href="/#highlighted-work">Papers</a-->
+<a href="/#highlighted-work">Research</a>
+<a href="/#short-biography">Bio</a>
+</nav>
+
+<!--a class="search">Search</a-->
+
+</header>
+</div>
+
+<!--main class="layoutCol"-->
+<div class="headerContainer full">
+<div class="cover layoutCol wide">
+
+<h1>Training Agents Inside of Scalable World&nbsp;Models</h1>
+
+
+<p class="authors layoutRow">
+
+<span class="author"><a target="_blank" href="https://danijar.com/">Danijar Hafner</a>*</span> <span class="author"><a target="_blank" href="https://wilson1yan.github.io/">Wilson Yan</a>*</span> <span class="author"><a target="_blank" href="https://contrastiveconvergence.net/~timothylillicrap/index.php">Timothy Lillicrap</a></span>
+
+</p>
+
+
+
+  
+
+
+<div class="teaser">
+
+<video autoplay loop muted><source src="https://danijar.com/asset/dreamer4/teaser.mp4"/></video>
+
+</div>
+
+
+<p class="buttons layoutRow">
+
+<a href="https://x.com/danijarh/status/1973072288351396320" target="_blank">Twitter</a>
+
+<a href="https://arxiv.org/abs/2509.24527" target="_blank">Paper</a>
+
+</p>
+
+
+</div>
+</div>
+
+<article>
+<h2 id="introducing-dreamer-4">Introducing Dreamer 4</h2>
+
+<p style="font-size: 1.2rem; margin: 1rem auto;">
+World models equip agents with a deep understanding of the world and the
+ability to predict the future. However, previous world models have been unable
+to accurately predict object interactions in complex environents. We present
+Dreamer 4, a scalable agent that learns to solve control tasks by imagination
+training inside of a fast and accurate world model. Through a new objective and
+architecture, the world model simulates complex object interactions
+while achieving real-time interactive inference. By training inside of its
+world model, Dreamer 4 is the first agent to obtain diamonds in Minecraft
+purely from offline data, aligning it with applications such as robotics where
+online interaction is often impractical.
+</p>
+
+<h2 id="diamonds-from-offline-experience">Diamonds from Offline Experience</h2>
+
+<p>By learning behaviors in imagination, Dreamer 4 is the first agent to obtain
+diamonds in Minecraft purely from offline data, without environment
+interaction. The task requires choosing sequences of over 20,000 mouse and
+keyboard actions from raw pixels. This video shows the agent being evaluated in
+the actual Minecraft environment.</p>
+
+<iframe class="youtubeVideo wide" width="560" height="315" src="https://www.youtube.com/embed/oDlBtTcX0g0?si=-z7YwXBW9bt5ndGS" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
+
+<p>Uncut evaluation videos are available here:
+<a target="_blank" href="https://www.youtube.com/watch?v=n4SwlSrkhvU">Video 1</a>,
+<a target="_blank" href="https://www.youtube.com/watch?v=5CnpLRM8iXA">Video 2</a>,
+<a target="_blank" href="https://www.youtube.com/watch?v=oZyliSpRMSw">Video 3</a>,
+<a target="_blank" href="https://www.youtube.com/watch?v=VSKpvb1bnbU">Video 4</a>.</p>
+
+<p>Dreamer 4 significantly outperforms OpenAI’s VPT offline agent, while using 100
+times less data. It also outperforms modern behavioral cloning approaches based
+on finetuning general vision-language models.</p>
+
+<div class="wide" style="margin: 1rem auto;">
+<img style="width: 100%" src="/asset/dreamer4/benchmark.png" />
+</div>
+
+<p>In the research paper, we also show that the world model provides better
+representations for behavioral cloning agents than Gemma 3. This shows that the
+world model learns a deep understanding of the environment in a form that is
+also useful for decision making.</p>
+
+<h2 id="imagination-training">Imagination Training</h2>
+
+<p>Dreamer 4 trains behaviors by reinforcement learning inside of the world model.
+We call this process <span style="font-style: italic;">imagination
+training</span>. Below, we show sequences of the agent practicing two tasks
+inside of the world model, decoded back into pixel space.</p>
+
+<div class="tasks wide collapsed">
+
+<div class="task">
+<div class="header">
+<a class="play"></a>
+<h3>Gather wood</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/imag/treechop1.mp4" />
+</video>
+<!-- <h4>Lucid</h4> -->
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/imag/treechop2.mp4" />
+</video>
+<!-- <h4>Oasis</h4> -->
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/imag/treechop3.mp4" />
+</video>
+<!-- <h4>Dreamer</h4> -->
+</div>
+</div>
+</div>
+
+<div class="task">
+<div class="header">
+<a class="play"></a>
+<h3>Mine stone</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/imag/cobble1.mp4" />
+</video>
+<!-- <h4>Lucid</h4> -->
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/imag/cobble2.mp4" />
+</video>
+<!-- <h4>Oasis</h4> -->
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/imag/cobble3.mp4" />
+</video>
+<!-- <h4>Dreamer</h4> -->
+</div>
+</div>
+</div>
+
+</div>
+<div style="margin-bottom: 1.5rem"></div>
+
+<p>The world model has learned a diverse distribution of Minecraft scenarios,
+allowing the agent to train complex and long-horizon tasks in imagination.
+Moreover, the reward model has accurately learned to identify task success even
+for imagined scenarios.</p>
+
+<h2 id="human-interaction">Human Interaction</h2>
+
+<p>The Dreamer 4 world model achieves real-time interactive inference on a single
+GPU through a new objective and architecture. Here we show a human player
+performing a wide range of tasks in the world model to demonstrate its
+counterfactual generations, comparing to previous Minecraft world models.</p>
+
+<div class="tasks wide collapsed humanTasks">
+
+
+<div class="task">
+
+<div class="header">
+<a class="play"></a>
+<h3>Build 3x3 wall from planks</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task00.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task00.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task00.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task">
+
+<div class="header">
+<a class="play"></a>
+<h3>Mine diamonds</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task09.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task09.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task09.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task">
+
+<div class="header">
+<a class="play"></a>
+<h3>Place and ride boat</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task11.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task11.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task11.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Eat apple</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task01.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task01.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task01.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Place three torches</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task02.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task02.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task02.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Chop tree</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task03.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task03.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task03.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Dig 3x3 pit with shovel</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task04.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task04.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task04.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Craft wooden pickaxe</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task05.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task05.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task05.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Use furnace and exit</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task06.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task06.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task06.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Place and open workbench</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task07.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task07.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task07.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Kill zombies</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task08.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task08.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task08.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Complete window</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task10.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task10.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task10.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Enter portal</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task12.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task12.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task12.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Place door and walk outside</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task13.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task13.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task13.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Place bed in house and sleep</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task14.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task14.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task14.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Plant reed and pour water</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task15.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task15.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task15.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+
+<div class="task collapses">
+
+<div class="header">
+<a class="play"></a>
+<h3>Turn 360 and enter house</h3>
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/lucid/task16.mp4" />
+</video>
+<h4>Lucid</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/oasis/task16.mp4" />
+</video>
+<h4>Oasis</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/human/dreamer/task16.mp4" />
+</video>
+<h4>Dreamer</h4>
+</div>
+</div>
+</div>
+
+<div class="button humanToggle">Toggle all tasks</div>
+</div>
+
+<h2 id="real-world-video">Real World Video</h2>
+
+<p>To see whether Dreamer 4 can also simulate object interactions on the physical
+world, we train the world model on a robotics dataset. While frontier video
+models have struggled with the physics of object interactions, Dreamer 4 allows
+for counterfactual interactions on this dataset, indicating its promise for
+applications such as robotics.</p>
+
+<div class="tasks wide" style="margin-top: 0">
+<div class="task">
+<div class="header">
+<a class="play"></a>
+<!-- <h3>Counterfactual human actions</h3> -->
+</div>
+<div class="entries">
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/realworld/soar1.mp4" />
+</video>
+<h4>Interaction 1</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/realworld/soar2.mp4" />
+</video>
+<h4>Interaction 2</h4>
+</div>
+<div class="entry">
+<video muted="">
+<source src="/asset/dreamer4/realworld/soar3.mp4" />
+</video>
+<h4>Interaction 3</h4>
+</div>
+</div>
+</div>
+</div>
+<div style="margin-bottom: 3rem"></div>
+
+<p>Dreamer 4 marks a significant step towards intelligent agents, introducing a
+fast and accurate world model and an effective recipe for training agents via
+imagination training. Details can be found in the research paper.</p>
+
+<p><a class="button" style="margin-top: 3rem" href="https://arxiv.org/pdf/2509.24527">Read the research paper</a></p>
+
+<script defer="">
+document.querySelectorAll('.play').forEach((playButton) => {
+  playButton.addEventListener('click', () => {
+    const task = playButton.closest('.task')
+    task.querySelectorAll('video').forEach((video) => {
+      video.currentTime = 0
+      video.play()
+    })
+  })
+})
+
+const humanToggle = document.querySelector('.humanToggle')
+humanToggle.addEventListener('click', () => {
+  const container = humanToggle.closest('.humanTasks')
+  container.classList.toggle('collapsed')
+})
+</script>
+
+<style>
+
+.abstract {
+  color: #888;
+  text-align: justify;
+}
+
+.youtubeVideo {
+    aspect-ratio: 16 / 9;
+    width: 100% !important;
+    height: auto;
+    overflow: hidden;
+    border-radius: .5rem;
+}
+
+
+.task .header {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0 .8rem;
+}
+
+.task h3 {
+    font-size: 1.3rem;
+    text-align: center;
+    margin: 0;
+    color: #888;
+    font-weight: 400;
+}
+
+.task .play {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    margin-right: .5rem;
+    background: url(/asset/play.svg);
+    background-size: contain;
+    opacity: 0.5;
+}
+
+.task h4 {
+    font-size: 1rem;
+    text-align: center;
+    margin: .5em 0;
+    color: #aaa;
+}
+
+.task .entries {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.task .entry {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.task .entry video { border-radius: .5rem; overflow: hidden; }
+.humanTasks .entry:nth-child(2) video { padding: 0 22%; background: #bbb; }
+
+.collapsed .collapses { display: none; }
+
+.button, .button:visited {
+    display: block;
+    width: 16rem;
+    margin: 1.2rem auto;
+    padding: .8em;
+    text-align: center;
+    background: #eee;
+    color: #888;
+    border-radius: 1.6em;
+    cursor: pointer;
+    transition: background-color .1s linear;
+}
+
+.button:hover { background: #ddd; color: #888; text-decoration: none; }
+
+</style>
+
+<!--
+## Media coverage
+
+- [Tech Xplore](https://techxplore.com/news/2025-10-deepmind-ai-agent-tasks-scalable.html)
+- [Implicator](https://www.implicator.ai/dreamer-4-mines-diamonds-in-an-imagined-minecraft/)
+- [InfoQ](https://www.infoq.com/news/2025/10/dreamer-4-minecraft-agent/)
+- [AI Research Roundup](https://www.youtube.com/watch?v=1jwFoVQO8-s)
+- [AI Papers Slop](https://www.youtube.com/watch?v=B2ZKokWdoDk)
+- [Dylan Curious](https://www.youtube.com/watch?v=SXHSsIqmzDY&t=770s)
+- [The Cutting Edge School](https://www.youtube.com/watch?v=TzGtJfbCGws&t=307s)
+- [Reddit discussion](https://www.reddit.com/r/accelerate/comments/1nvbfm1/deepmind_introducing_dreamer_4_an_agent_that/)
+-->
+
+</article>
+
+<script>
+document.querySelector('body').onload = function() {
+  console.log('SCROLL', window.scrollY);
+  if (window.scrollY > 10) return;
+  const element = document.querySelector('.cover')
+  const pos = element.getBoundingClientRect().top + window.scrollY
+  window.scroll({top: pos, behavior: 'smooth'})
+}
+</script>
+
+<!--/main-->
+
+<footer></footer>
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-78082517-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+<script async src='/scripts.js'></script>
+</body>
+</html>

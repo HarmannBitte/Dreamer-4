@@ -1,0 +1,78 @@
+{
+ "_id": "696fd8941cef19c99a14a9dd",
+ "id": "nicklashansen/dreamer4",
+ "private": false,
+ "pipeline_tag": "reinforcement-learning",
+ "tags": [
+  "reinforcement learning",
+  "world model",
+  "continuous control",
+  "robotics",
+  "reinforcement-learning",
+  "arxiv:2509.24527",
+  "license:mit",
+  "region:us"
+ ],
+ "downloads": 18,
+ "likes": 0,
+ "modelId": "nicklashansen/dreamer4",
+ "author": "nicklashansen",
+ "sha": "10e04fce900745e266ab68925b6779831551f157",
+ "lastModified": "2026-01-20T19:38:04.000Z",
+ "gated": false,
+ "disabled": false,
+ "model-index": null,
+ "config": {},
+ "cardData": {
+  "license": "mit",
+  "tags": [
+   "reinforcement learning",
+   "world model",
+   "continuous control",
+   "robotics"
+  ],
+  "pipeline_tag": "reinforcement-learning"
+ },
+ "siblings": [
+  {
+   "rfilename": ".gitattributes",
+   "blobId": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+   "size": 1519
+  },
+  {
+   "rfilename": "README.md",
+   "blobId": "81e664724a2f8b0d524483cee3a0c252cd39307f",
+   "size": 1178
+  },
+  {
+   "rfilename": "config.json",
+   "blobId": "fac2fe388cfd9ab699b9f359bb7a56008c7cd69c",
+   "size": 191
+  },
+  {
+   "rfilename": "dynamics.pt",
+   "blobId": "6dbf524d9819ab774726ef85c6f56f226e56a375",
+   "size": 511868041,
+   "lfs": {
+    "sha256": "7c0e0d3d7bf366947509fb6a0a90953785ab6f41e617b4edf7f491f87db3d773",
+    "size": 511868041,
+    "pointerSize": 134
+   }
+  },
+  {
+   "rfilename": "tokenizer.pt",
+   "blobId": "8e1a0eeec5f4b84ff55e1e68c239ae06b87e6629",
+   "size": 256658341,
+   "lfs": {
+    "sha256": "8a2cb0e3f381a5c5375a666e3f3012793482c3033975a4d40337269009f100d1",
+    "size": 256658341,
+    "pointerSize": 134
+   }
+  }
+ ],
+ "spaces": [
+  "ShinjiAA/unidream-space"
+ ],
+ "createdAt": "2026-01-20T19:33:40.000Z",
+ "usedStorage": 768526382
+}

@@ -1,0 +1,6 @@
+remote: https://github.com/next-state/open-dreamer.git
+branch: main
+commit: 797e41f052b5996740938fd2fe8161f1866de3a2
+date:   2026-07-26 09:44:18 -0700
+subject: fix coauthor * rendering
+fetched: 2026-09-20T13:35:05Z (shallow clone, depth 1; .git removed to save space)

@@ -1,0 +1,1824 @@
+{
+ "_id": "686e8977c9a0d72eb7d5f580",
+ "id": "p-doom/openai-minecraft-dataset",
+ "author": "p-doom",
+ "sha": "6fdd412a8b735c27c764577198d6b4446d32a42f",
+ "lastModified": "2025-08-05T22:18:50.000Z",
+ "private": false,
+ "gated": false,
+ "disabled": false,
+ "tags": [
+  "license:cc0-1.0",
+  "region:us"
+ ],
+ "description": "This dataset is a preprocessed version of the OpenAI Minecraft Video Dataset VPT, reformatted into array record files compatible with the Grain dataloader for efficient streaming.\n",
+ "downloads": 195,
+ "likes": 9,
+ "cardData": {
+  "license": "cc0-1.0"
+ },
+ "siblings": [
+  {
+   "rfilename": ".gitattributes",
+   "blobId": "1ef325f1b111266a6b26e0196871bd78baa8c2f3",
+   "size": 2461
+  },
+  {
+   "rfilename": "README.md",
+   "blobId": "15ab6a7aa6b81a97b538691362ba4784f221b506",
+   "size": 287
+  },
+  {
+   "rfilename": "shard_00000.tar",
+   "blobId": "2015de87e5d5af812c8ed2b6c76827ad6a516010",
+   "size": 9005946880,
+   "lfs": {
+    "sha256": "2425417e3df864585a5fd02d3ef6a179bf1a0f5e9cdfb70ddd514eaf06c678a8",
+    "size": 9005946880,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00001.tar",
+   "blobId": "0a8e4263f866a7ff2409b5e74cbc4088f845f79b",
+   "size": 9185187840,
+   "lfs": {
+    "sha256": "538184f2810f10ddc11df697a93993eda9680ea8a3694336f68ecfab14347254",
+    "size": 9185187840,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00002.tar",
+   "blobId": "c0b95055c5033ceec5e086d88c1cef1b8ede1e2e",
+   "size": 9400934400,
+   "lfs": {
+    "sha256": "74adf2217b3447fd406f9ef5364abc374553151d328c2d8540632ea31c0e84d7",
+    "size": 9400934400,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00003.tar",
+   "blobId": "de084fb1e4638f12913415a4b0a5063b7278bcdc",
+   "size": 9517783040,
+   "lfs": {
+    "sha256": "d870e7dfb6f5d52ad82ab9bbf37533424333a0d4a588ddb4ff0a5829dc9e3951",
+    "size": 9517783040,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00004.tar",
+   "blobId": "076cab42764dee6c0bcc9f10f522f00889ae984a",
+   "size": 6832250880,
+   "lfs": {
+    "sha256": "7d8cf943cce9d93b19e6da787c77069318814178a5321fdc0770a773182ae67a",
+    "size": 6832250880,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00005.tar",
+   "blobId": "cc67463451ebbb2a25922b815b13a54dbbdb9ac8",
+   "size": 6522460160,
+   "lfs": {
+    "sha256": "db6b643333b5096cbb84227da3d442964f176f1c07cfedc8714a56ff6f0eea1a",
+    "size": 6522460160,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00006.tar",
+   "blobId": "45a81c37396783b7981944d735706372d1b2e396",
+   "size": 6623119360,
+   "lfs": {
+    "sha256": "9b893436d062a5fb2c4b91eb5a1e0abee4e87f2b695eb18c383e7dfda9a2b1c7",
+    "size": 6623119360,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00007.tar",
+   "blobId": "6885352ea9de753f75041abac47c4530fd93dd0f",
+   "size": 7103764480,
+   "lfs": {
+    "sha256": "c129b5687a0912c6287f585b5f1465f9bb253baecf09d636bb03517821c961c6",
+    "size": 7103764480,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00008.tar",
+   "blobId": "b10664cf4974554ae211c3f07b752a63f5141267",
+   "size": 7406018560,
+   "lfs": {
+    "sha256": "735ad3f81e05699259b6f3d6ce4d6e8c1bc6dbf0f9795e814bf93479f36a5fb5",
+    "size": 7406018560,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00009.tar",
+   "blobId": "483bd32bb59526ad941412edadb3860ce5be7702",
+   "size": 9951436800,
+   "lfs": {
+    "sha256": "898df7e3da3fc881a6e699d05cc398ea6914d9008a15d39555bf5f18c30097c3",
+    "size": 9951436800,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00010.tar",
+   "blobId": "0f1b3ddc100a5f8c6e990c75e77d775eb499201b",
+   "size": 9899530240,
+   "lfs": {
+    "sha256": "2ead8b9fe196a7dc813e08f35458273798daa6adc5a778affa9c9f30d0acf948",
+    "size": 9899530240,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00011.tar",
+   "blobId": "3b8b451d630441199e0b5a0f20f4d59bf5ebb0f8",
+   "size": 10076078080,
+   "lfs": {
+    "sha256": "9f623b2b41885c5646deed62d98401bcb84c582bddd3af8b5e36c3ffe2e61d26",
+    "size": 10076078080,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00012.tar",
+   "blobId": "c3a59211fd58b7b68e7ae8969c7be26866e2c36e",
+   "size": 9647738880,
+   "lfs": {
+    "sha256": "9327c8d8003a09be48436eb8b858d7a73fa1358cb5bbecf7120a73727bed579a",
+    "size": 9647738880,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00013.tar",
+   "blobId": "9ccb61893ad21754cf6b4081998a7843a4593c45",
+   "size": 9143633920,
+   "lfs": {
+    "sha256": "d3980934e82b3acef97c1351da90f3a4676742b665ae409995fb3837b6a6adaa",
+    "size": 9143633920,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00014.tar",
+   "blobId": "fa8d03b0d37f70edc1dde55ae706170f809d201c",
+   "size": 9612544000,
+   "lfs": {
+    "sha256": "255e3e28470befaafe65e876eb2427c1b6a98e478cc7e897f0651eeed4180dd3",
+    "size": 9612544000,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00015.tar",
+   "blobId": "8e04b4b181f1807fa28a1ae57ca0eeb20e30f291",
+   "size": 8464875520,
+   "lfs": {
+    "sha256": "890509cdb06a1b6fb211e21686e14f695539f79458fad204354c2f8258c47200",
+    "size": 8464875520,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00016.tar",
+   "blobId": "0541cd04c4a9d4fcca3de0f7d93bda1b9d8d9a64",
+   "size": 12824135680,
+   "lfs": {
+    "sha256": "ad7d74b4a414c7e334e77aa6fcdf2c7c1d9a19d9c56205ef01db34e9096f3085",
+    "size": 12824135680,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00017.tar",
+   "blobId": "9ed7ba55e588fa1361bc5a1a432f628a853a8034",
+   "size": 12731924480,
+   "lfs": {
+    "sha256": "4b280cf43e61519145f86ef8a3ef9413a5e464670e6db1170b191d30c39ce389",
+    "size": 12731924480,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00018.tar",
+   "blobId": "dc3e15bb81aaf787df18a7d6c0b48dbd7e198fce",
+   "size": 12630016000,
+   "lfs": {
+    "sha256": "337ede92d8dd62bb8553972191898167269dbdbcb8fe12038ec2aee6562b6c26",
+    "size": 12630016000,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00019.tar",
+   "blobId": "bf382677c3c7d2f3a827abfed48985e3c2ce0f58",
+   "size": 11039989760,
+   "lfs": {
+    "sha256": "09cf202981affed7d0d7a174f0a8ff7deac74fd44ac0ec50080a5fd183c1344d",
+    "size": 11039989760,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00020.tar",
+   "blobId": "8c53038fa66a452b16497efec32d3af76bf5bc2f",
+   "size": 12396912640,
+   "lfs": {
+    "sha256": "7706547ed2cec88dcff7dfe91f58a75088f2fa74364d097c40c62c9eccb558f4",
+    "size": 12396912640,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00021.tar",
+   "blobId": "92a26dd90afde360a75ddd8ada6cd32880f60aac",
+   "size": 12540958720,
+   "lfs": {
+    "sha256": "a616be08e31aecc32783e39a966cf2df70d9f400358e2c7b826c1e4ba67e8ee9",
+    "size": 12540958720,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00022.tar",
+   "blobId": "3f09da15b553812388e3451d55e2af122c54de44",
+   "size": 13261660160,
+   "lfs": {
+    "sha256": "8f70d13fb8c0feba1e4d5ea23e201a83e061c83fb88e17cb6eb7d8143fefdf15",
+    "size": 13261660160,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00023.tar",
+   "blobId": "4259d85bc6d838ff19c18d95b84562a30884202a",
+   "size": 12627722240,
+   "lfs": {
+    "sha256": "63ecee8c0658d1331cb62f05cba12139d8e5f8f689cdb8e50731852c33aa0973",
+    "size": 12627722240,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00024.tar",
+   "blobId": "3f29596ad3a4ce2e0bef491448d61940788af96c",
+   "size": 12305684480,
+   "lfs": {
+    "sha256": "babb2633dc46bba891aa9690b25285e13f3ba34b455b8d9d93ccefd376ccf99f",
+    "size": 12305684480,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00025.tar",
+   "blobId": "f5c4ad1e59131f3a26f3e3c25a582fba18471f19",
+   "size": 12481249280,
+   "lfs": {
+    "sha256": "d4c1f6cd5546d362c5d6db0b37f14606996de6ebe11d6ec4d8d2640d15241b19",
+    "size": 12481249280,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00026.tar",
+   "blobId": "0608e7f2d02ab64c120106d442fc320ace222701",
+   "size": 12880568320,
+   "lfs": {
+    "sha256": "d331606a2425c7cf6ccc30441d65e24c29941bbf1fd96db06f7f9098e33a506a",
+    "size": 12880568320,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00027.tar",
+   "blobId": "be28f951e96620f68a7beb48cda0e35d3d45b01d",
+   "size": 13027891200,
+   "lfs": {
+    "sha256": "3c40790eb3c04c1f25f459425686cb677f7bb9747d5b978d9d6ebac9f34e0ed7",
+    "size": 13027891200,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00028.tar",
+   "blobId": "228f01cde75ff1b514d5519a619db3a6b2a36f5c",
+   "size": 7652106240,
+   "lfs": {
+    "sha256": "73a939e3233a0a09fc429d3feaadd95dbd9c0ac34fdb03d0bd4f769c4fcb4258",
+    "size": 7652106240,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00029.tar",
+   "blobId": "d347a39df0771a9c6522c3d0d91cab2cc493e7cc",
+   "size": 4352491520,
+   "lfs": {
+    "sha256": "5ed90e049c652cd8c4c3cdcee4c3b572c3204b54577c70c8094ae746cb64c103",
+    "size": 4352491520,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00030.tar",
+   "blobId": "2ae897ea167ad813d8ebc1ede113ee454566d06d",
+   "size": 4903065600,
+   "lfs": {
+    "sha256": "0a101c34b46e5e439d8c3f38762c6f7a139b7899cbbfbf8247b4446640e1d3b4",
+    "size": 4903065600,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00031.tar",
+   "blobId": "8d083f40852fa01f0e6d3ac1a844393f251d62ea",
+   "size": 5444198400,
+   "lfs": {
+    "sha256": "45d5480d95e7dbbc8e305124391845a045fd1b906f735d5e19cd6e12bcd28d71",
+    "size": 5444198400,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00032.tar",
+   "blobId": "65e279c2d0eda48b51a2b0eec036bdec33b24e17",
+   "size": 5019852800,
+   "lfs": {
+    "sha256": "fbdf212724282899a8620f11da6b46d38457320ccdb31eeb193a2b61adad2810",
+    "size": 5019852800,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00033.tar",
+   "blobId": "2f1c60a201bcf6e307cf97ea686ec18a932d92c0",
+   "size": 4876062720,
+   "lfs": {
+    "sha256": "67134b59594b3d1b69e786e9649ea631abbb55613ed2129b315ae7a41a2b88f3",
+    "size": 4876062720,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00034.tar",
+   "blobId": "38e864dce191e35ff98a1c600c93ca65a1079252",
+   "size": 4791654400,
+   "lfs": {
+    "sha256": "26ebc0835c47e8acea58a3417ebf6b6b16bd19de3ecea8ac41247f98318a5071",
+    "size": 4791654400,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00035.tar",
+   "blobId": "a83dc2ab5747ebd094c221e4e3675a29f6f05d50",
+   "size": 4974632960,
+   "lfs": {
+    "sha256": "003c604f6d2a267dd40f96ed882a1e7c8eb20c171306e04f92e53109bf10c654",
+    "size": 4974632960,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00036.tar",
+   "blobId": "6cdcc24aac76578ea1f8a81b2c72538d6d5073ad",
+   "size": 4754227200,
+   "lfs": {
+    "sha256": "7955f07758799cb1cfc229302a36f1b9e626100b076e099b396f3e8b41588364",
+    "size": 4754227200,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00037.tar",
+   "blobId": "13f46794b5539f26c41626fb29434deb8a6fbd32",
+   "size": 4285388800,
+   "lfs": {
+    "sha256": "18f4ab858da2fc93999b8f5bec3297a6b6ecc4369a3af34132c0dbf5be9838b7",
+    "size": 4285388800,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00038.tar",
+   "blobId": "ff86a26812df8019028dc58abc5dab8bc6088733",
+   "size": 5363783680,
+   "lfs": {
+    "sha256": "c5d508f1ae02f1f61600e6cb3b930e49dba6aa6ecd083260b2c4bc5f5405659e",
+    "size": 5363783680,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00039.tar",
+   "blobId": "4b56bdf7117211c56d9e951f5821bdd5beacb583",
+   "size": 5454612480,
+   "lfs": {
+    "sha256": "ef7909b9de7135772e110f07222361fba12cbe2730e4bb2033dcacb5f2fed96a",
+    "size": 5454612480,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00040.tar",
+   "blobId": "8f330a1cd92a2a1ce67776cc6ae73144e72d568a",
+   "size": 5136179200,
+   "lfs": {
+    "sha256": "ca25a3331544e9697cdc4997fdddfcbe37b03db7d904f0d87b4635fc1ba5d4a3",
+    "size": 5136179200,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00041.tar",
+   "blobId": "949e05554c315147f4749435043a1f59fccd3d63",
+   "size": 4584366080,
+   "lfs": {
+    "sha256": "e381dbb2725816d2b13a77329d1f3c0347968809cdad419887d77e6cb2f48aeb",
+    "size": 4584366080,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00042.tar",
+   "blobId": "4f341faeeb44ec898a9117789c7212b7b9523a59",
+   "size": 5065072640,
+   "lfs": {
+    "sha256": "4de7ec8a7afc384aaccc07b56f49d57746e41fc6a577cc87163d69bf62fde7bd",
+    "size": 5065072640,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00043.tar",
+   "blobId": "e2f81b5cc81b565b95b8c25d6985eb5e432cc6b3",
+   "size": 5082501120,
+   "lfs": {
+    "sha256": "21040400e89a8bba4a93909e6c37112956ad99f9fd0e6fcd1812157e8fad4596",
+    "size": 5082501120,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00044.tar",
+   "blobId": "4b29fc47fb5b549fd6b64d4d4d937113af7ab282",
+   "size": 5134469120,
+   "lfs": {
+    "sha256": "3416c6a3e8456ddbe8b235b6945b4d57481c3ef56906823d05e49ca34a5df732",
+    "size": 5134469120,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00045.tar",
+   "blobId": "a591a52c598fb276ce72efbe2f580b84d60f9387",
+   "size": 4869181440,
+   "lfs": {
+    "sha256": "a12d9746b2e959cd8cd72d6cb2aedd5febcbc6cebd9e0dd7de6aaa2eee63ee47",
+    "size": 4869181440,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00046.tar",
+   "blobId": "da3feafc76c5efa5e0aeedd0c2a38d3d782c3b04",
+   "size": 5124444160,
+   "lfs": {
+    "sha256": "00c36eb8942e67d82d8a11c020611e26af8faff5dee7e75c0cd2b179f3112c2c",
+    "size": 5124444160,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00047.tar",
+   "blobId": "213f83811af2a0ce8fa2fdf82f384c643c3f7d23",
+   "size": 4801218560,
+   "lfs": {
+    "sha256": "197b45adc731518268d0a3c70aa9cf8fc7216d325a6f39d5d81dbe379620a673",
+    "size": 4801218560,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00048.tar",
+   "blobId": "0612162179512f36dc0b4075ed9bd4d6cd93e32b",
+   "size": 4962048000,
+   "lfs": {
+    "sha256": "79711e4c078b2355d0040139eb5b06dcf5260f7947daba5ed753d81f4b36b72a",
+    "size": 4962048000,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00049.tar",
+   "blobId": "72b4877448efe744fba65a3d4307a02ae4f708f9",
+   "size": 4806922240,
+   "lfs": {
+    "sha256": "697e021bd9111ba3d499c8fb866d8a960cdabf8fb75a3d7b9f6450cb89be9d0d",
+    "size": 4806922240,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00050.tar",
+   "blobId": "e87c3fdcc33560c1f9bf0246f7172a740e4d43ad",
+   "size": 5537781760,
+   "lfs": {
+    "sha256": "4a97af09ca3c5046ab8363631110c5151a9ba36b1e064095868496d3628b9241",
+    "size": 5537781760,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00051.tar",
+   "blobId": "72c36c5656c706b39f9345dacf7aa1bb36c0e52b",
+   "size": 5220392960,
+   "lfs": {
+    "sha256": "4b1d0e978e1042c02c48946145d6048202c8077b3c74c5ecddeb3234c4708e22",
+    "size": 5220392960,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00052.tar",
+   "blobId": "0cddfadfa4f0078e6400a2b028cbde6ee6b794e4",
+   "size": 4969451520,
+   "lfs": {
+    "sha256": "a2c74f25ebe45a05c5627ab49c815f3d387a63a7200c59b494a60ae1ec6677f0",
+    "size": 4969451520,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00053.tar",
+   "blobId": "60d057a23d153763b46b0759a0d864c12aa25c09",
+   "size": 5094758400,
+   "lfs": {
+    "sha256": "d0fe75d8bfcb60115fd86fec7f24d6273ca24653eabf53bf9fc266c128a1627a",
+    "size": 5094758400,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00054.tar",
+   "blobId": "dcc2b6c3980542fc59d41354030be9c19f42f8aa",
+   "size": 5054914560,
+   "lfs": {
+    "sha256": "7b2e523ea294589a460a93a95465979968bc3c0cc0e0565068f64e1fbfc5dd0d",
+    "size": 5054914560,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00055.tar",
+   "blobId": "9358ae162c75291b0ad763825c288f87c80d5e9b",
+   "size": 4831365120,
+   "lfs": {
+    "sha256": "240cdf72f6b9b27b56bd9e55ea1010a7d6204b9901c03d160db0ab8c79c5936b",
+    "size": 4831365120,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00056.tar",
+   "blobId": "677844c8c47d108fbb4af631ce83cc17ff43fb1b",
+   "size": 5376952320,
+   "lfs": {
+    "sha256": "39f1a0a845f108c000c9df0f3e417c2b1db7ffc11041ef0f9fb83e395ab7bd88",
+    "size": 5376952320,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00057.tar",
+   "blobId": "81aca6114cf067457c41666f7e36350f658ea485",
+   "size": 4984258560,
+   "lfs": {
+    "sha256": "4d29ea5fb763cf87c6ff399cf44a373f62ba519ef48c2ff2885047e49aecb5d6",
+    "size": 4984258560,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00058.tar",
+   "blobId": "5b2d7c332a995e56275110308f09a5f17ae3a904",
+   "size": 5121228800,
+   "lfs": {
+    "sha256": "1b610c8a6c3948e9892deb5ed997ec9122d9086f54c4b21b6c5d3f8b2c4e6cb0",
+    "size": 5121228800,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00059.tar",
+   "blobId": "66331ebd370295793118e549fbe33aafe9e92d74",
+   "size": 4567982080,
+   "lfs": {
+    "sha256": "0d60f6f66c20d6b7fa7a408e77b202d290264421c6fce35a5b0808afc264dae3",
+    "size": 4567982080,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00060.tar",
+   "blobId": "7d6bdfba8df05c633328e685cac9b312eff20977",
+   "size": 5011200000,
+   "lfs": {
+    "sha256": "972183390a461396aac47981f389cbddfe13815d02f1374dc7f604561a12292b",
+    "size": 5011200000,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00061.tar",
+   "blobId": "e5ffa7435a4238669c465a5319e736d991d17574",
+   "size": 5104261120,
+   "lfs": {
+    "sha256": "b242cab8ce6d03d711543f6899ac7dd663d7874c6e4a4b3f1e2f41944e400f06",
+    "size": 5104261120,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00062.tar",
+   "blobId": "0e8d800711eafb5573616874df8f42e1a01e127c",
+   "size": 4994355200,
+   "lfs": {
+    "sha256": "6f95cb33f9626a21ab138b5d942afd5ae9eecce8d4d2532ef13c5fe5707ae031",
+    "size": 4994355200,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00063.tar",
+   "blobId": "d72f3497952ba49ad8d0a7093e9df8f23f441e99",
+   "size": 5025290240,
+   "lfs": {
+    "sha256": "373197a362d80ada9269495b25d7098c2bbfe939b86d8a0b4bf3fc826fb99ce2",
+    "size": 5025290240,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00064.tar",
+   "blobId": "0f437c4f2376bfd143910c3372afb9242e169073",
+   "size": 5295360000,
+   "lfs": {
+    "sha256": "7a3b9862c6ef019662b22d33363bb1ef68d12ac94ede388ceddc062f6376b433",
+    "size": 5295360000,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00065.tar",
+   "blobId": "5cb7d97983412a4b5a2e6e6c1a1037a94197b8fb",
+   "size": 4480614400,
+   "lfs": {
+    "sha256": "afe73aa28c36e2b9a8c71650b999bfa978b572232e50d7c749dc89bbd0f7b3ad",
+    "size": 4480614400,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00066.tar",
+   "blobId": "1674050184df519d9d9f9f933ec2644b2b923b3d",
+   "size": 5131264000,
+   "lfs": {
+    "sha256": "d46b76a28cf1ac1a6fbf4f24b5ca794257ed83942ade3cd0113a443ced7b91df",
+    "size": 5131264000,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00067.tar",
+   "blobId": "e78a500e21f701fff8d00d1e0c42e5a6845e6958",
+   "size": 5093969920,
+   "lfs": {
+    "sha256": "1eb76c52f8a6916c512d5d774cd6e9335fcee0cf9310059fdbe89708e0b42730",
+    "size": 5093969920,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00068.tar",
+   "blobId": "ce24a1a5abcfc82db8a44578d93e45b4a3254277",
+   "size": 4820684800,
+   "lfs": {
+    "sha256": "8af2f8f6d213719010370973b5d6230ecedac863ad861cc11c6bd4108a3962f1",
+    "size": 4820684800,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00069.tar",
+   "blobId": "3e1ce2b8be588d25444a95bbe8879859c9ffaba6",
+   "size": 4919971840,
+   "lfs": {
+    "sha256": "9717a14878720012b51c2e37b1dc82b3d84ef5332748d70dc53498381313c7bc",
+    "size": 4919971840,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00070.tar",
+   "blobId": "ca35513bd88156b389f9e28581062afd73bf2134",
+   "size": 4843950080,
+   "lfs": {
+    "sha256": "69d7b47965f1bf1195867c95d77debcfe6ebf38aa6744c0d3d236692a9de72e4",
+    "size": 4843950080,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00071.tar",
+   "blobId": "cab1ac5da53aea82e384595e5e00929d81bb5c00",
+   "size": 4342005760,
+   "lfs": {
+    "sha256": "859949ff3f46d813f5bbab34667df4c0e35ad75f25d480b058888e489e461733",
+    "size": 4342005760,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00072.tar",
+   "blobId": "fd179d95065e17184450a7c343128a48f05fafda",
+   "size": 4870103040,
+   "lfs": {
+    "sha256": "dc6f8bfacf0dc095ed1999902687086aad3458bd7c5458a38e103d2b7b7d474b",
+    "size": 4870103040,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00073.tar",
+   "blobId": "0d54790c8aef9a2c67743aa61f34baf4750a95d0",
+   "size": 4433633280,
+   "lfs": {
+    "sha256": "15e9884059498cb9fa147d205dc13c15b94c201c8041a92ddfa49db74bf3f6a7",
+    "size": 4433633280,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00074.tar",
+   "blobId": "3f14d3bed2680c593a0c709e996ec8983e204ee0",
+   "size": 3522027520,
+   "lfs": {
+    "sha256": "27dddea7f1a3509abf161b77f7244e5979d58760b05d630b597187658ea732ae",
+    "size": 3522027520,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00075.tar",
+   "blobId": "446f393b837ecf89867b439fc2c86027366b8a9d",
+   "size": 3759790080,
+   "lfs": {
+    "sha256": "799aba40cc954ca8b5688f358930f20fb40e972c6d9e8c347c3a5e10dcac167a",
+    "size": 3759790080,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00076.tar",
+   "blobId": "b016ae82b52c258f261370e1e1007a060d1294da",
+   "size": 13281443840,
+   "lfs": {
+    "sha256": "20215f65296e72c5bed99e6a6a522a135d7716a72940c3eac24b669476560ae3",
+    "size": 13281443840,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00077.tar",
+   "blobId": "e989bb6ace8e459acd50bb99cdf64af142f4c527",
+   "size": 12088893440,
+   "lfs": {
+    "sha256": "fc6cc7b6afc0b83c652bc00a8303e121a1e640405fdf540718ab6e3bc918674f",
+    "size": 12088893440,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00078.tar",
+   "blobId": "95d27fb809a9784f12fc0191f49630f6c2e84131",
+   "size": 11707013120,
+   "lfs": {
+    "sha256": "bb0a644531fba9348d359263539c16b4516ba060e1dbb6ca596a7acffb41eef0",
+    "size": 11707013120,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00079.tar",
+   "blobId": "d60b289f862963198f93cb66533d2ff43d1da153",
+   "size": 13374576640,
+   "lfs": {
+    "sha256": "7c1d3c9432d529ed2be0337c22851c3c4a578f9b160e2021a6413ff87336b3e4",
+    "size": 13374576640,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00080.tar",
+   "blobId": "111674eb85d8d413ccbbf54226df56efb6879217",
+   "size": 14438154240,
+   "lfs": {
+    "sha256": "aa13e7b3bf408836ba55d607c5389c4fa529e57e54450e55e96a7fb49c262937",
+    "size": 14438154240,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00081.tar",
+   "blobId": "3c68648dd0443c30c73f51a858642f124f472445",
+   "size": 13421957120,
+   "lfs": {
+    "sha256": "540937c62204de01fe5a5bc0ac037f66b7e36187283d099b3f958dbfeea47297",
+    "size": 13421957120,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00082.tar",
+   "blobId": "940747caf2770f98a84795e37040accd1ce389df",
+   "size": 12288051200,
+   "lfs": {
+    "sha256": "19dfe1d6e295def877d97b04717c98f96e99a4f6b089fb1317377cf2ed3f047b",
+    "size": 12288051200,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00083.tar",
+   "blobId": "315ced94f0cf87137ff7b4777a6468664de9b65c",
+   "size": 12637757440,
+   "lfs": {
+    "sha256": "3caee5628cafaf519460f06990616a90484a166b02e0236d3743aec21450519b",
+    "size": 12637757440,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00084.tar",
+   "blobId": "1208ae00db2ce00ba2eb1b33edcc044a532543ac",
+   "size": 12157378560,
+   "lfs": {
+    "sha256": "b961d9f934783dd1eaa7cbc21b353e8c265251c848eaf818bb1ffb675fbb1f88",
+    "size": 12157378560,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00085.tar",
+   "blobId": "f50e90e2fdb76ac1b51fd07075a9961b914efeb9",
+   "size": 11629158400,
+   "lfs": {
+    "sha256": "3039d26b6f81da1048d463ad8a7998612a90918626627c49d78710dda81d9348",
+    "size": 11629158400,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00086.tar",
+   "blobId": "44b4f5611ab2637cd7e687473fb7e7c8bb7e9ade",
+   "size": 14655938560,
+   "lfs": {
+    "sha256": "e5e236812dcab603cfb3985895717d631ff68c3d3c39980d3376981dd4c0677c",
+    "size": 14655938560,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00087.tar",
+   "blobId": "6dc960178fbfc92b01062c1aab6bc2a608a26db4",
+   "size": 14549504000,
+   "lfs": {
+    "sha256": "a29ca755c130082efd54feab659b5cf3bac0c56642af66a2232a5e42752d7bf0",
+    "size": 14549504000,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00088.tar",
+   "blobId": "25b527017bbe70ef0bfdd88a88601bf0355506c9",
+   "size": 12398018560,
+   "lfs": {
+    "sha256": "0339ce1502f45108519ef7ad94584ecf5d3ca9c2fd3516261bfc5458509b27b4",
+    "size": 12398018560,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00089.tar",
+   "blobId": "f13d621d32031380372e94b6773fa2bd12f4bfdf",
+   "size": 11678371840,
+   "lfs": {
+    "sha256": "8c28693578f2bc5995839a28de0535ab07ec8a3072feea5a063f93283d76f332",
+    "size": 11678371840,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00090.tar",
+   "blobId": "30b31552764b84f8f8554387bb9478ed408c5bae",
+   "size": 12729436160,
+   "lfs": {
+    "sha256": "a4c153699b449be028cffeec62650c53a4e35f189660d9b1c603115299fc8ff0",
+    "size": 12729436160,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00091.tar",
+   "blobId": "edaf956387b1f23dc92f8e8dcd66532e15d2c803",
+   "size": 11597373440,
+   "lfs": {
+    "sha256": "145eb7ccaf509af74aaefcaf730d4e1e5056915cce18c48ee3a00a8e03a8606c",
+    "size": 11597373440,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00092.tar",
+   "blobId": "334f7369f2ca37b0dfaea363e4df233445bd630a",
+   "size": 12999577600,
+   "lfs": {
+    "sha256": "1abf288101dcb26bf646f7271afb62836b37297d2683b22600708b39718113a6",
+    "size": 12999577600,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00093.tar",
+   "blobId": "bf78e09a79abf5d14e37542fe92d4115ecaf1a94",
+   "size": 12590110720,
+   "lfs": {
+    "sha256": "60db96f4d23dbcca549ff3dfeefd62e53aeb3235c4446254ea29db5d4de2a0f5",
+    "size": 12590110720,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00094.tar",
+   "blobId": "1983153ac92eb9097a740d6759e686959524803a",
+   "size": 12544624640,
+   "lfs": {
+    "sha256": "67a6cd9bac740bbf0639657eea6bfd6928544cf8d063cdc3346d84bc2f496092",
+    "size": 12544624640,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00095.tar",
+   "blobId": "ad0e1f3368882cd8f05783f6fda6d73ab37fdcb3",
+   "size": 13427916800,
+   "lfs": {
+    "sha256": "30c32a0090416969fb673c538cbeb71a9cbe49e45bd053c0004fb5f66c9065eb",
+    "size": 13427916800,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00096.tar",
+   "blobId": "cfa6e3c9f002d99a641c2c9ff7c359becc5d4446",
+   "size": 13302292480,
+   "lfs": {
+    "sha256": "fbb643d93182150c3c7e5d6d6b76c6482f30f1d7066bb1f281c0042b9fa4c258",
+    "size": 13302292480,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00097.tar",
+   "blobId": "70903a1f0a7a83829c55684a90d71368ab63d9f9",
+   "size": 12884561920,
+   "lfs": {
+    "sha256": "a22ec21ef38bf9d92b329598a6a416acaf6591731c49ba2e357fe2d7a8e8268b",
+    "size": 12884561920,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00098.tar",
+   "blobId": "575e1895dce20bb85bc03f0d83b879f3a80bc514",
+   "size": 13310545920,
+   "lfs": {
+    "sha256": "0eaad2a09f4e85eede8fd4dd8e304087e20d419980fd09f891b118cbbdb88974",
+    "size": 13310545920,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00099.tar",
+   "blobId": "0fa0889bfd2c26a297dceb9a9c0fbbc659c95754",
+   "size": 12627200000,
+   "lfs": {
+    "sha256": "2fd17733f2697be80495e9d1e57504ad67b560ea65b22ec8e8b91587281f3c59",
+    "size": 12627200000,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00100.tar",
+   "blobId": "e1206cd95bd88bc6edb5a71dc79fade7195ca413",
+   "size": 12356341760,
+   "lfs": {
+    "sha256": "0cdee0950bf4d0897bb0478ae3a48716212bcbc74a7a5d9da52694646111898e",
+    "size": 12356341760,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00101.tar",
+   "blobId": "b0532986cafd31e0aee2d247a0ae94b8a0d577dc",
+   "size": 11305738240,
+   "lfs": {
+    "sha256": "3638d6e14275444ebe6e519d64326a309d2d1f0e5d9f7dd821dc22d5c2afd0f2",
+    "size": 11305738240,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00102.tar",
+   "blobId": "f99bc25c95512314b1693eabb7bdf907ed078f1f",
+   "size": 12760432640,
+   "lfs": {
+    "sha256": "9ffde5d44bead08f72e2c95e7f7f58414535288f675a93797b0085a98504dd67",
+    "size": 12760432640,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00103.tar",
+   "blobId": "977ac0febc96cf407b4fb96e40497fd79a195b34",
+   "size": 11512504320,
+   "lfs": {
+    "sha256": "15cdb8a755c84306b73eaa697e2206e4ad60f00157c1aa1f2acce320024e771b",
+    "size": 11512504320,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00104.tar",
+   "blobId": "bc52c537bd4451839b8ec91aa7a10159be467857",
+   "size": 9444577280,
+   "lfs": {
+    "sha256": "3bdee2cfa5b8236feeb016f1d691c36d77a2d492723bdcafe6d88e1c77b360f7",
+    "size": 9444577280,
+    "pointerSize": 135
+   }
+  },
+  {
+   "rfilename": "shard_00105.tar",
+   "blobId": "1510e70675368a561f8d0dd4102448f3cde34e3e",
+   "size": 11818618880,
+   "lfs": {
+    "sha256": "5985cf12b79f18ead8edf8b4320fe066ed5093fe1908ad861e717297d95cf5fc",
+    "size": 11818618880,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00106.tar",
+   "blobId": "712108b3255b0fcc35722746ab0887561fbb25d8",
+   "size": 11204485120,
+   "lfs": {
+    "sha256": "3760d87c5d1767e800d9d3991f48f0be4a7980e0c2ea7e068275e553905be603",
+    "size": 11204485120,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00107.tar",
+   "blobId": "bcdf6eb871bb06c9115e4cfcee250ada7c58dd12",
+   "size": 11916072960,
+   "lfs": {
+    "sha256": "d271a4dc7635527b803831243dd1e01ad1f065e08b37a591c5be67c3f484ba83",
+    "size": 11916072960,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00108.tar",
+   "blobId": "ea731759b819baa665ff1a4d354abcc16cf16808",
+   "size": 11953029120,
+   "lfs": {
+    "sha256": "af938c601fc7f6430eec4b8d000fe8464723e99fcd9a9e8823dd0f52024d5de8",
+    "size": 11953029120,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00109.tar",
+   "blobId": "da75c977dfb73fb66d01ce62a52543e087f680df",
+   "size": 11573248000,
+   "lfs": {
+    "sha256": "43fb38993e389eb55d871752296f10f1cad38d35befd2d844108568ab002eaf1",
+    "size": 11573248000,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00110.tar",
+   "blobId": "9f5ca1f933afbbc3201693f6db14de2fe3e58544",
+   "size": 11400693760,
+   "lfs": {
+    "sha256": "0bdc127861bf97699265f8b198fc2f666a6f05d617756a557160976cdad45998",
+    "size": 11400693760,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00111.tar",
+   "blobId": "653b19650da9cf9f0ee9731d2c3fdeb45c00f582",
+   "size": 12135424000,
+   "lfs": {
+    "sha256": "381a3d4c9c56f3ed1140e9deab2c1882c55531ed8ded748f0cdbe11e021f11bd",
+    "size": 12135424000,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00112.tar",
+   "blobId": "68af0dde33be6a4210684ad47d8c01b705526134",
+   "size": 11073935360,
+   "lfs": {
+    "sha256": "6c2f2c8543888c677c7411d153d77ece2a029eed038b7627c336d81329a387f5",
+    "size": 11073935360,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00113.tar",
+   "blobId": "e9907eb40d482165e25810572eda7aac2ac8b3d8",
+   "size": 11664742400,
+   "lfs": {
+    "sha256": "8f8cb5578fcd3468fcd2434df1bbff57f940da2677e5de99434d4ad2a61feab7",
+    "size": 11664742400,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00114.tar",
+   "blobId": "471db8691e7229dfd008e1ebbb036d0a493aad06",
+   "size": 14829998080,
+   "lfs": {
+    "sha256": "4684a7bbac4eb0571e911956424761d211311a6cb3d58a16dea40243a9f3f9ec",
+    "size": 14829998080,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00115.tar",
+   "blobId": "a2375d479de307b4a63f80482aa0325fe0c212a5",
+   "size": 12879319040,
+   "lfs": {
+    "sha256": "d7de1fff259eb871cfb77df236947eefacec4daf1865cb803dcade9bacc49640",
+    "size": 12879319040,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00116.tar",
+   "blobId": "74822fae0757e4cbbe66cfdebc49099cc2994f35",
+   "size": 13225871360,
+   "lfs": {
+    "sha256": "628b8637723c3c4f60be22e68e9cfb985a5823047e7e06fcc0a3dcdbc2f66fce",
+    "size": 13225871360,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00117.tar",
+   "blobId": "d4e23de6a20630accfc0185e4e12c9f2bb052c3a",
+   "size": 12911564800,
+   "lfs": {
+    "sha256": "25ebe060785985a9d478178bfd5eec253fa2a3c8f434945c976bbb6a5f61b891",
+    "size": 12911564800,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00118.tar",
+   "blobId": "cdff8b0f7280cd2e11d7cd399abfd4508dd159ee",
+   "size": 11255859200,
+   "lfs": {
+    "sha256": "2d20064a0f3c89a73178e220e7d044b3733e2bf98069892f0be7b1fc2f029908",
+    "size": 11255859200,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00119.tar",
+   "blobId": "53548469c91f293ad1e05f9f60ef7bc5ca62b711",
+   "size": 12072704000,
+   "lfs": {
+    "sha256": "98b7857a0a5e3b74e4ed1e3893b4b845bf322caa732d183d37ca6e416d36eb4b",
+    "size": 12072704000,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00120.tar",
+   "blobId": "34627fd9d5ea2c7eaa8c29335159ae0eae95ebf9",
+   "size": 10629734400,
+   "lfs": {
+    "sha256": "dce66ce930d7876c99b02255bd7a48f380de38cbf288a96c141441a8d7ad693a",
+    "size": 10629734400,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00121.tar",
+   "blobId": "c41979fc5ac7ba0fe3c2284a50d6ffd30f5b3964",
+   "size": 12026101760,
+   "lfs": {
+    "sha256": "1b54088e4338a3f5f6895b9496abdfda80550ece857428c917a3c815be13fc90",
+    "size": 12026101760,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00122.tar",
+   "blobId": "473a95ed0c7708129b57a983653934a03921a91d",
+   "size": 11837890560,
+   "lfs": {
+    "sha256": "66e60d326b04754c5d9c262bfb9a799d4ec792c8dddf92ae4830d3cfaa9e431b",
+    "size": 11837890560,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00123.tar",
+   "blobId": "e58e9262537c1fa97d4aff035f0c7c00e63997c9",
+   "size": 11739781120,
+   "lfs": {
+    "sha256": "34db5454a4a32f34dad719cf79caf817bd65642a629f7d7127f0ce9f2a8c3d2c",
+    "size": 11739781120,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00124.tar",
+   "blobId": "6a333a2161e25796792561e759790c8955acfac7",
+   "size": 12493834240,
+   "lfs": {
+    "sha256": "f650084b425622b6e8f6f55ee6cded36dbb1676df09921c27836a3d2ad22af7b",
+    "size": 12493834240,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00125.tar",
+   "blobId": "d3380d4a850c408f353289b1f585efa38f6cc99b",
+   "size": 13038704640,
+   "lfs": {
+    "sha256": "209a0cd09b1253f9451da6197f2435e638c28ca4e1dc1d9115b253884c179493",
+    "size": 13038704640,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00126.tar",
+   "blobId": "280162c1e05dfcbb45ad19f3b728a9e84bb64979",
+   "size": 12814704640,
+   "lfs": {
+    "sha256": "c6762abd65928626cffbcb061d161b0b26fc42bf63bacdd0ba532ac8c01bb821",
+    "size": 12814704640,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00127.tar",
+   "blobId": "52b0ab1abbac44e552ff2185b68509e2376185c2",
+   "size": 13207982080,
+   "lfs": {
+    "sha256": "f52fa93ba127043d8e1323850351c9b63e97ee5496fa10ee0817f303309c7ab1",
+    "size": 13207982080,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00128.tar",
+   "blobId": "883a17ff11c57876d881fd06c6207054deba4e08",
+   "size": 13490247680,
+   "lfs": {
+    "sha256": "d546929dcc243dbafa92c5359892245dc059972022a03892597fbef04f7d82f0",
+    "size": 13490247680,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00129.tar",
+   "blobId": "15c6c7af90c7889fb359930e2e94afd9c25097ff",
+   "size": 13473597440,
+   "lfs": {
+    "sha256": "3807abe66ace6a06681949fcf5c7af2c2ade4d9287d78fa0a63dbe22632096ce",
+    "size": 13473597440,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00130.tar",
+   "blobId": "8497ed2b55d165f797943476c6bf7f834df3294b",
+   "size": 13246781440,
+   "lfs": {
+    "sha256": "121b3e2f57b3a4945caf16e04fe62ea3b889ca288e3b788442e69044ec76b92b",
+    "size": 13246781440,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00131.tar",
+   "blobId": "63301111cbb3aecc19a68d58ae6c78b5f08fd138",
+   "size": 12444221440,
+   "lfs": {
+    "sha256": "7be9520befafe5ca5bed3a9d69b8fa50916c7b295de008436e334a5bf6d9b262",
+    "size": 12444221440,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00132.tar",
+   "blobId": "1f187922d7224dcac97ea818221c06c2c4f3a2d3",
+   "size": 12335831040,
+   "lfs": {
+    "sha256": "98ae8c63409a9b99fb53a15a0aaa598a8dcc09bbd60ebadcbc67bc501bec2be1",
+    "size": 12335831040,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00133.tar",
+   "blobId": "bf23f6761fb01c0ce92f0e185f5488e44dfd8a4a",
+   "size": 13121146880,
+   "lfs": {
+    "sha256": "e611613c57b9c858b30d34c2ba1259c3e4b67800c9ffe1f2a24d0e54c7cb2fbc",
+    "size": 13121146880,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00134.tar",
+   "blobId": "883d6b3422087ca1e1a438d453e78e0b64514b09",
+   "size": 13423861760,
+   "lfs": {
+    "sha256": "7e3ccd854bc4cd5d5915e15aed18facf12c8b0bf1e6a992bc8df7c07c2732962",
+    "size": 13423861760,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00135.tar",
+   "blobId": "7dc9ae7d503a417180db079bef9d550f4a06be40",
+   "size": 12520509440,
+   "lfs": {
+    "sha256": "b3825af282d7a12f151e3d81243de7769f3fcbb80f90d0278016596cc6503c85",
+    "size": 12520509440,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00136.tar",
+   "blobId": "ba7b61a70c3a7c6c3bb3069a0f22574a57467c7f",
+   "size": 11621027840,
+   "lfs": {
+    "sha256": "0c7e695868943d824f7ca3577b954e800fec8cc5ec0e20b78931918b7f4c6868",
+    "size": 11621027840,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00137.tar",
+   "blobId": "0fe19e529c43f7f034e36c70b40db0ed8818d804",
+   "size": 11685058560,
+   "lfs": {
+    "sha256": "b88f75acd996afed83287654c32e6396f0b9e58797b6901f329ebe31abb0b72c",
+    "size": 11685058560,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00138.tar",
+   "blobId": "570200f7bf42bc8e5c4a70eed65f54099a7e09a4",
+   "size": 12252733440,
+   "lfs": {
+    "sha256": "71071352557fd3f60793507b1f977c2c035b54d4fc574e34689143302cea78b9",
+    "size": 12252733440,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00139.tar",
+   "blobId": "e386694a792a154b4bc45271ab2e493bf329bbbd",
+   "size": 12675112960,
+   "lfs": {
+    "sha256": "2b6ae9afc24b157048376ef5815e696618e963cca27b71e5399e1fae8a6a1059",
+    "size": 12675112960,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00140.tar",
+   "blobId": "e8ba42d78533113ff4b5fd9a3fa85e6ea251c6ba",
+   "size": 12815032320,
+   "lfs": {
+    "sha256": "f1d93dff795936326682b7b3e1cce1e128a03295017e26156fbf4c65f64ef207",
+    "size": 12815032320,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00141.tar",
+   "blobId": "8af2b5ead5271147ad484554136005e01afe918a",
+   "size": 12812206080,
+   "lfs": {
+    "sha256": "6bbbeda9df75bcf489e435b639fa9a79059929aa7cdd1c4a4e851676c1d472ff",
+    "size": 12812206080,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00142.tar",
+   "blobId": "b2a4b79c742cd58141b01f7504703e80cb7e0487",
+   "size": 11278213120,
+   "lfs": {
+    "sha256": "13f7e24762bb55708042eea062972130aec457fdec0735d76177c1bc58cfa8fb",
+    "size": 11278213120,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00143.tar",
+   "blobId": "5cc2681d1929d1f658bebbf5284fda4eacc97cbb",
+   "size": 12548751360,
+   "lfs": {
+    "sha256": "4478d31b4dc699af9ead34cc0efcd373130681813254a6e741686b046b6a0997",
+    "size": 12548751360,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00144.tar",
+   "blobId": "2ab84e75d55fc2a17aad6e6a753e7281ae1b57de",
+   "size": 12524636160,
+   "lfs": {
+    "sha256": "c90c36d6dd8e471ec34a084219d5d12cd040c46e1d1453ad4420e96386da8dcd",
+    "size": 12524636160,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00145.tar",
+   "blobId": "68a8b57fe0e08e247bdd5316378fd0d5044415e2",
+   "size": 12024535040,
+   "lfs": {
+    "sha256": "534819fd639288af1194131ca67c2b920d5a498e3d716e41b97dd25671582b6c",
+    "size": 12024535040,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00146.tar",
+   "blobId": "8ee9bac51dda0a65e98fb3f373594be3a98b55a2",
+   "size": 12863068160,
+   "lfs": {
+    "sha256": "7bd7c43c54585e09fa8308ec78c09b2dc0dd56dc1c9a8af38654d7d0d16b7636",
+    "size": 12863068160,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00147.tar",
+   "blobId": "5cc637af1bc70e080d1ed3cbd3c6563d62cd0150",
+   "size": 12292505600,
+   "lfs": {
+    "sha256": "6cd877b369e93d622ca18ec3d2e01f151c2f96c5a40960a1fc0eb055bf315b34",
+    "size": 12292505600,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00148.tar",
+   "blobId": "0357e9712cedfaef9e7a1c14f2b99d78f55d5ec6",
+   "size": 12040069120,
+   "lfs": {
+    "sha256": "f7b950dd90ad6c7c7886b564c111331ef1e9f9e4295528cf94b4445c739dc4c5",
+    "size": 12040069120,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00149.tar",
+   "blobId": "4a9dde219a6ca943912f4b4a3ebd744a7919ed97",
+   "size": 12679239680,
+   "lfs": {
+    "sha256": "6d875cbfebadd832989485e9c58bc8233340f6ce68386c6415b4b05c235c3e29",
+    "size": 12679239680,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00150.tar",
+   "blobId": "273bbfa0332aeec72da22c97d7cb6e4cd6ac328b",
+   "size": 14766428160,
+   "lfs": {
+    "sha256": "29d25f6b0749ff6f85b57a08fc9621e860802d7aa0fc1563dd0473c9503c53cc",
+    "size": 14766428160,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00151.tar",
+   "blobId": "f64b517948dc0894845864c632022742b97b0b2e",
+   "size": 15030599680,
+   "lfs": {
+    "sha256": "e405e9507fad39a26378b5580860c284623d533f8ed7c335b7a522abe3942195",
+    "size": 15030599680,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00152.tar",
+   "blobId": "306774791b8f7932d4fa0eefcdeb9b3cd8c0e740",
+   "size": 14953994240,
+   "lfs": {
+    "sha256": "5fd308714eaef07289b71d2eff6234669a3c2f91688a15e0abf55c5aa8ef47c7",
+    "size": 14953994240,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00153.tar",
+   "blobId": "61fb065705b879f8bc2a101d584827eeb1c42e83",
+   "size": 12433674240,
+   "lfs": {
+    "sha256": "a3da78e44be72a4bdb67daff044451da0e3fd2b88243f0c98d08dcf7333aa5d2",
+    "size": 12433674240,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00154.tar",
+   "blobId": "701adefbb182875a5a05251ad2fb6671f1073d38",
+   "size": 11673978880,
+   "lfs": {
+    "sha256": "c52571da109751355346b2f8a815d7ec9d6159e653082f7dfe459223dfb43879",
+    "size": 11673978880,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00155.tar",
+   "blobId": "7078e7993dd5d490084f2f3df5243177b2b3f9d5",
+   "size": 12024074240,
+   "lfs": {
+    "sha256": "6265e386e6a0632150c9b7b3182faa6edd2e49cf1795842280855e85f868f7ec",
+    "size": 12024074240,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00156.tar",
+   "blobId": "ae6f10f267e5b4386d3c4cf1f8d03168a28091be",
+   "size": 16489502720,
+   "lfs": {
+    "sha256": "ea1d150d59f6ccf5b9498f1c15705fbe69f82fd35f71948bb9fff206cc35a7e4",
+    "size": 16489502720,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00157.tar",
+   "blobId": "b7fa1bbcbdd1dd6dd8cfe43ce32acb211153e563",
+   "size": 16696135680,
+   "lfs": {
+    "sha256": "b7906101c2e573845b84dd5010d79f3386677ed95ef996eb7a7ded6f246a5ddf",
+    "size": 16696135680,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00158.tar",
+   "blobId": "4c53de523d789e309abf74a70b45a4e70e20184e",
+   "size": 16575027200,
+   "lfs": {
+    "sha256": "f5ebd14a2eed0ab33ae40d9c7ecada1354b41487181e7b15b0301a557a7af555",
+    "size": 16575027200,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00159.tar",
+   "blobId": "a81009f3d105b26ba722b120dcc95b98ffd9f727",
+   "size": 16350238720,
+   "lfs": {
+    "sha256": "7acdcb39f4726f828e66595477e260f55da8bb36967baf3f43ef0781dd924e72",
+    "size": 16350238720,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00160.tar",
+   "blobId": "7c169674f7b3084ef1bd133774bdd3eeb1b2d41f",
+   "size": 16235745280,
+   "lfs": {
+    "sha256": "4fbac1fdde1dd6e202a65cc5e191a368ee2cb540a025c90934a97486f50beb71",
+    "size": 16235745280,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00161.tar",
+   "blobId": "7883bd36813ce9b8380ee233629b461ef616692e",
+   "size": 15598602240,
+   "lfs": {
+    "sha256": "7dccc1a137fdf93c9f43e29c34e06b97cd57e1518713baa8b92e01e11e625943",
+    "size": 15598602240,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00162.tar",
+   "blobId": "26347883cf9b4cb57f9dadbbf988754ec9ae5c5f",
+   "size": 15038013440,
+   "lfs": {
+    "sha256": "97694b16529cfeb894d1675a1fce750f698d57d78512bdb23bf370020cc1f146",
+    "size": 15038013440,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00163.tar",
+   "blobId": "26ac39ce38d74612f5f60de42cc9c027cc4a047f",
+   "size": 14549043200,
+   "lfs": {
+    "sha256": "bb99662578253df772fdcf32fc6c22f3e2ec583a01da9fee8278b2797c0af1fb",
+    "size": 14549043200,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00164.tar",
+   "blobId": "9169b369cfff7f429a6345af2373b339047bcabe",
+   "size": 13859276800,
+   "lfs": {
+    "sha256": "49a717f4f7734e7b4ffcc76e462ad5cda457aabf7ae6d10c0e925d09e2d7734f",
+    "size": 13859276800,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00165.tar",
+   "blobId": "a50c21d540289eb841c04a33662f0ab09e283288",
+   "size": 16264120320,
+   "lfs": {
+    "sha256": "cf2178beb6f7e9c0b40dddaaa23934ba74e84a248d4cff3d7e06379e7caaef85",
+    "size": 16264120320,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00166.tar",
+   "blobId": "daa3bcacde686efa524fdc38f3d8bb065fbecb06",
+   "size": 16109322240,
+   "lfs": {
+    "sha256": "1c0c409ccf0110dac75cae34c620c9e061e087d2a2c9d7ff7d0b0c560571fe9b",
+    "size": 16109322240,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00167.tar",
+   "blobId": "d8ac6c784ac5da26087c77aeaf2307f71c5682c8",
+   "size": 15889981440,
+   "lfs": {
+    "sha256": "75705c7e644d5526d7f1c682ef40f6943ef871328a9fbf011a28b9c7a8ecf589",
+    "size": 15889981440,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00168.tar",
+   "blobId": "abf6bac207551ed7c474013e2d06c5209ed03f89",
+   "size": 15642583040,
+   "lfs": {
+    "sha256": "08f3fdecba575e64e1ef7f42aef075eadefb35317c410d4ca800fc14547b36d2",
+    "size": 15642583040,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00169.tar",
+   "blobId": "4c1f069f9a96e5b9476dedb8a748b8e89bbd0a8b",
+   "size": 15763169280,
+   "lfs": {
+    "sha256": "d2d7f9335cdaaf1a686cad4434eb22e1a7c51cf6c300ad218a489c01bf9461dd",
+    "size": 15763169280,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00170.tar",
+   "blobId": "4e0d1ac22b11be626f76e7da84bbe0179a67c24e",
+   "size": 14326947840,
+   "lfs": {
+    "sha256": "082adc0a93370fb4cccaf526bd76efb66dfe5639c0ba8952f0ada7c4b45fcf33",
+    "size": 14326947840,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00171.tar",
+   "blobId": "2a96b62d1ec156460da6bb2125bc5694143122fb",
+   "size": 14175948800,
+   "lfs": {
+    "sha256": "674b99b5e81a01edbec4a0518cbc417c3c4f7466fa4e8b0ddaaaa8f317be83f2",
+    "size": 14175948800,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00172.tar",
+   "blobId": "36e5a6067cf589e2ab3e5768416c8059b4974337",
+   "size": 15288483840,
+   "lfs": {
+    "sha256": "8bf6f5b87fe8f8a5fd531a39358fc9e5a3c3d0da33c36d33d4e99b467111cbe4",
+    "size": 15288483840,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00173.tar",
+   "blobId": "71b988a2eb2b5cb3e688127debbfcfcc393c4590",
+   "size": 15114424320,
+   "lfs": {
+    "sha256": "ea96db0095f4f1ae9135c22b479827ece15fd723f8aa756b8d7337f31a76d2b6",
+    "size": 15114424320,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00174.tar",
+   "blobId": "a24cee7e0df75fd2511a3c62f5454f543120db32",
+   "size": 15355074560,
+   "lfs": {
+    "sha256": "1f9e724c602901f46f151d9467a232253431052373448e56236f7e68448c5ba6",
+    "size": 15355074560,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00175.tar",
+   "blobId": "912ca54bc77f9e286965b830825bd5756e4a7f4b",
+   "size": 12171008000,
+   "lfs": {
+    "sha256": "4522d9aa1696db2cf0d255eb0dc6e17e55cc8c4c4a1ea670aba4ded8d8eb3843",
+    "size": 12171008000,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00176.tar",
+   "blobId": "1dbce1c0aa7b77e2596ad4a75c3733192cc2c48a",
+   "size": 12139356160,
+   "lfs": {
+    "sha256": "e8def20706b47edbbccfeceeb0afe4aca57a3e9e4ee18ba38dae5eab89edb75f",
+    "size": 12139356160,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00177.tar",
+   "blobId": "720286a1d7ad82ea79b02bb2913a7fa149e2276f",
+   "size": 11710545920,
+   "lfs": {
+    "sha256": "71f75872d4dca26d0ec33e2234b4d50da7f8aea4874917c268577130f19de0b1",
+    "size": 11710545920,
+    "pointerSize": 136
+   }
+  },
+  {
+   "rfilename": "shard_00178.tar",
+   "blobId": "6d24beb7855abb4bbde7e5321d97980c5dd47310",
+   "size": 9727825920,
+   "lfs": {
+    "sha256": "388b229ab2c65e3937d8f369c615795bbf47f40d9819278b29e24ef397314059",
+    "size": 9727825920,
+    "pointerSize": 135
+   }
+  }
+ ],
+ "createdAt": "2025-07-09T15:23:35.000Z",
+ "usedStorage": 1870513326080
+}

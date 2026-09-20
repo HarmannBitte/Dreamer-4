@@ -1,0 +1,106 @@
+[project]
+name = "dreamer4"
+version = "0.19.3"
+description = "Dreamer4 - PyTorch"
+authors = [
+    { name = "Phil Wang", email = "lucidrains@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">= 3.10"
+license = { file = "LICENSE" }
+keywords = [
+    'artificial intelligence',
+    'deep learning',
+    'transformer',
+    'attention mechanism',
+    'model-based reinforcement learning',
+    'world models'
+]
+
+classifiers = [
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Developers',
+    'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3.9',
+]
+
+dependencies = [
+    "accelerate",
+    "adam-atan2-pytorch>=0.3.6",
+    "assoc-scan",
+    "discrete-continuous-embed-readout>=0.2.10",
+    "einx>=0.3.0",
+    "einops>=0.8.1",
+    "ema-pytorch",
+    "env-ssl-wrapper>=0.1.8",
+    "fire",
+    "hl-gauss-pytorch>=0.2.7",
+    "h-net-dynamic-chunking>=0.5.12",
+    "imageio",
+    "imageio-ffmpeg",
+    "loguru",
+    "memmap-replay-buffer>=0.1.10",
+    "opencv-python",
+    "Pillow",
+    "PoPE_pytorch>=0.2.1",
+    "rich",
+    "torch>=2.4",
+    "torch-einops-utils>=0.1.19",
+    "torchaudio",
+    "torchvision",
+    "tqdm",
+    "x-mlps-pytorch>=0.3.5",
+    "x-transformers>=2.19.7",
+    "vit-pytorch>=1.21.5",
+]
+
+[project.urls]
+Homepage = "https://pypi.org/project/dreamer4/"
+Repository = "https://codeberg.org/lucidrains/dreamer4"
+
+[project.scripts]
+dreamer4 = "dreamer4.cli:main"
+
+[project.optional-dependencies]
+examples = []
+test = [
+    "gymnasium",
+    "pygame",
+    "pytest",
+    "pytest-shard"
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "."
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.build]
+ignore-vcs = true
+include = [
+    "/dreamer4",
+    "/README.md",
+    "/LICENSE",
+]
+exclude = [
+    "/tests",
+    "*.sh",
+    "*.png",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["dreamer4"]

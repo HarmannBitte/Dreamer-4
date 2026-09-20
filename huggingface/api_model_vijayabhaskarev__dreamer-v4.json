@@ -1,0 +1,176 @@
+{
+ "_id": "6a3ba5b310057ed629232008",
+ "id": "vijayabhaskarev/dreamer-v4",
+ "private": false,
+ "pipeline_tag": "reinforcement-learning",
+ "library_name": "pytorch",
+ "tags": [
+  "pytorch",
+  "reinforcement-learning",
+  "model-based-rl",
+  "world-models",
+  "dreamer",
+  "flow-matching",
+  "arxiv:2509.24527",
+  "license:mit",
+  "region:us"
+ ],
+ "downloads": 0,
+ "likes": 0,
+ "modelId": "vijayabhaskarev/dreamer-v4",
+ "author": "vijayabhaskarev",
+ "sha": "f8540f32106f963d484ae15eef194a334559422d",
+ "lastModified": "2026-08-08T05:33:05.000Z",
+ "gated": false,
+ "disabled": false,
+ "model-index": null,
+ "config": {},
+ "cardData": {
+  "license": "mit",
+  "tags": [
+   "reinforcement-learning",
+   "model-based-rl",
+   "world-models",
+   "dreamer",
+   "flow-matching",
+   "pytorch"
+  ],
+  "library_name": "pytorch",
+  "pipeline_tag": "reinforcement-learning"
+ },
+ "siblings": [
+  {
+   "rfilename": ".gitattributes",
+   "blobId": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+   "size": 1519
+  },
+  {
+   "rfilename": "README.md",
+   "blobId": "689d9cd9e437abfd452a47d211955609889c3d70",
+   "size": 3394
+  },
+  {
+   "rfilename": "ball_in_cup/agent_bc.pt",
+   "blobId": "ddd76f68474bdbf6ddfdd46f9194e09651da6672",
+   "size": 506716349,
+   "lfs": {
+    "sha256": "34f348fcb33f530c81916ac6b7cc7e6bae3eadfc94b34a8869f3671bad7c7f3c",
+    "size": 506716349,
+    "pointerSize": 134
+   }
+  },
+  {
+   "rfilename": "ball_in_cup/agent_imagination_rl.pt",
+   "blobId": "70527abad207356dd2e485f1b60b813b883cc329",
+   "size": 7034023,
+   "lfs": {
+    "sha256": "aef3dd19d54ddecb9e0f08d05440132ba7bb5e973af31c2f8332ea8ed4c4f41c",
+    "size": 7034023,
+    "pointerSize": 132
+   }
+  },
+  {
+   "rfilename": "ball_in_cup/seeds/bc_seed11.pt",
+   "blobId": "cdc397dbac6b8cfe4eccc4269b727c6ab4be5b9e",
+   "size": 506725094,
+   "lfs": {
+    "sha256": "3e7d83ea3b472936e22de132c942a239cc9730a6840be17d0bfb4a52e95ce612",
+    "size": 506725094,
+    "pointerSize": 134
+   }
+  },
+  {
+   "rfilename": "ball_in_cup/seeds/bc_seed12.pt",
+   "blobId": "ddaf6fa5b4614316be3a1bf3db809b099a5b254b",
+   "size": 506725094,
+   "lfs": {
+    "sha256": "ee76ad81d8d09923f0b9df0b6da59aed994fc4feb4742ad935ffbfbd0bc44f33",
+    "size": 506725094,
+    "pointerSize": 134
+   }
+  },
+  {
+   "rfilename": "ball_in_cup/seeds/bc_seed13.pt",
+   "blobId": "9321e7f100e2f2b2f84a830d10f7aa7a25aa17af",
+   "size": 506725094,
+   "lfs": {
+    "sha256": "ebf9a32f38fcfee11f01b92c6d21964011017f20685caa97b6fb2a613fc4ff78",
+    "size": 506725094,
+    "pointerSize": 134
+   }
+  },
+  {
+   "rfilename": "ball_in_cup/seeds/imagination_rl_seed1.pt",
+   "blobId": "d67632f01c9eced6d1e9b30c8b562473c9f1d622",
+   "size": 21096771,
+   "lfs": {
+    "sha256": "5055691a8ac41e0099e34b15c8415ad9d6dff8550695b5984f7c1d576fe45b6a",
+    "size": 21096771,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "ball_in_cup/seeds/imagination_rl_seed2.pt",
+   "blobId": "7c7602cf22b79ded73cf39dd91a673d2bc845531",
+   "size": 21096771,
+   "lfs": {
+    "sha256": "406b8822261d3a6c7cf09a3a2730d2f34ba1e462bac130e4c5cf0b33a044d492",
+    "size": 21096771,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "ball_in_cup/seeds/imagination_rl_seed3.pt",
+   "blobId": "e0929e866983047f1aeff4b569c9251d4fe2e7b1",
+   "size": 21096771,
+   "lfs": {
+    "sha256": "0ef4929867fb0df4d13bd510fe92d31bbfea61a84b2d448cdeeb84f33799b72e",
+    "size": 21096771,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "ball_in_cup/seeds/imagination_rl_seed4.pt",
+   "blobId": "805c998083c323f253f4c146c425d5756c0673d0",
+   "size": 21096771,
+   "lfs": {
+    "sha256": "2fe11c260568b906662289e2cebf79147a0661f134bade53e5aa2182e016db8e",
+    "size": 21096771,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "ball_in_cup/seeds/imagination_rl_seed5.pt",
+   "blobId": "c8cc269c0ab668a3288d4481e481f97a50312e19",
+   "size": 21096771,
+   "lfs": {
+    "sha256": "d6088602a977fff171e0da1c6cecdacdfdb2db69447d8fb99f354424e9393ac7",
+    "size": 21096771,
+    "pointerSize": 133
+   }
+  },
+  {
+   "rfilename": "ball_in_cup/tokenizer.pt",
+   "blobId": "966121d85215aebad78dbaf1800b3b4df22bc37c",
+   "size": 299818123,
+   "lfs": {
+    "sha256": "596e1dfa4cd56299517f54a036adad84a48a372fb7cb63f00eb702616639a885",
+    "size": 299818123,
+    "pointerSize": 134
+   }
+  },
+  {
+   "rfilename": "ball_in_cup/world_model.pt",
+   "blobId": "b3e3ddd413dc2997c1772f26478430e5a02943a9",
+   "size": 490949931,
+   "lfs": {
+    "sha256": "5f10ed73ac2dd8b18eeae31dbe852596787f4d4c049252bd1bd4133e633e4064",
+    "size": 490949931,
+    "pointerSize": 134
+   }
+  }
+ ],
+ "spaces": [],
+ "createdAt": "2026-06-24T09:38:59.000Z",
+ "usedStorage": 2930177563
+}

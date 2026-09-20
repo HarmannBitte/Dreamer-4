@@ -1,0 +1,14 @@
+# Files removed from chrisgao99_dreamer4 because they are byte-identical (md5) to the file at the same relative path in nicklashansen_dreamer4 (chrisgao99 is a fork of that repo).
+# relative path	md5	size (bytes)	identical copy kept at
+tasks.json	e479fae398b3f8da3658c28aeb8abd58	3273087	nicklashansen_dreamer4/tasks.json
+assets/tasks/walker-run.gif	68100f00d92a43a1d36b09b43de69ed0	778772	nicklashansen_dreamer4/assets/tasks/walker-run.gif
+assets/4.gif	24be9e86f8ca04f7db7cbc6b470c8dfe	769616	nicklashansen_dreamer4/assets/4.gif
+assets/tasks/walker-run-backward.gif	f68b8bb6f264b8b40d5ee9a326996f0a	764542	nicklashansen_dreamer4/assets/tasks/walker-run-backward.gif
+assets/3.png	44aeb257b11c73f01063c149555a4842	681560	nicklashansen_dreamer4/assets/3.png
+assets/tasks/hopper-hop.gif	8b6fa1e8e80bfd542b8b6f658972e8e0	621357	nicklashansen_dreamer4/assets/tasks/hopper-hop.gif
+assets/tasks/finger-spin.gif	279b419a990ba1cae301b0f01a4ea5a9	584212	nicklashansen_dreamer4/assets/tasks/finger-spin.gif
+assets/2.png	b7dde4c325af153c4587bebf4e4b779e	534689	nicklashansen_dreamer4/assets/2.png
+assets/1.png	1a8e7cd1d3199e587c315a450b8d5363	302090	nicklashansen_dreamer4/assets/1.png
+assets/tasks/pendulum-swingup.gif	a80d3211af54c02fb9a8d4316e7f806e	250847	nicklashansen_dreamer4/assets/tasks/pendulum-swingup.gif
+assets/tasks/reacher-hard.gif	a9b45af3ecafb4f69ea5aaefd98eff5d	202876	nicklashansen_dreamer4/assets/tasks/reacher-hard.gif
+assets/tasks/jumper-jump.gif	91e1e1a036c2bd742a5a9fcf60fd1e74	193076	nicklashansen_dreamer4/assets/tasks/jumper-jump.gif

@@ -1,0 +1,29 @@
+# Large media/data files removed from the local repo snapshots to respect workspace size limits.
+# size	local path (removed)	download URL (use ?raw=true or the 'Download raw' button)
+    48.6 MB	./next-state_open-dreamer/dreamer/fvd/i3d_pretrained_400.npz	https://github.com/next-state/open-dreamer/blob/main/dreamer/fvd/i3d_pretrained_400.npz
+    16.5 MB	./HKimiwada_Dreamer4/inference/results/world_model/minecraft/latest_multistep.mp4	https://github.com/HKimiwada/Dreamer4/blob/main/inference/results/world_model/minecraft/latest_multistep.mp4
+    16.5 MB	./HKimiwada_Dreamer4/inference/results/world_model/minecraft/multistep_inference.mp4	https://github.com/HKimiwada/Dreamer4/blob/main/inference/results/world_model/minecraft/multistep_inference.mp4
+    16.5 MB	./HKimiwada_Dreamer4/inference/results/world_model/minecraft/one_step_inference.mp4	https://github.com/HKimiwada/Dreamer4/blob/main/inference/results/world_model/minecraft/one_step_inference.mp4
+    16.5 MB	./HKimiwada_Dreamer4/inference/results/world_model/minecraft/latest_singlestep.mp4	https://github.com/HKimiwada/Dreamer4/blob/main/inference/results/world_model/minecraft/latest_singlestep.mp4
+     8.7 MB	./HKimiwada_Dreamer4/inference/results/tokenizer/reconstructed_output.mp4	https://github.com/HKimiwada/Dreamer4/blob/main/inference/results/tokenizer/reconstructed_output.mp4
+     8.1 MB	./HKimiwada_Dreamer4/inference/results/tokenizer/v2_reconstructed_output.mp4	https://github.com/HKimiwada/Dreamer4/blob/main/inference/results/tokenizer/v2_reconstructed_output.mp4
+     5.9 MB	./next-state_open-dreamer/site/public/website/xpred-vpred-noise-comparison.svg	https://github.com/next-state/open-dreamer/blob/main/site/public/website/xpred-vpred-noise-comparison.svg
+     3.6 MB	./skr3178_DreamerV4/DreamerV4.pdf	https://github.com/skr3178/DreamerV4/blob/pretrained_tokenizer/DreamerV4.pdf
+     3.6 MB	./vijayabhaskar-ev_dreamer_v4/assets/hero_exploiting.gif	https://github.com/vijayabhaskar-ev/dreamer_v4/blob/main/assets/hero_exploiting.gif
+     3.5 MB	./vijayabhaskar-ev_dreamer_v4/assets/hero_healthy.gif	https://github.com/vijayabhaskar-ev/dreamer_v4/blob/main/assets/hero_healthy.gif
+     3.5 MB	./reactor-team_open-dreamer/assets/banner.png	https://github.com/reactor-team/open-dreamer/blob/main/assets/banner.png
+     3.5 MB	./next-state_open-dreamer/assets/banner.png	https://github.com/next-state/open-dreamer/blob/main/assets/banner.png
+     3.1 MB	./next-state_open-dreamer/site/public/website/comparison.mp4	https://github.com/next-state/open-dreamer/blob/main/site/public/website/comparison.mp4
+     3.0 MB	./vijayabhaskar-ev_dreamer_v4/assets/policy_stochastic_catch.gif	https://github.com/vijayabhaskar-ev/dreamer_v4/blob/main/assets/policy_stochastic_catch.gif
+     2.5 MB	./next-state_open-dreamer/site/public/website/coinrun.gif	https://github.com/next-state/open-dreamer/blob/main/site/public/website/coinrun.gif
+     2.4 MB	./skr3178_DreamerV4/Notes/5.jpeg	https://github.com/skr3178/DreamerV4/blob/pretrained_tokenizer/Notes/5.jpeg
+     2.3 MB	./edwhu_dreamer4-jax/docs/rl-cropped.gif	https://github.com/edwhu/dreamer4-jax/blob/main/docs/rl-cropped.gif
+     2.2 MB	./skr3178_DreamerV4/Notes/3.jpeg	https://github.com/skr3178/DreamerV4/blob/pretrained_tokenizer/Notes/3.jpeg
+     2.1 MB	./skr3178_DreamerV4/Notes/2.jpeg	https://github.com/skr3178/DreamerV4/blob/pretrained_tokenizer/Notes/2.jpeg
+     2.1 MB	./skr3178_DreamerV4/Notes/1.jpeg	https://github.com/skr3178/DreamerV4/blob/pretrained_tokenizer/Notes/1.jpeg
+     2.1 MB	./skr3178_DreamerV4/Notes/4.jpeg	https://github.com/skr3178/DreamerV4/blob/pretrained_tokenizer/Notes/4.jpeg
+     1.9 MB	./next-state_open-dreamer/site/public/website/diffusion-forcing.svg	https://github.com/next-state/open-dreamer/blob/main/site/public/website/diffusion-forcing.svg
+     1.4 MB	./edwhu_dreamer4-jax/docs/imagination-cropped.gif	https://github.com/edwhu/dreamer4-jax/blob/main/docs/imagination-cropped.gif
+     1.1 MB	./nicklashansen_dreamer4/assets/0.gif	https://github.com/nicklashansen/dreamer4/blob/main/assets/0.gif
+     1.1 MB	./chrisgao99_dreamer4/assets/0.gif	https://github.com/chrisgao99/dreamer4/blob/main/assets/0.gif
+     1.0 MB	./next-state_open-dreamer/site/public/website/coinrun-wm.mp4	https://github.com/next-state/open-dreamer/blob/main/site/public/website/coinrun-wm.mp4
