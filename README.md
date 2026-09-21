@@ -3,6 +3,8 @@
 Local archive of (almost) every source cited in `dreamer4_research_report.md` (copy included here; original at `/home/user/dreamer4_research_report.md`).
 Everything was fetched on **2026-09-20** from the sandbox in Frankfurt. Total size ≈ 112 MB / ~1,370 files.
 
+**Presentation.** `presentation/` holds a 39-slide deep dive on the paper for a mixed technical audience (45–60 min): [`Dreamer4_Deep_Dive.pptx`](presentation/Dreamer4_Deep_Dive.pptx) (with speaker notes), [`Dreamer4_Deep_Dive.pdf`](presentation/Dreamer4_Deep_Dive.pdf), the [speaker notes](presentation/Dreamer4_Deep_Dive_speaker_notes.md) as Markdown, and the python-pptx scripts that regenerate it.
+
 **Media?** See **`MEDIA_INDEX.md`** — a complete list of every video, audio file, image and large artefact (archived or listed-only, with sizes and URLs).
 
 **Scope decision.** Text, code, PDFs, metadata and thumbnails were archived. Multi-GB artefacts (model checkpoints, datasets, full videos, podcast audio,
@@ -21,7 +23,8 @@ dreamer4_resources/
 ├── articles/      48 web pages: raw HTML/JSON + Markdown extraction               (8.8 MB) → articles/README.md, articles/_manifest.json
 ├── community/     Hacker News thread + 4 Reddit threads (JSON + Markdown)         (0.3 MB) → table below
 ├── videos/        oEmbed metadata + thumbnails for 7 YouTube videos               (0.1 MB) → videos/README.md
-└── huggingface/   model/dataset cards + API file listings for 4 models, 4 datasets (0.7 MB) → huggingface/README.md
+├── huggingface/   model/dataset cards + API file listings for 4 models, 4 datasets (0.7 MB) → huggingface/README.md
+└── presentation/  39-slide deep-dive deck (.pptx with speaker notes, .pdf, notes .md, build scripts) (5.1 MB) → presentation/README.md
 ```
 
 ---
