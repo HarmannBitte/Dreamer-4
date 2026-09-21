@@ -12,17 +12,19 @@ from PIL import Image, ImageEnhance
 import os
 
 A = "assets/"
-NAVY = RGBColor(0x14, 0x21, 0x3D); BLUE = RGBColor(0x2F, 0x5B, 0xEA); TEAL = RGBColor(0x1F, 0xB5, 0xA6)
-PURPLE = RGBColor(0x8B, 0x5C, 0xF6); RED = RGBColor(0xEF, 0x53, 0x50); GREY = RGBColor(0x6B, 0x72, 0x80)
-LIGHT = RGBColor(0xF3, 0xF5, 0xF9); WHITE = RGBColor(0xFF, 0xFF, 0xFF); DARK = RGBColor(0x1F, 0x29, 0x37)
-PALE_BLUE = RGBColor(0xE4, 0xEB, 0xFC); AMBER = RGBColor(0xF5, 0x9E, 0x0B)
+# ---- visual system: one dark ink, one accent, greys and hairlines; no fills, shadows or rounded shapes
+NAVY = RGBColor(0x14, 0x21, 0x3D); BLUE = RGBColor(0x2A, 0x56, 0xD6); DARK = RGBColor(0x1F, 0x29, 0x37)
+GREY = RGBColor(0x6B, 0x72, 0x80); MUTED = RGBColor(0x9A, 0xA3, 0xB2); RULE = RGBColor(0xD3, 0xD8, 0xE2)
+PANEL = RGBColor(0xF3, 0xF5, 0xF8); WHITE = RGBColor(0xFF, 0xFF, 0xFF); SKY = RGBColor(0x9D, 0xB8, 0xF5)
+GREEN = RGBColor(0x2E, 0x8B, 0x57); AMBER = RGBColor(0xC9, 0x7A, 0x0A)
+LIGHT = PANEL; PALE_BLUE = PANEL; TEAL = SKY; PURPLE = BLUE; RED = AMBER   # legacy names
 FONT = "Calibri"
 W, H = Inches(13.333), Inches(7.5)
 
 prs = Presentation(); prs.slide_width = W; prs.slide_height = H
 BLANK = prs.slide_layouts[6]
-FOOTER = "Dreamer 4 — Hafner*, Yan*, Lillicrap (Google DeepMind), arXiv 2509.24527, Sep 2025"
-state = {"n": 0}
+FOOTER = "Dreamer 4  ·  Hafner, Yan, Lillicrap (Google DeepMind)  ·  arXiv 2509.24527"
+state = {"n": 0, "part": None}
 
 # ---------------------------------------------------------------- helpers
 def _font(run_or_p, size, bold=False, color=DARK, italic=False, name=FONT):
@@ -31,14 +33,14 @@ def _font(run_or_p, size, bold=False, color=DARK, italic=False, name=FONT):
 import re
 _MARK = re.compile(r"(?<!\w)\*\*(?=\S)(.+?)(?<=\S)\*\*(?!\w)|(?<!\w)\*(?=\S)(.+?)(?<=\S)\*(?!\w)")
 
-def add_runs(p, text, size, color=DARK, bold=False, italic=False):
+def add_runs(p, text, size, color=DARK, bold=False, italic=False, bold_color=None):
     """Add runs to paragraph p, honouring **bold** and *italic* inline markup (author asterisks like 'Hafner*' are left alone)."""
     pos = 0
     for m in _MARK.finditer(text):
         if m.start() > pos:
             r = p.add_run(); r.text = text[pos:m.start()]; _font(r, size, bold, color, italic)
         if m.group(1) is not None:
-            r = p.add_run(); r.text = m.group(1); _font(r, size, True, color, italic)
+            r = p.add_run(); r.text = m.group(1); _font(r, size, True, bold_color or color, italic)
         else:
             r = p.add_run(); r.text = m.group(2); _font(r, size, bold, color, True)
         pos = m.end()
@@ -46,34 +48,38 @@ def add_runs(p, text, size, color=DARK, bold=False, italic=False):
         r = p.add_run(); r.text = text[pos:]; _font(r, size, bold, color, italic)
 
 def add_text(slide, left, top, width, height, text, size=18, bold=False, color=DARK, align=PP_ALIGN.LEFT,
-             anchor=MSO_ANCHOR.TOP, italic=False, line_spacing=1.05):
+             anchor=MSO_ANCHOR.TOP, italic=False, line_spacing=1.05, space=0, spc=None, bold_color=None):
     tb = slide.shapes.add_textbox(left, top, width, height); tf = tb.text_frame; tf.word_wrap = True
     tf.vertical_anchor = anchor; tf.margin_left = tf.margin_right = Inches(0.05); tf.margin_top = tf.margin_bottom = Inches(0.02)
     lines = text if isinstance(text, list) else [text]
     for i, line in enumerate(lines):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         p.alignment = align; p.line_spacing = line_spacing
-        add_runs(p, line, size, color, bold, italic)
+        if space: p.space_after = Pt(space)
+        add_runs(p, line, size, color, bold, italic, bold_color)
+        if spc is not None:
+            for r in p.runs: r._r.get_or_add_rPr().set("spc", str(int(spc * 100)))
     return tb
 
-def _bullet(p, level, char="•"):
+def _bullet(p, level, char="•", color=MUTED):
     pPr = p._p.get_or_add_pPr()
-    mar = Inches(0.28 + 0.32 * level); pPr.set("marL", str(int(mar))); pPr.set("indent", str(int(-Inches(0.24))))
-    for tag in ("a:buNone", "a:buChar", "a:buAutoNum"):
+    mar = Inches(0.26 + 0.3 * level); pPr.set("marL", str(int(mar))); pPr.set("indent", str(int(-Inches(0.22))))
+    for tag in ("a:buClr", "a:buNone", "a:buChar", "a:buAutoNum", "a:buFont"):
         for el in pPr.findall(qn(tag)): pPr.remove(el)
+    bc = etree.SubElement(pPr, qn("a:buClr")); c = etree.SubElement(bc, qn("a:srgbClr")); c.set("val", str(color))
     bf = etree.SubElement(pPr, qn("a:buFont")); bf.set("typeface", "Arial")
-    bc = etree.SubElement(pPr, qn("a:buChar")); bc.set("char", char)
+    ch = etree.SubElement(pPr, qn("a:buChar")); ch.set("char", char)
 
 def add_bullets(slide, left, top, width, height, items, size=18, color=DARK, space=6, bold_lead=True):
-    """items: list of str or (str, level). A leading '**text**' segment becomes bold."""
+    """items: list of str or (str, level). '**text**' segments are bold (lead-ins render in ink colour)."""
     tb = slide.shapes.add_textbox(left, top, width, height); tf = tb.text_frame; tf.word_wrap = True
     tf.margin_left = tf.margin_right = Inches(0.05)
     for i, it in enumerate(items):
         txt, lvl = (it, 0) if isinstance(it, str) else it
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
-        p.space_after = Pt(space); p.line_spacing = 1.05
+        p.space_after = Pt(space); p.line_spacing = 1.08
         sz = size if lvl == 0 else size - 2
-        add_runs(p, txt, sz, color)
+        add_runs(p, txt, sz, color, bold_color=NAVY)
         _bullet(p, lvl, "•" if lvl == 0 else "–")
     return tb
 
@@ -87,15 +93,25 @@ def fit_picture(slide, path, left, top, max_w, max_h, align="center"):
 def caption(slide, left, top, width, text, size=10.5):
     return add_text(slide, left, top, width, Inches(0.5), text, size=size, color=GREY, italic=True)
 
+def hline(slide, left, top, width, color=RULE, pt=0.75):
+    r = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, left, top, width, Pt(pt)); r.fill.solid(); r.fill.fore_color.rgb = color; r.line.fill.background(); return r
+
+def vline(slide, left, top, height, color=RULE, pt=0.75):
+    r = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, left, top, Pt(pt), height); r.fill.solid(); r.fill.fore_color.rgb = color; r.line.fill.background(); return r
+
+def kicker(slide, left, top, width, text, color=GREY, size=10, align=PP_ALIGN.LEFT):
+    """Small upper-case, letter-spaced label."""
+    return add_text(slide, left, top, width, Inches(0.3), text.upper(), size=size, bold=True, color=color, spc=1.2, align=align)
+
 def chrome(slide, title, subtitle=None, dark=False):
     state["n"] += 1
     if not dark:
-        bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, W, Inches(0.12)); bar.fill.solid(); bar.fill.fore_color.rgb = NAVY; bar.line.fill.background()
-        acc = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, Inches(0.12), Inches(1.6), Inches(0.05)); acc.fill.solid(); acc.fill.fore_color.rgb = BLUE; acc.line.fill.background()
-        add_text(slide, Inches(0.5), Inches(0.32), Inches(12.3), Inches(0.75), title, size=26, bold=True, color=NAVY)
-        if subtitle: add_text(slide, Inches(0.52), Inches(0.98), Inches(12.3), Inches(0.45), subtitle, size=15, color=GREY)
-        add_text(slide, Inches(0.5), Inches(7.05), Inches(10), Inches(0.35), FOOTER, size=9.5, color=GREY)
-    add_text(slide, Inches(12.2), Inches(7.05), Inches(0.8), Inches(0.35), str(state["n"]), size=10, color=(WHITE if dark else GREY), align=PP_ALIGN.RIGHT)
+        add_text(slide, Inches(0.5), Inches(0.38), Inches(12.3), Inches(0.75), title, size=26, bold=True, color=NAVY)
+        if subtitle: add_text(slide, Inches(0.52), Inches(1.0), Inches(12.3), Inches(0.45), subtitle, size=14, color=GREY)
+        hline(slide, Inches(0.5), Inches(6.98), Inches(12.33))
+        add_text(slide, Inches(0.5), Inches(7.04), Inches(8), Inches(0.3), FOOTER, size=9, color=MUTED)
+        if state["part"]: kicker(slide, Inches(8.0), Inches(7.05), Inches(4.0), state["part"], color=MUTED, size=8.5, align=PP_ALIGN.RIGHT)
+    add_text(slide, Inches(12.2), Inches(7.03), Inches(0.63), Inches(0.3), str(state["n"]), size=10, bold=True, color=(SKY if dark else GREY), align=PP_ALIGN.RIGHT)
 
 def notes(slide, text):
     slide.notes_slide.notes_text_frame.text = text
@@ -106,41 +122,103 @@ def new_slide(title, subtitle=None):
 def section(title, sub, n):
     s = prs.slides.add_slide(BLANK)
     bg = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, W, H); bg.fill.solid(); bg.fill.fore_color.rgb = NAVY; bg.line.fill.background()
-    acc = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.9), Inches(3.05), Inches(1.2), Inches(0.08)); acc.fill.solid(); acc.fill.fore_color.rgb = TEAL; acc.line.fill.background()
-    add_text(s, Inches(0.9), Inches(1.9), Inches(11), Inches(1.0), f"Part {n}", size=20, color=TEAL, bold=True)
-    add_text(s, Inches(0.9), Inches(3.25), Inches(11.5), Inches(1.3), title, size=44, bold=True, color=WHITE)
-    add_text(s, Inches(0.9), Inches(4.5), Inches(11), Inches(1.2), sub, size=20, color=RGBColor(0xC9, 0xD3, 0xE6))
+    add_text(s, Inches(7.6), Inches(0.9), Inches(5.3), Inches(4.2), f"{n:02d}", size=260, bold=True, color=RGBColor(0x1D, 0x2D, 0x52), align=PP_ALIGN.RIGHT)
+    kicker(s, Inches(0.9), Inches(2.55), Inches(6), f"Part {n}", color=SKY, size=13)
+    hline(s, Inches(0.9), Inches(2.98), Inches(0.9), color=SKY, pt=1.5)
+    add_text(s, Inches(0.9), Inches(3.15), Inches(9), Inches(1.3), title, size=44, bold=True, color=WHITE)
+    add_text(s, Inches(0.9), Inches(4.35), Inches(8.5), Inches(1.4), sub, size=18, color=RGBColor(0xC9, 0xD3, 0xE6), line_spacing=1.15)
+    state["part"] = f"Part {n} · {title}"
     chrome(s, title, dark=True); return s
 
-def add_table(slide, left, top, width, rows, col_widths=None, font=12, header_fill=NAVY, highlight_col=None, highlight_row=None, row_h=0.36):
+def _borders(cell, top=None, bottom=None):
+    """Booktabs-style borders: (color, pt) for top/bottom, no vertical rules. Elements are inserted in schema order."""
+    tcPr = cell._tc.get_or_add_tcPr()
+    for tag in ("a:lnL", "a:lnR", "a:lnT", "a:lnB"):
+        for el in tcPr.findall(qn(tag)): tcPr.remove(el)
+    for i, (tag, spec) in enumerate((("a:lnL", None), ("a:lnR", None), ("a:lnT", top), ("a:lnB", bottom))):
+        ln = etree.Element(qn(tag))
+        if spec:
+            ln.set("w", str(int(Pt(spec[1])))); ln.set("cap", "flat"); ln.set("cmpd", "sng"); ln.set("algn", "ctr")
+            sf = etree.SubElement(ln, qn("a:solidFill")); c = etree.SubElement(sf, qn("a:srgbClr")); c.set("val", str(spec[0]))
+            d = etree.SubElement(ln, qn("a:prstDash")); d.set("val", "solid")
+        else:
+            ln.set("w", "0"); etree.SubElement(ln, qn("a:noFill"))
+        tcPr.insert(i, ln)
+
+def add_table(slide, left, top, width, rows, col_widths=None, font=12, header_fill=None, highlight_col=None, highlight_row=None, row_h=0.36):
     nr, nc = len(rows), len(rows[0])
     shp = slide.shapes.add_table(nr, nc, left, top, width, Inches(row_h * nr)); t = shp.table
+    tblPr = t._tbl.tblPr; tblPr.set("firstRow", "0"); tblPr.set("bandRow", "0")
+    for el in tblPr.findall(qn("a:tableStyleId")): tblPr.remove(el)
     if col_widths:
         for i, cw in enumerate(col_widths): t.columns[i].width = Inches(cw)
-    if nr > 1 and row_h > 0.45:  # keep the header row compact even when body rows are tall
+    if nr > 1 and row_h > 0.45:
         t.rows[0].height = Inches(0.42)
     for r in range(nr):
         for c in range(nc):
-            cell = t.cell(r, c); cell.text = ""; cell.margin_left = cell.margin_right = Inches(0.06); cell.margin_top = cell.margin_bottom = Inches(0.03)
+            cell = t.cell(r, c); cell.text = ""; cell.margin_left = cell.margin_right = Inches(0.07); cell.margin_top = cell.margin_bottom = Inches(0.04)
+            cell.vertical_anchor = MSO_ANCHOR.MIDDLE
             p = cell.text_frame.paragraphs[0]; txt = str(rows[r][c])
-            hdr = (r == 0)
-            add_runs(p, txt, font, color=WHITE if hdr else DARK, bold=hdr or (highlight_col == c and r > 0) or (highlight_row == r))
+            hdr = (r == 0); hl = (highlight_row == r) or (highlight_col == c and r > 0)
+            add_runs(p, txt, font if not hdr else font - 0.5, color=NAVY if hdr else (BLUE if (highlight_col == c and r > 0) else DARK), bold=hdr or hl)
             p.alignment = PP_ALIGN.LEFT if (c == 0 or len(txt) > 28) else PP_ALIGN.CENTER
-            cell.fill.solid()
-            if hdr: cell.fill.fore_color.rgb = header_fill
-            elif highlight_row == r or (highlight_col == c): cell.fill.fore_color.rgb = PALE_BLUE
-            else: cell.fill.fore_color.rgb = WHITE if r % 2 else LIGHT
+            if highlight_row == r: cell.fill.solid(); cell.fill.fore_color.rgb = PANEL
+            else: cell.fill.background()
+            if hdr: _borders(cell, top=(NAVY, 1.0), bottom=(NAVY, 1.0))
+            elif r == nr - 1: _borders(cell, bottom=(NAVY, 1.0))
+            else: _borders(cell, bottom=(RULE, 0.5))
     return t
 
-def box(slide, left, top, width, height, title, body, fill=PALE_BLUE, title_color=NAVY, size=13):
-    b = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height); b.fill.solid(); b.fill.fore_color.rgb = fill; b.line.fill.background()
-    b.adjustments[0] = 0.08
-    add_text(slide, left + Inches(0.12), top + Inches(0.08), width - Inches(0.24), Inches(0.4), title, size=size + 2, bold=True, color=title_color)
-    add_text(slide, left + Inches(0.12), top + Inches(0.5), width - Inches(0.24), height - Inches(0.55), body if isinstance(body, list) else [body], size=size, color=DARK)
-    return b
+def note(slide, left, top, width, height, title, body, size=12.5, accent=BLUE, **_):
+    """Margin note: thin accent rule on the left, small-caps label, body text. Replaces the old filled/rounded box."""
+    body = body if isinstance(body, list) else [body]
+    cpl = max(20, int((width - Inches(0.22)) / Inches(1) * 72 / (size * 0.46)))
+    est = Inches(0.42 + sum(-(-len(re.sub(r"\*", "", b)) // cpl) for b in body) * size * 1.1 * 1.2 / 72 + len(body) * 5 / 72)
+    vline(slide, left, top + Inches(0.03), min(height, est) - Inches(0.06), color=accent, pt=2)
+    kicker(slide, left + Inches(0.2), top, width - Inches(0.22), title, color=NAVY, size=10)
+    if body and all(b.startswith("• ") for b in body):
+        add_bullets(slide, left + Inches(0.14), top + Inches(0.36), width - Inches(0.16), height - Inches(0.4), [b[2:] for b in body], size=size, space=4)
+    else:
+        add_text(slide, left + Inches(0.2), top + Inches(0.36), width - Inches(0.22), height - Inches(0.4), body, size=size, color=DARK, line_spacing=1.1, space=5)
+box = note
+
+def columns(slide, top, height, items, left=Inches(0.5), width=Inches(12.33), gap=Inches(0.45), start=1, size=13, head_size=15,
+            numerals=True, num_label=lambda i: f"{i:02d}", arrows=False, bullets=False, rule_colors=None, head_h=0.42):
+    """Flat column layout: optional accent numeral, thin rule, heading, body. items = [(heading, body-str-or-list), ...]."""
+    n = len(items); cw = int((width - gap * (n - 1)) / n)
+    for i, (head, body) in enumerate(items):
+        x = left + i * (cw + gap); y = top
+        if numerals:
+            add_text(slide, x, y, cw, Inches(0.45), num_label(start + i), size=20, bold=True, color=BLUE)
+            if arrows and i < n - 1: add_text(slide, x + cw, y + Inches(0.02), gap, Inches(0.45), "→", size=18, color=MUTED, align=PP_ALIGN.CENTER)
+            y += Inches(0.48)
+        hline(slide, x, y, cw, color=(rule_colors[i] if rule_colors else NAVY), pt=1.0)
+        add_text(slide, x, y + Inches(0.08), cw, Inches(head_h), head, size=head_size, bold=True, color=NAVY)
+        by = y + Inches(0.12) + Inches(head_h); bh = top + height - by
+        body = body if isinstance(body, list) else [body]
+        if bullets: add_bullets(slide, x - Inches(0.05), by, cw + Inches(0.05), bh, body, size=size, space=5)
+        else: add_text(slide, x, by, cw, bh, body, size=size, color=DARK, line_spacing=1.1, space=5)
+
+def numbered(slide, left, top, width, items, size=16, gap=0.22, num_w=0.55, head_w=None):
+    """Numbered list with accent numerals in a narrow column. items = str | (head, body). Returns bottom y."""
+    y = top
+    for i, it in enumerate(items):
+        head, body = (None, it) if isinstance(it, str) else it
+        add_text(slide, left, y - Inches(0.03), Inches(num_w), Inches(0.5), f"{i + 1:02d}", size=size + 2, bold=True, color=BLUE)
+        tx = left + Inches(num_w); tw = width - Inches(num_w)
+        if head and head_w:
+            add_text(slide, tx, y, Inches(head_w), Inches(0.5), head, size=size, bold=True, color=NAVY); tx += Inches(head_w); tw -= Inches(head_w)
+            txt = body
+        else:
+            txt = (f"**{head}** {body}" if head else body)
+        cpl = max(20, int(tw / Inches(1) * 72 / (size * 0.46)))      # rough chars per line
+        lines = max(1, -(-len(re.sub(r"\*", "", txt)) // cpl))
+        add_text(slide, tx, y, tw, Inches(0.3 + lines * size * 1.25 / 72), txt, size=size, color=DARK, line_spacing=1.1, bold_color=NAVY)
+        y += Inches(lines * size * 1.25 / 72 + gap)
+    return y
 
 def arrow(slide, left, top, width=Inches(0.45), height=Inches(0.5), color=GREY):
-    a = slide.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, left, top, width, height); a.fill.solid(); a.fill.fore_color.rgb = color; a.line.fill.background(); return a
+    return add_text(slide, left, top, width, height, "→", size=18, color=MUTED, align=PP_ALIGN.CENTER)
 
 def jpeg(path, max_w=1600, q=85):
     """Downscale/convert an asset to JPEG to keep the deck small; returns new path."""
@@ -153,30 +231,42 @@ def jpeg(path, max_w=1600, q=85):
 # ================================================================ SLIDES
 # 1 Title -----------------------------------------------------------------
 s = prs.slides.add_slide(BLANK); state["n"] += 1
-bgsrc = A + "frame_teaser_1.jpg"; im = Image.open(bgsrc).convert("RGB"); im = ImageEnhance.Brightness(im).enhance(0.35); im.save(A + "title_bg.jpg", quality=85)
-s.shapes.add_picture(A + "title_bg.jpg", 0, 0, width=W, height=H)
-add_text(s, Inches(0.8), Inches(1.5), Inches(11.5), Inches(0.5), "PAPER DEEP DIVE", size=16, bold=True, color=TEAL)
-add_text(s, Inches(0.8), Inches(2.0), Inches(11.8), Inches(1.4), "Dreamer 4", size=66, bold=True, color=WHITE)
-add_text(s, Inches(0.8), Inches(3.2), Inches(11.8), Inches(1.0), "Training Agents Inside of Scalable World Models", size=32, color=WHITE)
-add_text(s, Inches(0.8), Inches(4.25), Inches(11.8), Inches(0.9), ["Danijar Hafner*, Wilson Yan*, Timothy Lillicrap — Google DeepMind", "arXiv 2509.24527 · 29 September 2025 · danijar.com/dreamer4"], size=18, color=RGBColor(0xD6, 0xDE, 0xEE))
-add_text(s, Inches(0.8), Inches(6.3), Inches(11.8), Inches(0.5), "Presenter: ____________    ·    Date: ____________    ·    ~45–60 min incl. discussion", size=14, color=RGBColor(0xB8, 0xC2, 0xD6))
+bg = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, W, H); bg.fill.solid(); bg.fill.fore_color.rgb = NAVY; bg.line.fill.background()
+# right-hand strips: imagined rollout, human play inside the model, robot world model (all model-generated frames)
+strip_w, strip_h = Inches(5.433), Inches(2.5); sx = W - strip_w
+for i, (f, pre, anchor) in enumerate([("frame_imag_treechop.jpg", (0, 0, 634, 356), "top"),      # game view only (the clip also shows reward/value traces)
+                                      ("frame_diamond_dreamer.jpg", None, "top"), ("frame_realworld_soar1.jpg", None, "center")]):
+    im = Image.open(A + f).convert("RGB")
+    if pre: im = im.crop(pre)
+    tw, th = im.width, int(im.width * strip_h / strip_w)
+    if th > im.height: th = im.height; tw = int(im.height * strip_w / strip_h)
+    l = (im.width - tw) // 2; t = 0 if anchor == "top" else (im.height - th) // 2
+    im.crop((l, t, l + tw, t + th)).save(A + f"title_strip_{i}.jpg", quality=88)
+    s.shapes.add_picture(A + f"title_strip_{i}.jpg", sx, i * strip_h, width=strip_w, height=strip_h)
+kicker(s, Inches(0.8), Inches(1.55), Inches(6), "Paper deep dive  ·  arXiv 2509.24527", color=SKY, size=11)
+add_text(s, Inches(0.75), Inches(1.95), Inches(6.8), Inches(1.3), "Dreamer 4", size=64, bold=True, color=WHITE)
+add_text(s, Inches(0.8), Inches(3.1), Inches(6.4), Inches(1.4), ["Training Agents Inside of", "Scalable World Models"], size=26, color=WHITE, line_spacing=1.1)
+hline(s, Inches(0.85), Inches(4.55), Inches(0.9), color=SKY, pt=1.5)
+add_text(s, Inches(0.8), Inches(4.75), Inches(6.6), Inches(1.0), ["Danijar Hafner*, Wilson Yan*, Timothy Lillicrap — Google DeepMind", "29 September 2025  ·  danijar.com/project/dreamer4"], size=15, color=RGBColor(0xC9, 0xD3, 0xE6), line_spacing=1.2)
+add_text(s, Inches(0.8), Inches(6.55), Inches(6.6), Inches(0.4), "Presenter ____________     Date ____________     ~45–60 min incl. discussion", size=11.5, color=RGBColor(0x8F, 0x9B, 0xB8))
+caption(s, Inches(0.8), Inches(6.95), Inches(6.6), "Right: frames generated by the Dreamer 4 world model — an imagined rollout, a human playing inside the model, and the robot-arm model.", size=9)
 notes(s, "Welcome. This is a deep dive into Dreamer 4, the September 2025 DeepMind paper by Danijar Hafner, Wilson Yan and Tim Lillicrap. "
          "Headline: an agent that learns to obtain diamonds in Minecraft purely from offline video, by training inside a learned world model that runs in real time on a single GPU. "
-         "Background image: a frame of the official teaser video from the project page.")
+         "The three frames on the right are all generated by the world model: an imagined training rollout, a human play-testing session, and the robot-arm model.")
 
 # 2 Agenda -----------------------------------------------------------------
 s = new_slide("Agenda")
-add_bullets(s, Inches(0.7), Inches(1.5), Inches(6), Inches(5), [
-    "**Part 1 — Background:** why world models, what made scaling them hard, the offline diamond challenge",
-    "**Part 2 — Method:** tokenizer, dynamics transformer, shortcut forcing, agent tokens, imagination training (PMPO)",
-    "**Part 3 — Experiments:** real-time human play-testing, diamond challenge, ablations, learning from unlabeled video, robotics",
-    "**Part 4 — Discussion:** limitations, critical reading, future work, takeaways",
-    "**Appendix:** hyper-parameters, full tables, glossary"], size=18, space=12)
-box(s, Inches(7.3), Inches(1.6), Inches(5.4), Inches(4.4), "How to read this deck", [
-    "• Equations are kept to the minimum needed for intuition; the appendix has the exact settings.",
-    "• Every number is from the paper's tables (Table 1, 2, 7, 8) or the authors' talks — sources are on each slide.",
-    "• Figures: © the authors (arXiv 2509.24527 / danijar.com), reproduced for discussion.",
-    "• Suggested pacing: Parts 1–2 ≈ 25 min, Part 3 ≈ 15 min, Part 4 ≈ 10 min + Q&A."], size=13)
+numbered(s, Inches(0.6), Inches(1.7), Inches(6.9), [
+    ("Background", "why world models, what made scaling them hard, the offline diamond challenge"),
+    ("Method", "tokenizer, dynamics transformer, shortcut forcing, agent tokens, imagination training (PMPO)"),
+    ("Experiments", "real-time human play-testing, diamond challenge, ablations, learning from unlabeled video, robotics"),
+    ("Discussion", "limitations, critical reading, future work, takeaways"),
+    ("Appendix", "hyper-parameters, full tables, glossary")], size=16, gap=0.3, num_w=0.6, head_w=2.0)
+note(s, Inches(8.3), Inches(1.75), Inches(4.5), Inches(3.6), "How to read this deck", [
+    "Equations are kept to the minimum needed for intuition; the appendix has the exact settings.",
+    "Every number is from the paper's tables (Table 1, 2, 7, 8) or the authors' talks — sources are on each slide.",
+    "Figures © the authors (arXiv 2509.24527 / danijar.com), reproduced for discussion.",
+    "Suggested pacing: Parts 1–2 ≈ 25 min, Part 3 ≈ 15 min, Part 4 ≈ 10 min + Q&A."], size=12.5)
 notes(s, "Four parts plus an appendix. For a mixed audience I'll spend most time on the method intuition and on what the experiments do and do not show.")
 
 # 3 TL;DR -----------------------------------------------------------------
@@ -202,10 +292,10 @@ add_bullets(s, Inches(0.6), Inches(1.55), Inches(6.4), Inches(4.2), [
     "**Dreamer 4's bet:** if the simulator is accurate enough about object interactions, RL inside it can go beyond what pure imitation learns"], size=17)
 # timeline
 y = Inches(6.0); xs = [0.7, 3.7, 6.7, 9.7]; items = [("Dreamer (2019)", "latent imagination on DM Control"), ("DreamerV2 (2020)", "discrete latents, Atari"), ("DreamerV3 (2023/Nature 2025)", "one config for 150+ tasks; diamonds with online RL"), ("Dreamer 4 (2025)", "transformer diffusion WM; diamonds offline; real-time on 1 GPU")]
-ln = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.9), y + Inches(0.18), Inches(11.4), Inches(0.04)); ln.fill.solid(); ln.fill.fore_color.rgb = GREY; ln.line.fill.background()
+hline(s, Inches(0.9), y + Inches(0.2), Inches(11.4), color=RULE, pt=1)
 for (x, (t, d)) in zip(xs, items):
-    dot = s.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x + 0.1), y + Inches(0.05), Inches(0.3), Inches(0.3)); dot.fill.solid(); dot.fill.fore_color.rgb = BLUE if "4" in t else NAVY; dot.line.fill.background()
-    add_text(s, Inches(x), y + Inches(0.4), Inches(2.9), Inches(0.8), [t, d], size=11, color=DARK)
+    dot = s.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x + 0.14), y + Inches(0.12), Inches(0.17), Inches(0.17)); dot.fill.solid(); dot.fill.fore_color.rgb = BLUE if "4" in t else NAVY; dot.line.fill.background()
+    add_text(s, Inches(x), y + Inches(0.4), Inches(2.9), Inches(0.8), [f"**{t}**", d], size=11, color=GREY, bold_color=NAVY)
 fit_picture(s, A + "frame_imag_treechop.jpg", Inches(7.3), Inches(1.6), Inches(5.5), Inches(3.4))
 caption(s, Inches(7.3), Inches(5.05), Inches(5.5), "Imagined rollout decoded for visualisation, with the agent's reward and value estimates (project page, 'Gather wood').")
 notes(s, "The core idea has been constant since the first Dreamer in 2019: learn a model of the environment, then train the policy on imagined trajectories. "
@@ -214,9 +304,7 @@ notes(s, "The core idea has been constant since the first Dreamer in 2019: learn
 
 # 6 What made it hard ------------------------------------------------------------
 s = new_slide("What made scalable world models hard before", "Three requirements pulled in different directions")
-box(s, Inches(0.5), Inches(1.6), Inches(4.0), Inches(2.6), "1 · Fidelity of interactions", ["Video generators look good but get game mechanics wrong: inventories, crafting menus, breaking blocks, placing a boat and riding it.", "Prior Minecraft world models (Oasis, Lucid-v1, MineWorld) fail most such tasks."], fill=LIGHT)
-box(s, Inches(4.67), Inches(1.6), Inches(4.0), Inches(2.6), "2 · Speed", ["Imagination RL needs millions of generated frames — and a human tester needs ≥ 20 FPS.", "Diffusion transformers spend tens of denoising steps per frame: 0.8 FPS for the baseline in this paper."], fill=LIGHT)
-box(s, Inches(8.84), Inches(1.6), Inches(4.0), Inches(2.6), "3 · Memory & drift", ["Autoregressive video drifts: small errors feed back into the context.", "Short contexts (1–2 s in prior models) forget what is behind the player."], fill=LIGHT)
+columns(s, Inches(1.55), Inches(2.85), [("Fidelity of interactions", ["Video generators look good but get game mechanics wrong: inventories, crafting menus, breaking blocks, placing a boat and riding it.", "Prior Minecraft world models (Oasis, Lucid-v1, MineWorld) fail most such tasks."]), ("Speed", ["Imagination RL needs millions of generated frames — and a human tester needs ≥ 20 FPS.", "Diffusion transformers spend tens of denoising steps per frame: 0.8 FPS for the baseline in this paper."]), ("Memory & drift", ["Autoregressive video drifts: small errors feed back into the context.", "Short contexts (1–2 s in prior models) forget what is behind the player."])], size=13, head_size=15)
 add_bullets(s, Inches(0.6), Inches(4.5), Inches(12.2), Inches(2.3), [
     "**Dreamer 3's RSSM** is fast (~1,000× faster than a diffusion transformer) but operates at 64×64 pixels and needed abstract inventory state and crafting actions — not raw mouse & keyboard",
     "**Dreamer 4's answer:** a diffusion transformer that needs only 4 sampling steps (shortcut forcing), an architecture tuned for long context at low cost, and training tricks that keep long rollouts stable (x-prediction, noised context)"], size=16)
@@ -246,14 +334,7 @@ s = new_slide("Overview: three phases, one transformer", "Algorithm 1 in the pap
 cols = [("Phase 1 · World-model pretraining", ["Train the causal tokenizer (masked autoencoding), then freeze it", "Train the interactive dynamics model on tokenized video ± actions with shortcut forcing", "Inputs: all 2,541 h, labeled or not"], BLUE),
         ("Phase 2 · Agent fine-tuning", ["Insert agent tokens with task embedding; add policy & reward heads", "Behavioural cloning with multi-token prediction (L = 8) on task-relevant data", "Dynamics loss continues on uniform data so the model stays honest"], TEAL),
         ("Phase 3 · Imagination training", ["Freeze the transformer; train policy + value heads only", "Roll out the policy inside the world model, reward from the learned reward head", "PMPO with reverse-KL to the frozen BC policy; γ = 0.997"], PURPLE)]
-x = Inches(0.5)
-for i, (t, body, col) in enumerate(cols):
-    b = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, x, Inches(1.65), Inches(3.85), Inches(3.5)); b.fill.solid(); b.fill.fore_color.rgb = LIGHT; b.line.color.rgb = col; b.line.width = Pt(2); b.adjustments[0] = 0.06
-    hd = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, x, Inches(1.65), Inches(3.85), Inches(0.6)); hd.fill.solid(); hd.fill.fore_color.rgb = col; hd.line.fill.background(); hd.adjustments[0] = 0.3
-    add_text(s, x + Inches(0.1), Inches(1.7), Inches(3.65), Inches(0.5), t, size=14, bold=True, color=WHITE, anchor=MSO_ANCHOR.MIDDLE)
-    add_bullets(s, x + Inches(0.1), Inches(2.4), Inches(3.65), Inches(2.7), body, size=13, space=5)
-    if i < 2: arrow(s, x + Inches(3.9), Inches(3.15), Inches(0.35), Inches(0.5))
-    x += Inches(4.25)
+columns(s, Inches(1.55), Inches(3.7), [(t.split(" · ")[1][0].upper() + t.split(" · ")[1][1:], body) for (t, body, col) in cols], gap=Inches(0.55), num_label=lambda k: f"Phase {k}", arrows=True, bullets=True, size=13, head_size=15)
 add_bullets(s, Inches(0.6), Inches(5.4), Inches(12.2), Inches(1.6), [
     "**Key design choice:** the same block-causal transformer serves as tokenizer, dynamics model and agent backbone; policy and value are tiny heads on 'agent tokens'",
     "**Data mix in phases 2–3:** 50 % uniform sequences / 50 % task-relevant; BC loss only on relevant data, dynamics loss only on uniform data ('to avoid optimistic generations')"], size=14.5)
@@ -302,22 +383,16 @@ notes(s, "The dynamics model reads the interleaved sequence of actions and laten
 
 # 13 Diffusion primer ---------------------------------------------------------------
 s = new_slide("Two-minute primer: flow matching, signal level τ, x vs v", "Just enough background for shortcut forcing")
-box(s, Inches(0.5), Inches(1.6), Inches(6.1), Inches(2.55), "Flow matching view of diffusion", [
-    "Interpolate between noise ε and clean latent x:  z_τ = τ · x + (1 − τ) · ε,  τ ∈ [0, 1]  (τ = signal level).",
+columns(s, Inches(1.6), Inches(2.5), [("Flow matching view of diffusion", ["Interpolate between noise ε and clean latent x:  z_τ = τ · x + (1 − τ) · ε,  τ ∈ [0, 1]  (τ = signal level).",
     "A network learns to move z_τ toward x; sampling integrates from τ = 0 (pure noise) to τ = 1 (clean) in K steps.",
-    "Standard models need many small steps because the learned direction is only locally correct."], fill=LIGHT, size=12.5)
-box(s, Inches(6.75), Inches(1.6), Inches(6.1), Inches(2.55), "Two parameterisations of the same target", [
-    "v-prediction: output the velocity  v = x − ε  (common in image/video diffusion).",
+    "Standard models need many small steps because the learned direction is only locally correct."]), ("Two parameterisations of the same target", ["v-prediction: output the velocity  v = x − ε  (common in image/video diffusion).",
     "x-prediction: output the clean latent x directly; the velocity follows as (x − z_τ)/(1 − τ).",
-    "Mathematically equivalent — numerically very different when errors feed back autoregressively (slide 15)."], fill=LIGHT, size=12.5)
-box(s, Inches(0.5), Inches(4.35), Inches(6.1), Inches(2.45), "Diffusion forcing (Chen et al., 2024)", [
-    "Give every frame in the sequence its *own* noise level instead of one level for the whole clip.",
+    "Mathematically equivalent — numerically very different when errors feed back autoregressively (slide 15)."])], numerals=False, size=12.5, head_size=14.5)
+columns(s, Inches(4.3), Inches(2.5), [("Diffusion forcing (Chen et al., 2024)", ["Give every frame in the sequence its *own* noise level instead of one level for the whole clip.",
     "The model learns to predict a noisy future from a cleaner past → supports causal, frame-by-frame rollouts and keeping context frames slightly noisy at test time.",
-    "Cost: still tens of denoising steps per frame."], fill=PALE_BLUE, size=12.5)
-box(s, Inches(6.75), Inches(4.35), Inches(6.1), Inches(2.45), "Shortcut models (Frans et al., 2024)", [
-    "Condition the network on the step size d as well as τ.",
+    "Cost: still tens of denoising steps per frame."]), ("Shortcut models (Frans et al., 2024)", ["Condition the network on the step size d as well as τ.",
     "Self-consistency ('bootstrap') loss: one step of size 2d must equal two consecutive steps of size d.",
-    "Result: the model learns to take large, accurate steps → few-step or even one-step sampling."], fill=PALE_BLUE, size=12.5)
+    "Result: the model learns to take large, accurate steps → few-step or even one-step sampling."])], numerals=False, size=12.5, head_size=14.5)
 notes(s, "For the non-diffusion people: think of a noise level τ from 0 (pure noise) to 1 (clean latent). The model learns to push a noisy latent toward the clean one; sampling repeats this K times. "
          "Diffusion forcing makes the noise level per frame, which is what allows causal rollouts. Shortcut models teach the network to take big steps consistently. Dreamer 4 combines the two.")
 
@@ -365,7 +440,7 @@ add_bullets(s, Inches(8.9), Inches(1.55), Inches(4.1), Inches(5.4), [
     "**Time-factorised long context** trades a little quality (91) for 30 FPS; **registers** stabilise attention",
     "**More latent tokens** (128 → 256) brings FVD to 57 at 21.4 FPS — the final configuration",
     "Runs were 48 h each; FVD computed on 1,024 generations of 384 frames"], size=14)
-notes(s, "Read the bars top to bottom. The red bars are the starting point: a diffusion-forcing transformer that is either slow or bad. The grey bars are the objective changes from the previous slides; the blue bar is the final model. "
+notes(s, "Read the bars top to bottom. The two dark bars at the top are the starting point: a diffusion-forcing transformer that is either slow or bad. The grey bars are the objective changes from the previous slides; the blue bar is the final model. "
          "The architectural changes on the lower half mostly move FPS, not FVD — exactly what you want.")
 
 # 17 Agent tokens ---------------------------------------------------------------
@@ -497,10 +572,11 @@ rows = [["", "Dreamer 3 (Nature 2025)", "Dreamer 4"],
         ["Data", "1.4 K h of *online* interaction, no human data", "2.5 K h of *offline* human data, no interaction"],
         ["RL", "Return normalisation + entropy bonus", "PMPO (advantage sign) + KL to BC prior"],
         ["Speed", "~1,000× faster than a diffusion transformer", "~30× faster than diffusion forcing; ~40× slower than the RSSM"]]
-add_table(s, Inches(0.5), Inches(1.55), Inches(7.6), rows, col_widths=[1.5, 3.0, 3.1], font=12, highlight_col=2, row_h=0.6)
+add_table(s, Inches(0.5), Inches(1.55), Inches(7.6), rows, col_widths=[1.5, 3.0, 3.1], font=12.5, highlight_col=2, row_h=0.74)
 fit_picture(s, jpeg(A + "fig11_dreamer3_vs_4.png"), Inches(8.4), Inches(1.55), Inches(4.5), Inches(1.9))
 caption(s, Inches(8.4), Inches(3.5), Inches(4.5), "Figure 11: multi-step generations, Dreamer 4 (top) vs Dreamer 3 (bottom).")
-fit_picture(s, A + "chart_speed_fidelity.png", Inches(8.3), Inches(3.9), Inches(4.7), Inches(3.1))
+fit_picture(s, A + "chart_speed.png", Inches(8.3), Inches(3.95), Inches(4.7), Inches(2.6))
+caption(s, Inches(8.4), Inches(6.5), Inches(4.5), "Generation speed on a log scale (paper, TalkRL): ~30× faster than diffusion forcing, ~40× slower than the RSSM.", size=9.5)
 notes(s, "Same family, different regime. Dreamer 3 solved diamonds with online interaction and privileged state at 64×64; Dreamer 4 does it offline from raw pixels and inputs. The price is speed: the transformer is still about forty times slower than the recurrent model, according to Hafner.")
 
 # 28 Compute & data ---------------------------------------------------------------
@@ -529,29 +605,26 @@ section("Discussion", "Limitations, critical reading, future work, takeaways", 4
 
 # 30 Limitations ---------------------------------------------------------------
 s = new_slide("Limitations the paper itself states", "From the discussion section and the authors' talks")
-add_bullets(s, Inches(0.6), Inches(1.55), Inches(12.2), Inches(5.4), [
-    "**Diamonds are rare:** 0.7 % success; the authors call the pipeline a 'reliable and performant starting point', not a solved task",
-    "**Memory:** 9.6 s of context; walk into a house for 30 s and the outside is regenerated — long-term memory is the number-one item on the roadmap",
-    "**Inventory drift:** small UI elements and item counts blur over long horizons; small objects and long-range semantic correlations are what video models learn last",
-    "**Frozen, exploitable simulator:** no epistemic-uncertainty estimate; the policy can exploit model errors (invalid crafting) — currently mitigated only by the KL constraint",
-    "**Two-stage training:** tokenizer is trained separately and frozen; the authors expect end-to-end training eventually",
-    "**Single domain for the agent:** RL results exist only for Minecraft; robotics and kitchen video are qualitative world-model demos",
-    "**Compute:** hundreds of TPU v5p chips per run; not a recipe individuals can reproduce at full scale"], size=15.5)
+numbered(s, Inches(0.6), Inches(1.65), Inches(12.1), [
+    ("Diamonds are rare:", "0.7 % success; the authors call the pipeline a 'reliable and performant starting point', not a solved task"),
+    ("Memory:", "9.6 s of context; walk into a house for 30 s and the outside is regenerated — long-term memory is the number-one item on the roadmap"),
+    ("Inventory drift:", "small UI elements and item counts blur over long horizons; small objects and long-range semantic correlations are what video models learn last"),
+    ("Frozen, exploitable simulator:", "no epistemic-uncertainty estimate; the policy can exploit model errors (invalid crafting) — currently mitigated only by the KL constraint"),
+    ("Two-stage training:", "tokenizer is trained separately and frozen; the authors expect end-to-end training eventually"),
+    ("Single domain for the agent:", "RL results exist only for Minecraft; robotics and kitchen video are qualitative world-model demos"),
+    ("Compute:", "hundreds of TPU v5p chips per run; not a recipe individuals can reproduce at full scale")], size=15.5, gap=0.2, num_w=0.6)
 notes(s, "The authors are quite candid. The two that matter most for the agenda of the paper are memory and exploitability: both limit how far imagination training can be pushed before the policy learns things that are only true inside the model.")
 
 # 31 Critical reading ---------------------------------------------------------------
 s = new_slide("A critical reading: established vs. open", "What a reviewer would push on (and what independent groups later found)")
-box(s, Inches(0.5), Inches(1.6), Inches(6.1), Inches(5.2), "Well supported", [
-    "• Shortcut forcing + x-prediction gives a large speed/quality win — a clean 12-step ablation cascade, and reproduced by Open Dreamer at 1.6 B scale (JAX, 2026).",
-    "• The world model handles object interactions far better than Oasis / Lucid-v1 — consistent human play-tests plus long-rollout FVD.",
-    "• World-model features are a strong prior for imitation (WM+BC ≫ BC on the same data).",
-    "• Action conditioning from ~4 % labeled data works and transfers across visual domains."], fill=RGBColor(0xE6, 0xF7, 0xF3), size=13)
-box(s, Inches(6.75), Inches(1.6), Inches(6.1), Inches(5.2), "Open or thinly supported", [
-    "• Diamond result: 0.7 % without confidence intervals or per-seed variance; success criterion is a game event, protocol details are in the appendix only.",
-    "• No direct quantitative long-horizon accuracy metric — interaction accuracy is human-judged on 16 tasks (Pith/EmergentMind critique).",
-    "• RL gains over WM+BC are modest on most items; small-scale reproductions report high seed variance in the RL phase and reward-hacking of the frozen reward head.",
-    "• No peer review as of Sept 2026 (arXiv v1 only); no code or weights; nobody outside DeepMind has reproduced offline diamonds.",
-    "• Generality of the *agent* beyond Minecraft is untested."], fill=RGBColor(0xFD, 0xF1, 0xE7), size=13)
+columns(s, Inches(1.6), Inches(5.2), [("Well supported", ["Shortcut forcing + x-prediction gives a large speed/quality win — a clean 12-step ablation cascade, and reproduced by Open Dreamer at 1.6 B scale (JAX, 2026).",
+    "The world model handles object interactions far better than Oasis / Lucid-v1 — consistent human play-tests plus long-rollout FVD.",
+    "World-model features are a strong prior for imitation (WM+BC ≫ BC on the same data).",
+    "Action conditioning from ~4 % labeled data works and transfers across visual domains."]), ("Open or thinly supported", ["Diamond result: 0.7 % without confidence intervals or per-seed variance; success criterion is a game event, protocol details are in the appendix only.",
+    "No direct quantitative long-horizon accuracy metric — interaction accuracy is human-judged on 16 tasks (Pith/EmergentMind critique).",
+    "RL gains over WM+BC are modest on most items; small-scale reproductions report high seed variance in the RL phase and reward-hacking of the frozen reward head.",
+    "No peer review as of Sept 2026 (arXiv v1 only); no code or weights; nobody outside DeepMind has reproduced offline diamonds.",
+    "Generality of the *agent* beyond Minecraft is untested."])], numerals=False, bullets=True, size=14.5, head_size=16, rule_colors=[GREEN, AMBER], gap=Inches(0.6))
 notes(s, "Balance sheet. The methodological contribution — how to make a fast, accurate autoregressive video world model — is robust and has been independently reproduced. The headline agent result is real but statistically thin and has not been reproduced outside DeepMind. "
          "For a reading group, this split is where the discussion usually starts.")
 
@@ -563,31 +636,31 @@ items = [("Internet-video pretraining", "Learn dynamics from unlabeled web video
          ("A little online data", "Small rounds of *corrective* interaction to fix the errors the policy exploits — then the KL constraint can be relaxed."),
          ("Automatic goal discovery", "Empowerment / exploration objectives (APD, Plan2Explore, Director) so agents propose their own tasks inside the model."),
          ("End-to-end training", "Fold the tokenizer into the dynamics model; scale parameters and context together.")]
-x, y = Inches(0.5), Inches(1.6)
-for i, (t, d) in enumerate(items):
-    box(s, x + (i % 3) * Inches(4.17), y + (i // 3) * Inches(2.6), Inches(4.0), Inches(2.4), t, [d], fill=LIGHT if i % 2 else PALE_BLUE, size=13)
+columns(s, Inches(1.55), Inches(2.55), items[:3], size=14, head_size=15.5)
+columns(s, Inches(4.35), Inches(2.55), items[3:], start=4, size=14, head_size=15.5)
 notes(s, "Six directions, three of which — memory, corrective data, and language — directly address the limitations we just discussed. Note that the authors' next steps are toward physical robots, not more Minecraft.")
 
 # 33 Takeaways ---------------------------------------------------------------
 s = new_slide("Key takeaways")
-add_bullets(s, Inches(0.7), Inches(1.6), Inches(12), Inches(5.3), [
-    "**1. Imagination training now works from raw pixels and raw inputs, offline.** Dreamer 4 reaches diamonds in Minecraft with zero environment interaction and ~100× less data than VPT.",
-    "**2. The enabling contribution is speed at quality:** shortcut forcing (4 sampling steps), x-prediction with x-space loss, and an architecture that attends across time only every 4th layer — 21 FPS on one GPU with a 9.6 s context.",
-    "**3. Accuracy of interactions, not visual polish, is the bar** — validated by humans playing inside the model (14/16 tasks vs 5/16 for the best prior model).",
-    "**4. Video pretraining is a strong prior for control:** most of the gain over BC comes from the world-model representation; RL adds the rest on the hardest, longest-horizon items.",
-    "**5. Labels are cheap:** ~100 h of actions on top of thousands of unlabeled hours suffice, and action semantics transfer to unseen visual domains.",
-    "**6. Open problems remain:** short memory, exploitable frozen simulators, thin statistics on the headline result, no official release."], size=16, space=10)
+tk = [("Imagination training works offline, from pixels", "Dreamer 4 reaches diamonds in Minecraft with zero environment interaction and about 100× less data than VPT."),
+      ("The enabling contribution is speed at quality", "Shortcut forcing (4 sampling steps), x-prediction with an x-space loss, and time attention only in every 4th layer: 21 FPS on one GPU with a 9.6 s context."),
+      ("Interaction accuracy, not visual polish, is the bar", "Validated by humans playing inside the model: 14 of 16 tasks, against 5 of 16 for the best prior Minecraft world model."),
+      ("Video pretraining is a strong prior for control", "Most of the gain over BC comes from the world-model representation; RL adds the rest on the hardest, longest-horizon items."),
+      ("Action labels are cheap", "About 100 h of labeled actions on top of thousands of unlabeled hours suffice, and action semantics transfer to unseen visual domains."),
+      ("Open problems remain", "Short memory, exploitable frozen simulators, thin statistics on the headline result, and no official code or weights.")]
+columns(s, Inches(1.55), Inches(2.6), tk[:3], size=14.5, head_size=15.5, head_h=0.72)
+columns(s, Inches(4.4), Inches(2.6), tk[3:], start=4, size=14.5, head_size=15.5, head_h=0.72)
 notes(s, "Six takeaways, ordered from result to method to caveats.")
 
 # 34 Discussion questions ---------------------------------------------------------------
 s = new_slide("Questions for discussion")
-add_bullets(s, Inches(0.7), Inches(1.6), Inches(12), Inches(5.3), [
+numbered(s, Inches(0.7), Inches(1.7), Inches(11.9), [
     "How much of the diamond result is the world model versus PMPO? Would a stronger offline-RL baseline on world-model features (no imagination) close the gap?",
     "Is human play-testing on 16 tasks a sufficient measure of 'accurate simulation'? What automated long-horizon metric would you propose?",
     "The transformer is frozen during RL and the reward head is learned: where would you expect exploitation to appear first, and how would you detect it offline?",
     "9.6 s of context: which memory mechanism (retrieval, state-space layers, compressed summaries) fits a block-causal diffusion transformer best?",
     "The recipe needs ~100 h of action labels per domain. What does the path to internet-scale video look like — inverse dynamics models, or Dreamer 4's 'no-action' embedding at scale?",
-    "What would convince you that this transfers to real robots — and what evaluation would you run first?"], size=16, space=12)
+    "What would convince you that this transfers to real robots — and what evaluation would you run first?"], size=16, gap=0.3, num_w=0.65)
 notes(s, "Pick two or three depending on the room.")
 
 # 35 References ---------------------------------------------------------------
@@ -602,6 +675,7 @@ add_bullets(s, Inches(0.6), Inches(1.5), Inches(12.3), Inches(5.6), [
 notes(s, "All sources, plus the GitHub archive that contains local copies of every item used to build this deck.")
 
 # ---- Appendix -------------------------------------------------------------
+state["part"] = "Appendix"
 s = new_slide("Appendix A — Configuration & hyper-parameters")
 rows = [["Component", "Setting"],
         ["Tokenizer", "Masked autoencoder; 16×16 patches; patch dropout ~ U(0, 0.9); loss MSE + 0.2·LPIPS; bottleneck 512×16 with tanh → N_z = 256 tokens × 32 dims; causal in time; ≈ 400 M params; frozen after pretraining"],

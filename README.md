@@ -24,7 +24,7 @@ dreamer4_resources/
 ├── community/     Hacker News thread + 4 Reddit threads (JSON + Markdown)         (0.3 MB) → table below
 ├── videos/        oEmbed metadata + thumbnails for 7 YouTube videos               (0.1 MB) → videos/README.md
 ├── huggingface/   model/dataset cards + API file listings for 4 models, 4 datasets (0.7 MB) → huggingface/README.md
-└── presentation/  39-slide deep-dive deck (.pptx with speaker notes, .pdf, notes .md, build scripts) (5.1 MB) → presentation/README.md
+└── presentation/  39-slide deep-dive deck (.pptx with speaker notes, .pdf, notes .md, build scripts) (4.8 MB) → presentation/README.md
 ```
 
 ---
