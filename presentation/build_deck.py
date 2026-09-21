@@ -355,46 +355,64 @@ add_bullets(s, Inches(8.4), Inches(1.6), Inches(4.5), Inches(5.2), [
 notes(s, "Both halves use the same transformer block. Block-causal means every token in frame t can see all tokens of frames up to t, which is exactly what you need for online, frame-by-frame generation with a human or a policy in the loop.")
 
 # 11 Tokenizer ---------------------------------------------------------------
-s = new_slide("The causal tokenizer", "Compress each frame into 256 latent tokens without looking into the future")
-add_bullets(s, Inches(0.6), Inches(1.55), Inches(7.4), Inches(5.3), [
-    "**Masked autoencoder, not a VAE/VQ:** patches are dropped with ratio ~ U(0, 0.9) during training; encoder sees the surviving patches plus learned latent tokens, decoder reconstructs all patches",
-    "**Loss:** MSE + 0.2 · LPIPS (perceptual term keeps textures crisp)",
-    "**Bottleneck:** 512×16 per frame with tanh squashing, reshaped to 256 tokens × 32 dims for the dynamics model — a *continuous* latent, no codebook",
-    "**Causal in time:** frame t is encoded/decoded using only frames ≤ t → the same tokenizer works during live interaction",
-    "**Why MAE-style?** Inspired by MAETok (masked autoencoders make good tokenizers for diffusion models): masking regularises the latent space so the dynamics model has an easier, smoother target",
-    "**Trained once, then frozen** — Hafner expects fully end-to-end training to be possible eventually"], size=15)
-fit_picture(s, A + "fig_tok.png", Inches(8.3), Inches(1.7), Inches(4.5), Inches(3.9))
-caption(s, Inches(8.3), Inches(5.65), Inches(4.5), "Figure 2a (arXiv HTML render).")
-notes(s, "The tokenizer is a masked autoencoder over 16×16 patches with a small continuous bottleneck. Two properties matter downstream: it is causal in time, and its latent space is smooth because of the heavy masking during training. "
-         "Everything after this operates on 256 latent tokens per frame instead of 960 patches.")
+s = new_slide("The causal tokenizer", "Compress each frame into 256 continuous latent tokens without looking into the future (paper §3.1)")
+fit_picture(s, jpeg(A + "diag_tokenizer.png", max_w=1800, q=88), Inches(0.4), Inches(1.5), Inches(8.1), Inches(4.1))
+caption(s, Inches(0.5), Inches(5.6), Inches(8.0), "Schematic built from one archived world-model frame; the latent grid is illustrative (real latents are 256 tokens × 32 dims, not a 16×16 image).")
+add_bullets(s, Inches(8.75), Inches(1.55), Inches(4.2), Inches(5.3), [
+    "**Masked autoencoder, not a VAE/VQ:** input patches are dropped with probability p ~ U(0, 0.9) and replaced by a learned embedding, so the encoder must infer them from context — that regularises the latent space; p = 0 at inference",
+    "**Bottleneck:** latent tokens are read out through a linear projection to 512×16 with a tanh, reshaped to 256 tokens × 32 dims per frame — continuous, no codebook",
+    "**Loss:** MSE + 0.2·LPIPS on the reconstructed patches; the perceptual term keeps textures crisp",
+    "**Causal in time:** frame t is encoded and decoded from frames ≤ t only, so the same tokenizer runs frame by frame during live play",
+    "**Trained once, then frozen** (≈ 400 M parameters); Hafner expects end-to-end training to be possible eventually"], size=13, space=5)
+notes(s, "The tokenizer is a masked autoencoder over 16×16 patches with a small continuous bottleneck. Two properties matter downstream: it is causal in time, and its latent space is smooth because of the heavy random masking during training. "
+         "Everything after this operates on 256 latent tokens per frame instead of 960 patches. The schematic on the left is an illustration built from a real frame, not a visualisation of the trained model.")
 
 # 12 Dynamics model ---------------------------------------------------------------
-s = new_slide("The interactive dynamics model", "Predict the next frame's latents from past latents, actions and the current noisy guess")
-add_bullets(s, Inches(0.6), Inches(1.55), Inches(7.6), Inches(5.3), [
-    "**Sequence layout:** per frame, action tokens (23 keys + mouse class, or a learned 'no action' embedding for unlabeled video), then 256 latent tokens, plus a token carrying signal level τ and step size d",
-    "**Attention pattern:** space-only attention inside a frame in 3 of every 4 layers; a *causal time* layer every 4th layer sees the 192-frame context → most compute is spent on cheap per-frame attention",
-    "**Efficiency tricks:** grouped-query attention, register tokens, alternating batch lengths (64-frame short batches interleaved with 256-frame long batches — long context is learned without paying for it every step)",
-    "**Objective:** shortcut forcing — a diffusion/flow objective that (i) noises every frame independently and (ii) is conditioned on the step size so that 4 sampling steps suffice (next slides)",
-    "**Inference:** 21 FPS at 640×360 on one H100 with K = 4 steps; context frames are kept slightly noisy (τ_ctx ≈ 0.1) so the model tolerates its own imperfections"], size=14.5)
-fit_picture(s, A + "fig_dyn.png", Inches(8.5), Inches(1.7), Inches(4.3), Inches(3.9))
-caption(s, Inches(8.5), Inches(5.65), Inches(4.3), "Figure 2b (arXiv HTML render).")
+s = new_slide("The interactive dynamics model", "Predict the clean latents of the next frame from the past, the actions and a noisy guess (paper §3.2)")
+fit_picture(s, jpeg(A + "diag_dynamics.png", max_w=1800, q=88), Inches(0.4), Inches(1.5), Inches(8.1), Inches(4.1))
+caption(s, Inches(0.5), Inches(5.6), Inches(8.0), "Sequence layout and attention pattern (schematic). Three of the 192 context frames are shown.")
+add_bullets(s, Inches(8.75), Inches(1.55), Inches(4.2), Inches(5.3), [
+    "**Sequence per frame:** action tokens (23 keys + mouse class, or a learned 'no action' embedding for unlabeled video), one token for signal level τ_t and step size d, the 256 latent tokens, register tokens",
+    "**Block-causal attention:** everything within a frame sees each other; across frames only the past. Space-only layers do most of the work; a causal time layer every 4th layer sees the 192-frame (9.6 s) context",
+    "**Training target:** the clean latents of every frame (x-prediction) from their noised versions, the past and the actions — one loss over the whole sequence",
+    "**Efficiency:** grouped-query attention, alternating 64/256-frame batches, registers — 1.6 B parameters, 21 FPS on one H100 with K = 4",
+    "**Inference:** past frames are kept slightly corrupted (the paper's τ_ctx) so small generation errors do not push the model off-distribution"], size=13, space=5)
 notes(s, "The dynamics model reads the interleaved sequence of actions and latents. Only every fourth layer attends across time; the rest work within one frame. That is what makes a 9.6 s context affordable. "
-         "Alternating short and long batches is a training-cost trick: it cut a training step from 9.8 s to 1.5 s in the ablation (Table 2).")
+         "Alternating short and long batches is a training-cost trick: it cut a training step from 9.8 s to 1.5 s in the ablation (Table 2). "
+         "A wording note: the paper says the past inputs are 'slightly corrupted to signal level τ_ctx = 0.1' — read that as a small amount of noise on the context, not 90 % noise.")
 
-# 13 Diffusion primer ---------------------------------------------------------------
-s = new_slide("Two-minute primer: flow matching, signal level τ, x vs v", "Just enough background for shortcut forcing")
-columns(s, Inches(1.6), Inches(2.5), [("Flow matching view of diffusion", ["Interpolate between noise ε and clean latent x:  z_τ = τ · x + (1 − τ) · ε,  τ ∈ [0, 1]  (τ = signal level).",
-    "A network learns to move z_τ toward x; sampling integrates from τ = 0 (pure noise) to τ = 1 (clean) in K steps.",
-    "Standard models need many small steps because the learned direction is only locally correct."]), ("Two parameterisations of the same target", ["v-prediction: output the velocity  v = x − ε  (common in image/video diffusion).",
-    "x-prediction: output the clean latent x directly; the velocity follows as (x − z_τ)/(1 − τ).",
-    "Mathematically equivalent — numerically very different when errors feed back autoregressively (slide 15)."])], numerals=False, size=12.5, head_size=14.5)
-columns(s, Inches(4.3), Inches(2.5), [("Diffusion forcing (Chen et al., 2024)", ["Give every frame in the sequence its *own* noise level instead of one level for the whole clip.",
-    "The model learns to predict a noisy future from a cleaner past → supports causal, frame-by-frame rollouts and keeping context frames slightly noisy at test time.",
-    "Cost: still tens of denoising steps per frame."]), ("Shortcut models (Frans et al., 2024)", ["Condition the network on the step size d as well as τ.",
-    "Self-consistency ('bootstrap') loss: one step of size 2d must equal two consecutive steps of size d.",
-    "Result: the model learns to take large, accurate steps → few-step or even one-step sampling."])], numerals=False, size=12.5, head_size=14.5)
-notes(s, "For the non-diffusion people: think of a noise level τ from 0 (pure noise) to 1 (clean latent). The model learns to push a noisy latent toward the clean one; sampling repeats this K times. "
-         "Diffusion forcing makes the noise level per frame, which is what allows causal rollouts. Shortcut models teach the network to take big steps consistently. Dreamer 4 combines the two.")
+# 13 Primer 1: flow matching ---------------------------------------------------------------
+s = new_slide("Primer 1 of 3 · Flow matching: one dial from noise to image", "The background the dynamics objective is built on (paper §2)")
+fit_picture(s, jpeg(A + "diag_flow.png", max_w=1800, q=88), Inches(0.5), Inches(1.5), Inches(12.3), Inches(3.3))
+add_bullets(s, Inches(0.6), Inches(4.95), Inches(12.2), Inches(2.0), [
+    "**Signal level τ ∈ [0, 1]:** x(τ) = (1 − τ)·ε + τ·x — τ = 0 is pure noise, τ = 1 the clean latent; during training τ is drawn at random for every example",
+    "**The network learns a direction:** f(x(τ), τ) ≈ v = x − ε, the velocity pointing from noise to data; sampling starts from noise and walks to τ = 1 in K steps",
+    "**Two ways to say the same thing:** predict the velocity v (standard) or the clean latent x directly (x-prediction); the maths is identical, the error behaviour under autoregressive feedback is not (slide 17)",
+    "**Why so many steps?** The learned direction is only locally right, so ordinary diffusion needs 16–64 small steps per image — far too slow for a 20 FPS simulator"], size=13.5, space=5)
+notes(s, "For the non-diffusion people: think of a dial τ from 0 (pure noise) to 1 (clean latent). Training corrupts a clean latent to a random position on the dial and asks the network for the way back, either as a direction (velocity) or as the clean end point. "
+         "Sampling turns the dial from 0 to 1 in K steps. The strip at the top is a real world-model frame mixed with Gaussian noise at five signal levels. The problem for a real-time simulator is K: standard models need dozens of steps per frame.")
+
+# 14 Primer 2: diffusion forcing ---------------------------------------------------------------
+s = new_slide("Primer 2 of 3 · Diffusion forcing: a noise level per frame", "Chen et al., 2024 — what makes causal, frame-by-frame generation possible")
+fit_picture(s, jpeg(A + "diag_forcing.png", max_w=1800, q=88), Inches(0.5), Inches(1.5), Inches(12.3), Inches(3.5))
+add_bullets(s, Inches(0.6), Inches(5.1), Inches(12.2), Inches(1.9), [
+    "**Standard video diffusion** corrupts the whole clip with one τ: past and future are always equally noisy, so the model cannot be rolled out one frame at a time",
+    "**Diffusion forcing** draws an independent τ_t for every frame; each frame is at once a denoising target and (noisy) history for the frames after it — a single loss over the whole sequence",
+    "**What it buys at inference:** generate the next frame from pure noise given a clean or lightly noised past — exactly the interactive setting; keeping the past slightly noised makes the model robust to its own small mistakes",
+    "**What it does not fix:** still tens of denoising steps for every frame — the 0.8 FPS starting point of the design cascade (Table 2)"], size=13.5, space=5)
+notes(s, "Diffusion forcing is the trick that turns a video diffusion model into a causal simulator: every frame gets its own noise level, so the model learns to predict a noisy future from a cleaner past. "
+         "That is precisely the situation at inference, where the past is what the model generated a moment ago. What it does not solve is speed; that is what shortcut models are for.")
+
+# 15 Primer 3: shortcut models ---------------------------------------------------------------
+s = new_slide("Primer 3 of 3 · Shortcut models: learning to take big steps", "Frans, Hafner, Levine, Abbeel, 2024 — why four sampling steps can be enough")
+fit_picture(s, jpeg(A + "diag_shortcut.png", max_w=1800, q=88), Inches(0.5), Inches(1.5), Inches(12.3), Inches(3.4))
+add_bullets(s, Inches(0.6), Inches(5.0), Inches(12.2), Inches(2.0), [
+    "**Add the step size d as an input:** f(x(τ), τ, d) predicts the average direction over a jump of size d, not just the local direction",
+    "**Smallest step:** ordinary flow-matching loss. **Larger steps:** self-consistency (bootstrap) loss — one step of size d must land where two steps of size d/2 land; the two-step target is produced by the model itself with gradients stopped",
+    "**Result:** 2–4 steps reach the quality of 64 in the original paper, with no separate distillation stage — one model, one training run",
+    "**Dreamer 4 combines the two:** per-frame τ_t from diffusion forcing + step-size conditioning from shortcut models = shortcut forcing, K = 4 steps per frame at 21 FPS (next slide)"], size=13.5, space=5)
+notes(s, "Shortcut models teach the network to take big steps consistently. The extra input is the step size; the extra loss says that one big step must agree with two half steps that the model computes itself. "
+         "Because the target is deterministic it is easier to fit than the noisy flow-matching target, which is one reason the bootstrap term works well. Dreamer 4 combines this with diffusion forcing into shortcut forcing.")
 
 # 14 Shortcut forcing ---------------------------------------------------------------
 s = new_slide("Shortcut forcing: the training objective", "Diffusion forcing + shortcut models, with three engineering choices that turn out to matter a lot")
