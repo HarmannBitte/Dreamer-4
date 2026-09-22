@@ -23,5 +23,5 @@ frame(M + "human__dreamer__task09.mp4", 0.8, A + "frame_diamond_dreamer.jpg"); f
 frame(M + "imag__cobble1.mp4", 0.6, A + "frame_imag_cobble.jpg"); frame(M + "realworld__soar1.mp4", 0.5, A + "frame_realworld_soar1.jpg")
 shutil.copy(M + "benchmark.png", A + "benchmark.png")
 # 4. charts
-subprocess.run(["python3", "make_charts.py"], check=True); subprocess.run(["python3", "make_diagrams.py"], check=True)
+subprocess.run(["python3", "make_charts.py"], check=True); subprocess.run(["python3", "make_diagrams.py"], check=True); subprocess.run(["python3", "make_stack_diagram.py"], check=True)
 print("assets ready:", len(os.listdir(A)))

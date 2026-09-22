@@ -341,6 +341,26 @@ add_bullets(s, Inches(0.6), Inches(5.4), Inches(12.2), Inches(1.6), [
 notes(s, "Three phases. First a world model is trained on all video. Second, agent tokens and heads are added and trained by behavioural cloning while the dynamics loss keeps running. Third, the transformer is frozen and only the policy and value heads are trained by RL on imagined rollouts. "
          "Keeping the dynamics loss on uniform data rather than task-relevant data is a small but deliberate choice to avoid a world model that is optimistic about task success.")
 
+# 9b/9c How the pieces fit together (system diagram, two halves) ---------------------------
+s = new_slide("How the pieces fit together (1/2): data → tokenizer → one transformer", "What flows between the components, and which phase trains which output")
+fit_picture(s, jpeg(A + "diag_stack_model.png", max_w=2400, q=90), Inches(0.4), Inches(1.5), Inches(12.5), Inches(3.75))
+add_bullets(s, Inches(0.6), Inches(5.35), Inches(12.2), Inches(1.6), [
+    "**Two block-causal transformers:** the tokenizer (400 M) turns each frame into 256 latent tokens; the dynamics/agent transformer (1.6 B) predicts the clean next latents and reads policy, reward and value off its agent tokens (MLP heads, multi-token prediction L = 8)",
+    "**The decoder is outside the agent's loop:** pretraining, fine-tuning and imagination all happen in latent space — pixels are only rendered for humans",
+    "**One-way attention for agent tokens:** they see everything, nothing sees them, so adding the agent cannot change what the simulator predicts"], size=13.5)
+notes(s, "This is the system view before we go component by component. Read it left to right: video frames enter the tokenizer encoder and become 256 latent tokens per frame; those latents, noised to a per-frame signal level, go into the big transformer together with the actions, the register tokens and, from phase 2 on, the agent tokens that carry the task id. "
+         "The transformer has one output for the world model, the clean latents of the frame, and three outputs for the agent: policy, reward, value. The italic tags say which phase trains which output. "
+         "Two things to point out: the decoder is only used to make videos and figures, the agent never sees pixels after the encoder; and the agent tokens can read everything but nothing reads them, which is what keeps the agent from biasing its own simulator.")
+
+s = new_slide("How the pieces fit together (2/2): the two loops", "Training inside the model, and acting in the real game")
+fit_picture(s, jpeg(A + "diag_stack_loops.png", max_w=2400, q=90), Inches(0.4), Inches(1.5), Inches(12.5), Inches(3.3))
+add_bullets(s, Inches(0.6), Inches(4.95), Inches(12.2), Inches(2.0), [
+    "**Imagination loop (phase 3):** start from real latents → policy head samples an action → dynamics predicts the next latents in K = 4 shortcut steps → reward and value heads score the step → PMPO with reverse KL updates the policy and value heads only; one rollout per context, transformer frozen",
+    "**Acting (evaluation):** encoder → transformer → policy head, once per frame at 20 FPS; the world model generates nothing at test time — it provides the representation",
+    "**What the loop buys:** on the same representations, behavioural cloning reaches the iron pickaxe in 16.9 % of episodes and no diamonds; after imagination training 29 % and 0.7 % (Table 7)"], size=13.5)
+notes(s, "Bottom half of the system view. On the right, the imagination loop: rollouts start from real contexts, the policy proposes actions, the frozen dynamics model predicts what happens in latent space with four forward passes per frame, the learned reward and value heads score the outcome and PMPO nudges the policy toward positive-advantage actions and away from negative ones, with a reverse KL to the frozen behavioural-cloning copy as prior. "
+         "Gradients only reach the policy and value heads. On the left, evaluation: in the real game the same transformer runs once per frame as a feature extractor for the policy head; nothing is imagined at test time. The numbers at the end are the case for doing RL inside the model at all.")
+
 # 10 World model design ----------------------------------------------------------
 s = new_slide("World-model design", "Figure 2: causal tokenizer + interactive dynamics model, one shared block-causal transformer")
 fit_picture(s, A + "fig2_world_model_design.png", Inches(0.5), Inches(1.55), Inches(7.6), Inches(3.4))

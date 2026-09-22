@@ -1,0 +1,249 @@
+[
+ {
+  "file": "figure01_dreamer_4_learns_to_solve_complex_contro.jpg",
+  "kind": "Figure",
+  "num": 1,
+  "page": 1,
+  "caption": "Dreamer 4 learns to solve complex control tasks by reinforcement learning inside of its world model. We decode the imagined training sequences for visualization, showing that the world model has learned to simulate a wide range of game mechanics from low-level mouse and keyboard actions, including breaking blocks, using tools, and interacting with crafting tables.",
+  "clip_pt": [
+   64.4,
+   388.6,
+   547.6,
+   667.2
+  ]
+ },
+ {
+  "file": "figure02_world_model_design_dreamer_4_consists_of.png",
+  "kind": "Figure",
+  "num": 2,
+  "page": 4,
+  "caption": "World model design. Dreamer 4 consists of a causal tokenizer and an interactive dynam- ics model, which both use the same block-causal transformer architecture. The tokenizer encodes partially masked image patches and latent tokens, squeezes the latents through a low-dimensional projection with tanh activation, and decodes the patches. It uses causal attention to achieve tempo- ral compression while allowing frames to be decoded one by one. The dynamics model operates on the interleaved sequence of actions, shortcut noise levels and step sizes, and tokenizer representa- tions. It denoises representations via a shortcut forcing objective. After pretraining, the world model is finetuned into an agent by inserting task tokens into the dynamics transformer and predicting ac- tions, rewards, and values from them.",
+  "clip_pt": [
+   74.9,
+   40.9,
+   542.6,
+   233.2
+  ]
+ },
+ {
+  "file": "figure03_agent_performance_in_minecraft_without_e.png",
+  "kind": "Figure",
+  "num": 3,
+  "page": 9,
+  "caption": "Agent performance in Minecraft without environment interaction. All methods have ac- cess to the same contractor dataset15 with image inputs and low-level mouse and keyboard actions. We report the success rates of important items obtained during 60-minute episodes that start in random worlds and from empty inventory, computed over 1000 episodes. Leveraging imagination training, Dreamer 4 is the first agent to obtain diamonds in Minecraft purely from offline experience. Dreamer 4 substantially outperforms OpenAI’s VPT offline agent15 while using 100× less data. It also outperforms our VLA agent41,42, which leverages the general knowledge of the Gemma 3 vision- language model43, nearly tripling its success rate for crafting iron pickaxes.",
+  "clip_pt": [
+   62.0,
+   48.5,
+   567.4,
+   223.7
+  ]
+ },
+ {
+  "file": "figure04_agent_ablations_on_the_offline_diamond_c.png",
+  "kind": "Figure",
+  "num": 4,
+  "page": 10,
+  "caption": "Agent ablations on the offline diamond challenge. We report success rates and time needed to reach an item for four milestone items. Dreamer 4 outperforms methods based on behav- ioral cloning in both metrics, demonstrating that imagination training improves both the robustness and efficiency of the policy. Moreover, using the world model representations for behavioral cloning outperforms using Gemma 3 or training from scratch.",
+  "clip_pt": [
+   61.9,
+   51.8,
+   555.6,
+   202.0
+  ]
+ },
+ {
+  "file": "figure05_human_interaction_a_human_player_counter.jpg",
+  "kind": "Figure",
+  "num": 5,
+  "page": 11,
+  "caption": "Human interaction. A human player counterfactually interacts with the world model in real time via mouse and keyboard to perform the same task from the same initial image. Dreamer 4 is the first world model to accurately predict the object interactions and game mechanics of placing the blocks in the correct shape. In contrast, previous Minecraft world models degrade visually, change the held item, and hallucinate structures that the player never built. The Dreamer 4 world model allows the player to accomplish the task ( ) while Oasis and Lucid do not ( ).",
+  "clip_pt": [
+   59.4,
+   51.1,
+   546.0,
+   241.1
+  ]
+ },
+ {
+  "file": "figure06_robotics_generations_for_counterfactual.jpg",
+  "kind": "Figure",
+  "num": 6,
+  "page": 13,
+  "caption": "Robotics generations for counterfactual actions. Dreamer 4 learns an accurate real-time simulator of the environment, allowing human operators to control the imagined robot to pick up objects, flip over a bowl, press a ball onto a plate, move a towel, and throw a bowl.",
+  "clip_pt": [
+   66.0,
+   62.7,
+   546.0,
+   237.7
+  ]
+ },
+ {
+  "file": "figure07_action_generalization_left_dreamer_4_lea.png",
+  "kind": "Figure",
+  "num": 7,
+  "page": 14,
+  "caption": "Action generalization. (left) Dreamer 4 learns accurate action conditioning from 2500 hours of video with only 100 hours of paired actions. It achieves over 80% of the action-conditioned generation accuracy, normalized within the range of training without any actions and using all actions. (right) When learned with only actions of the Minecraft Overworld, the action conditioning generalizes to the Nether and End dimensions of the game that are only seen in unlabeled videos. These environments are distinct from the Overworld in their textures, blocks, and items. The results indicate that Dreamer 4 learns action conditioning from small amounts of action data that generalize broadly, paving the way toward learning simulators from diverse unlabeled web videos.",
+  "clip_pt": [
+   61.4,
+   64.0,
+   546.0,
+   208.7
+  ]
+ },
+ {
+  "file": "figure08_generation_quality_of_short_cut_forcing.png",
+  "kind": "Figure",
+  "num": 8,
+  "page": 16,
+  "caption": "Generation quality of short- cut forcing compared to diffusion forc- ing. Shortcut forcing with only 4 sam- pling steps approaches the quality of dif- fusion forcing with 64 steps, resulting in 16× faster generations.",
+  "clip_pt": [
+   342.6,
+   67.1,
+   546.0,
+   227.8
+  ]
+ },
+ {
+  "file": "figure09_kitchen_video_generations_starting_from.jpg",
+  "kind": "Figure",
+  "num": 9,
+  "page": 26,
+  "caption": "Kitchen video generations starting from holdout context.",
+  "clip_pt": [
+   66.0,
+   106.8,
+   546.0,
+   701.2
+  ]
+ },
+ {
+  "file": "figure10_comparison_of_input_images_for_different.jpg",
+  "kind": "Figure",
+  "num": 10,
+  "page": 29,
+  "caption": "Comparison of input images for different agents. Dreamer 4 learns directly from high- resolution images reflecting the experience of human players.",
+  "clip_pt": [
+   66.0,
+   95.8,
+   546.0,
+   224.9
+  ]
+ },
+ {
+  "file": "figure11_comparison_of_multi_step_video_generatio.jpg",
+  "kind": "Figure",
+  "num": 11,
+  "page": 29,
+  "caption": "Comparison of multi-step video generations between Dreamer 3 and Dreamer 4.",
+  "clip_pt": [
+   63.5,
+   492.0,
+   546.8,
+   712.3
+  ]
+ },
+ {
+  "file": "table01_comparison_of_minecraft_world_models_dre.png",
+  "kind": "Table",
+  "num": 1,
+  "page": 12,
+  "caption": "Comparison of Minecraft world models. Dreamer 4 is the first world model to accurately simulate a wide range of object interactions and game mechanics in Minecraft. Moreover, Dreamer 4 pushes the limits of context length compared to previous models by 6×, while maintaining real-time interactive inference. We measure the inference speed of each model on a single H100 GPU, and translate the inference speed for the proprietary large Oasis model based on public information. The Minecraft dataset is recorded at 20 FPS, matching the update rate of the game.",
+  "clip_pt": [
+   83.5,
+   68.0,
+   528.5,
+   175.4
+  ]
+ },
+ {
+  "file": "table02_cascade_of_model_design_choices_dreamer.png",
+  "kind": "Table",
+  "num": 2,
+  "page": 15,
+  "caption": "Cascade of model design choices. Dreamer 4 is based on a shortcut forcing objective and an efficient transformer architecture, combining a range of known techniques to achieve accurate and fast interleaved generation. Starting from a naive diffusion forcing transformer with 𝑁z = 64 spatial tokens and 𝐾= 64 sampling steps, we apply the objective and architecture modifications, and increase the number of spatial tokens once feasible. Inference speed measured on a single H100 GPU. The resulting world model achieves high model capacity and inference efficiency.",
+  "clip_pt": [
+   103.7,
+   57.5,
+   508.3,
+   269.2
+  ]
+ },
+ {
+  "file": "table03_comparison_of_experimental_setups_for_di.png",
+  "kind": "Table",
+  "num": 3,
+  "page": 16,
+  "caption": "Comparison of experimental setups for different Minecraft agents. Dreamer 4 learns purely from offline experience and requires 100× less data than previous keyboard and mouse agents. See Figure 10 for examples of input images.",
+  "clip_pt": [
+   97.0,
+   542.3,
+   505.4,
+   672.2
+  ]
+ },
+ {
+  "file": "table04_taskset_for_training_the_multi_task_agen.png",
+  "kind": "Table",
+  "num": 4,
+  "page": 27,
+  "caption": "Taskset for training the multi-task agent.",
+  "clip_pt": [
+   87.0,
+   106.4,
+   290.1,
+   418.4
+  ]
+ },
+ {
+  "file": "table05_milestone_items_used_for_measuring_progr.png",
+  "kind": "Table",
+  "num": 5,
+  "page": 27,
+  "caption": "Milestone items used for measuring progress during evaluation.",
+  "clip_pt": [
+   90.4,
+   465.5,
+   290.1,
+   712.7
+  ]
+ },
+ {
+  "file": "table06_prompt_sequence_for_evaluation.png",
+  "kind": "Table",
+  "num": 6,
+  "page": 27,
+  "caption": "Prompt sequence for evaluation.",
+  "clip_pt": [
+   321.9,
+   106.4,
+   525.9,
+   486.2
+  ]
+ },
+ {
+  "file": "table07_success_rates_for_each_milestone_item_av.png",
+  "kind": "Table",
+  "num": 7,
+  "page": 28,
+  "caption": "Success rates for each milestone item averaged over 1000 evaluation episodes. Scores within 5% of the highest recorded score are highlighted in bold.",
+  "clip_pt": [
+   71.1,
+   107.7,
+   535.7,
+   370.4
+  ]
+ },
+ {
+  "file": "table08_time_in_minutes_needed_for_reaching_each.png",
+  "kind": "Table",
+  "num": 8,
+  "page": 28,
+  "caption": "Time in minutes needed for reaching each milestone item, averaged over successful episodes. We omit timings for items below a success rate of 0.5% to ensure statistical significance. Scores within 5% of the fastest recorded score are highlighted in bold.",
+  "clip_pt": [
+   71.1,
+   410.5,
+   535.7,
+   673.2
+  ]
+ }
+]

@@ -36,130 +36,138 @@ _(no notes)_
 
 Three phases. First a world model is trained on all video. Second, agent tokens and heads are added and trained by behavioural cloning while the dynamics loss keeps running. Third, the transformer is frozen and only the policy and value heads are trained by RL on imagined rollouts. Keeping the dynamics loss on uniform data rather than task-relevant data is a small but deliberate choice to avoid a world model that is optimistic about task success.
 
-## 10. World-model design
+## 10. How the pieces fit together (1/2): data → tokenizer → one transformer
+
+This is the system view before we go component by component. Read it left to right: video frames enter the tokenizer encoder and become 256 latent tokens per frame; those latents, noised to a per-frame signal level, go into the big transformer together with the actions, the register tokens and, from phase 2 on, the agent tokens that carry the task id. The transformer has one output for the world model, the clean latents of the frame, and three outputs for the agent: policy, reward, value. The italic tags say which phase trains which output. Two things to point out: the decoder is only used to make videos and figures, the agent never sees pixels after the encoder; and the agent tokens can read everything but nothing reads them, which is what keeps the agent from biasing its own simulator.
+
+## 11. How the pieces fit together (2/2): the two loops
+
+Bottom half of the system view. On the right, the imagination loop: rollouts start from real contexts, the policy proposes actions, the frozen dynamics model predicts what happens in latent space with four forward passes per frame, the learned reward and value heads score the outcome and PMPO nudges the policy toward positive-advantage actions and away from negative ones, with a reverse KL to the frozen behavioural-cloning copy as prior. Gradients only reach the policy and value heads. On the left, evaluation: in the real game the same transformer runs once per frame as a feature extractor for the policy head; nothing is imagined at test time. The numbers at the end are the case for doing RL inside the model at all.
+
+## 12. World-model design
 
 Both halves use the same transformer block. Block-causal means every token in frame t can see all tokens of frames up to t, which is exactly what you need for online, frame-by-frame generation with a human or a policy in the loop.
 
-## 11. The causal tokenizer
+## 13. The causal tokenizer
 
 The tokenizer is a masked autoencoder over 16×16 patches with a small continuous bottleneck. Two properties matter downstream: it is causal in time, and its latent space is smooth because of the heavy random masking during training. Everything after this operates on 256 latent tokens per frame instead of 960 patches. The schematic on the left is an illustration built from a real frame, not a visualisation of the trained model.
 
-## 12. The interactive dynamics model
+## 14. The interactive dynamics model
 
 The dynamics model reads the interleaved sequence of actions and latents. Only every fourth layer attends across time; the rest work within one frame. That is what makes a 9.6 s context affordable. Alternating short and long batches is a training-cost trick: it cut a training step from 9.8 s to 1.5 s in the ablation (Table 2). A wording note: the paper says the past inputs are 'slightly corrupted to signal level τ_ctx = 0.1' — read that as a small amount of noise on the context, not 90 % noise.
 
-## 13. Primer 1 of 3 · Flow matching: one dial from noise to image
+## 15. Primer 1 of 3 · Flow matching: one dial from noise to image
 
 For the non-diffusion people: think of a dial τ from 0 (pure noise) to 1 (clean latent). Training corrupts a clean latent to a random position on the dial and asks the network for the way back, either as a direction (velocity) or as the clean end point. Sampling turns the dial from 0 to 1 in K steps. The strip at the top is a real world-model frame mixed with Gaussian noise at five signal levels. The problem for a real-time simulator is K: standard models need dozens of steps per frame.
 
-## 14. Primer 2 of 3 · Diffusion forcing: a noise level per frame
+## 16. Primer 2 of 3 · Diffusion forcing: a noise level per frame
 
 Diffusion forcing is the trick that turns a video diffusion model into a causal simulator: every frame gets its own noise level, so the model learns to predict a noisy future from a cleaner past. That is precisely the situation at inference, where the past is what the model generated a moment ago. What it does not solve is speed; that is what shortcut models are for.
 
-## 15. Primer 3 of 3 · Shortcut models: learning to take big steps
+## 17. Primer 3 of 3 · Shortcut models: learning to take big steps
 
 Shortcut models teach the network to take big steps consistently. The extra input is the step size; the extra loss says that one big step must agree with two half steps that the model computes itself. Because the target is deterministic it is easier to fit than the noisy flow-matching target, which is one reason the bootstrap term works well. Dreamer 4 combines this with diffusion forcing into shortcut forcing.
 
-## 16. Shortcut forcing: the training objective
+## 18. Shortcut forcing: the training objective
 
 Here is the objective in words. Combining the two prior ideas gets you from 875 back to 329 FVD at 4 steps — but the big wins come from the parameterisation details: predicting x instead of v, computing the loss in x-space, and the ramp weight together take FVD from 329 to 102. These are the kind of choices you only discover with a careful cascade of ablations, which the paper provides.
 
-## 17. Why x-prediction matters for autoregressive world models
+## 19. Why x-prediction matters for autoregressive world models
 
 This is the most transferable lesson of the paper for anyone building autoregressive generative models: predict the clean signal, not the velocity, when your own outputs become your inputs. Open Dreamer, the open-source reproduction, independently confirmed this — they report the same instability with v-prediction at scale.
 
-## 18. Architecture choices that buy speed without losing quality
+## 20. Architecture choices that buy speed without losing quality
 
 Read the bars top to bottom. The two dark bars at the top are the starting point: a diffusion-forcing transformer that is either slow or bad. The grey bars are the objective changes from the previous slides; the blue bar is the final model. The architectural changes on the lower half mostly move FPS, not FVD — exactly what you want.
 
-## 19. From world model to agent: agent tokens & heads
+## 21. From world model to agent: agent tokens & heads
 
 Agent tokens are the interface between simulation and decision making. The one-directional mask is subtle but important: if latents could attend to agent tokens, the model could 'cheat' by predicting frames consistent with what the policy intends rather than with the physics of the game. Notice how much of the gain over BC comes from this phase alone — the representation matters.
 
-## 20. Imagination training with PMPO
+## 22. Imagination training with PMPO
 
 PMPO is deliberately simple. Using only the sign of the advantage makes the update invariant to reward scale, which matters when rewards are rare item events. The KL term to the BC policy is doing two jobs: stabilising RL and preventing the policy from wandering into regions the world model gets wrong. Hafner mentioned in a talk that a few rounds of corrective online data would allow a much weaker KL — but that is not in the paper.
 
-## 21. Part 3 — Experiments
+## 23. Part 3 — Experiments
 
 _(no notes)_
 
-## 22. Is the world model accurate? Let humans play inside it
+## 24. Is the world model accurate? Let humans play inside it
 
 This is the paper's most convincing evidence about the world model. Real people sit down with a mouse and keyboard and try to do things. Dreamer 4 is the only model in which crafting, riding a boat or entering a portal work. The caveat is on the right: this is a small, human-judged protocol; I'd like to see automated long-horizon metrics in follow-ups.
 
-## 23. What 'accurate object interactions' looks like
+## 25. What 'accurate object interactions' looks like
 
 Three of the sixteen tasks. In the boat task Lucid shows only blue; in the portal task the baselines never enter; in the crafting task Dreamer 4 opens a functional crafting menu. The clips themselves are in the resource archive if you want to play them during the talk.
 
-## 24. Offline diamond challenge: results
+## 26. Offline diamond challenge: results
 
 The official results figure. Every method nails the first items; the interesting region is the right half. Dreamer 4 roughly doubles or triples the VLA on iron-age items and is the only one reaching diamonds — rarely, but from zero interaction. Remember this is a 60-minute budget per episode; humans need about 20 minutes on average.
 
-## 25. Where do the gains come from? Agent ablations and speed
+## 27. Where do the gains come from? Agent ablations and speed
 
 Two separable effects. First, using the world model as the representation for imitation already gives a large jump — that's a statement about video pretraining. Second, RL inside the model adds a further, smaller but consistent gain on the hardest items and makes the agent faster, which is a hallmark of RL over imitation.
 
-## 26. Unlabeled video: how many action labels are needed?
+## 28. Unlabeled video: how many action labels are needed?
 
 This experiment is easy to overlook but strategically important. Only about a hundred hours of labeled actions are needed on top of thousands of unlabeled hours, and the learned action semantics transfer to visual domains that were never labeled. That is the argument for scaling to internet video later.
 
-## 27. Inside the imagination: decoded training rollouts
+## 29. Inside the imagination: decoded training rollouts
 
 Figure 1 from the paper. All of these frames are generated by the model while the policy is being trained. Worth stressing to a mixed audience: the agent learns in latent space; decoding is purely for visualisation.
 
-## 28. Beyond Minecraft: robotics & egocentric video (qualitative)
+## 30. Beyond Minecraft: robotics & egocentric video (qualitative)
 
 The paper positions Dreamer 4 as a step toward robotics. The evidence here is qualitative: plausible counterfactual generations on real robot and kitchen video. Hafner left DeepMind shortly after the paper to work on humanoid robotics, which tells you where the authors think this goes.
 
-## 29. Dreamer 3 vs Dreamer 4
+## 31. Dreamer 3 vs Dreamer 4
 
 Same family, different regime. Dreamer 3 solved diamonds with online interaction and privileged state at 64×64; Dreamer 4 does it offline from raw pixels and inputs. The price is speed: the transformer is still about forty times slower than the recurrent model, according to Hafner.
 
-## 30. Data, compute and scale
+## 32. Data, compute and scale
 
 Scale context. The Minecraft data is the public VPT contractor set, which makes the comparison with VPT clean: Dreamer 4 uses about a hundred times less data and no interaction. Compute is disclosed only as a TPU range. Nothing was open-sourced, which shaped the follow-up ecosystem.
 
-## 31. Part 4 — Discussion
+## 33. Part 4 — Discussion
 
 _(no notes)_
 
-## 32. Limitations the paper itself states
+## 34. Limitations the paper itself states
 
 The authors are quite candid. The two that matter most for the agenda of the paper are memory and exploitability: both limit how far imagination training can be pushed before the policy learns things that are only true inside the model.
 
-## 33. A critical reading: established vs. open
+## 35. A critical reading: established vs. open
 
 Balance sheet. The methodological contribution — how to make a fast, accurate autoregressive video world model — is robust and has been independently reproduced. The headline agent result is real but statistically thin and has not been reproduced outside DeepMind. For a reading group, this split is where the discussion usually starts.
 
-## 34. Where the authors want to take it
+## 36. Where the authors want to take it
 
 Six directions, three of which — memory, corrective data, and language — directly address the limitations we just discussed. Note that the authors' next steps are toward physical robots, not more Minecraft.
 
-## 35. Key takeaways
+## 37. Key takeaways
 
 Six takeaways, ordered from result to method to caveats.
 
-## 36. Questions for discussion
+## 38. Questions for discussion
 
 Pick two or three depending on the room.
 
-## 37. References & resources
+## 39. References & resources
 
 All sources, plus the GitHub archive that contains local copies of every item used to build this deck.
 
-## 38. Appendix A — Configuration & hyper-parameters
+## 40. Appendix A — Configuration & hyper-parameters
 
 Reference slide; not meant to be presented in full.
 
-## 39. Appendix B — Full design cascade (Table 2)
+## 41. Appendix B — Full design cascade (Table 2)
 
 Numbers transcribed from Table 2 and read off Figure 8.
 
-## 40. Appendix C — Full success-rate table (Table 7, %)
+## 42. Appendix C — Full success-rate table (Table 7, %)
 
 Full table for reference.
 
-## 41. Appendix D — Glossary
+## 43. Appendix D — Glossary
 
 Glossary for the mixed audience.
