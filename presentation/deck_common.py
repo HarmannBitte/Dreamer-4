@@ -135,7 +135,7 @@ def section(title, sub, n):
     add_text(s, Inches(0.9), Inches(3.15), Inches(9), Inches(1.3), title, size=44, bold=True, color=WHITE)
     add_text(s, Inches(0.9), Inches(4.35), Inches(8.5), Inches(1.4), sub, size=18, color=RGBColor(0xC9, 0xD3, 0xE6), line_spacing=1.15)
     state["part"] = f"Part {n} · {title}"
-    chrome(s, title, dark=True); state["titles"][-1] = f"Part {n} — {title}"; return s
+    chrome(s, title, dark=True); state["titles"][-1] = f"Part {n}: {title}"; return s
 
 def _borders(cell, top=None, bottom=None):
     """Booktabs-style borders: (color, pt) for top/bottom, no vertical rules. Elements are inserted in schema order."""

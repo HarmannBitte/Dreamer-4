@@ -33,6 +33,7 @@ g.crop((0, int((60 - 56.6) * ppu), g.width, int((60 - 30.0) * ppu))).save(A + "g
 print("assets ready:", len(os.listdir(A)))
 
 subprocess.run(["python3", "make_landscape.py"], check=True)      # final deck: world-model landscape
+subprocess.run(["python3", "make_equations.py"], check=True)      # Algorithm 1 slides: eqs. 5-11 as PNG
 
 # ---- slide 4: official video material (thumbnail, QR codes, teaser poster frame)
 import subprocess, requests, segno, imageio_ffmpeg

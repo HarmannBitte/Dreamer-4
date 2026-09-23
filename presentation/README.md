@@ -2,23 +2,23 @@
 
 Two decks built from the same slide library:
 
-* **`Dreamer4_Final.pptx` / `.pdf` — the final talk (~30 min + discussion), framed around world models.** 31 talk slides + 12 appendix slides.
+* **`Dreamer4_Final.pptx` / `.pdf` — the final talk (~30 min + discussion), framed around world models.** 31 talk slides + 14 appendix slides.
   Arc: hook (official video, the thesis in one slide) → Part 1 *World models* (what they are, the 2019–2025 landscape of "models an agent trains inside"
   vs. "models a human plays inside" with Dreamer 4 in both — `make_landscape.py`, what an agent needs from a world model, the diamond test) →
   Part 2 *What makes Dreamer 4 special* (six design decisions: latents not pixels · shortcut forcing with the three primers and x-prediction ·
   a 21-FPS architecture · the agent inside the transformer · offline imagination training with PMPO · action semantics from few labels) →
   Part 3 *Does it hold up?* (humans inside the model, the diamond results, where the gains come from) → Part 4 *Where it stands*
   (Genie 3 vs Dreamer 4, a critical reading, "what makes Dreamer 4 special" in one slide, discussion questions). Appendix: protocol, predecessors,
-  the three-phase recipe, the system diagram, the stack-by-stack comparison, Genie 3 details, Dreamer 3 vs 4, limitations, configuration, Table 7, glossary.
+  the three-phase recipe and Algorithm 1 written out in full (eqs. 5-11), the system diagram, the stack-by-stack comparison, Genie 3 details, Dreamer 3 vs 4, limitations, configuration, Table 7, glossary.
   Speaker notes on every slide (`Dreamer4_Final_speaker_notes.md`). Built by `build_final.py`.
-* **`Dreamer4_Deep_Dive.pptx` / `.pdf` — the 50-slide reference deck** that follows the paper's structure (details below). Built by `build_deck.py`.
+* **`Dreamer4_Deep_Dive.pptx` / `.pdf` — the 52-slide reference deck** that follows the paper's structure (details below). Built by `build_deck.py`.
 
 Both scripts import `deck_common.py` (visual system, helpers) and `deck_slides.py` (one function per slide; the final deck reuses them under new titles
 via `titled()` and adds its own framing slides). `setup_libreoffice.sh` recreates the user-space LibreOffice used to render the PDFs.
 
 ## The deep-dive deck
 
-* `Dreamer4_Deep_Dive.pptx` — 50 slides (16:9), speaker notes on every slide. Mixed technical audience, 50–65 min.
+* `Dreamer4_Deep_Dive.pptx` — 52 slides (16:9), speaker notes on every slide. Mixed technical audience, 50–65 min.
   v6 (Sep 2026) added slide 4, "The paper in three minutes: the official video": the YouTube video *Dreamer 4 | Diamonds from Offline Experience* (2:55, essentially Figure 1 in motion) as a
   click-through thumbnail with QR code, plus the official 10-second teaser from danijar.com embedded as an offline-playable clip (`assets/video/`, `dreamer4_resources/media/`).
   Link chips were added to the play-test frames (all 51 project-page clips), the diamond-results slide (the four uncut 60-minute evaluation episodes) and the Figure 1 slide.
@@ -33,7 +33,7 @@ via `titled()` and adds its own framing slides). `setup_libreoffice.sh` recreate
   Visual system (v2): flat editorial layout — one ink colour + one accent, hairlines instead of boxes, margin notes, numbered columns,
   booktabs-style tables, charts restyled in the deck's font/palette, split title slide with model-generated frames. Every slide was
   rendered (LibreOffice → PDF → PNG) and checked for overflow/overlap.
-* `Dreamer4_Deep_Dive.pdf` — the same 50 slides as a PDF (the embedded teaser is replaced by its poster frame; the YouTube links are live) (rendered with LibreOffice 26.2 using Carlito, the metric-compatible Calibri substitute; images capped at 150 dpi, JPEG quality 82; speaker notes are not included in the PDF).
+* `Dreamer4_Deep_Dive.pdf` — the same 52 slides as a PDF (the embedded teaser is replaced by its poster frame; the YouTube links are live) (rendered with LibreOffice 26.2 using Carlito, the metric-compatible Calibri substitute; images capped at 150 dpi, JPEG quality 82; speaker notes are not included in the PDF).
 * `make_vpt_stack_diagram.py` → `../vpt_stack_diagram.png` / `.svg` (GitHub mirror: `diagrams/`) — the same kind of system diagram for OpenAI's VPT (Baker et al. 2022), for comparison; not used in the deck.
 * `make_tech_tree.py` → `assets/diag_tech_tree.png`, `assets/chart_agent_cost.png` — the two graphics of slides 9–10 (Tables 3, 7, 8).
 * `make_wm_stack_comparison.py` → `../minecraft_world_models_stack.png` / `.svg` (GitHub mirror: `diagrams/`) — stack-by-stack comparison of the five Minecraft world models of Table 1 (MineWorld, Lucid-v1, Oasis small/large, Dreamer 4); with `--deck` it writes the two halves used on slides 28–29.
@@ -42,8 +42,22 @@ via `titled()` and adds its own framing slides). `setup_libreoffice.sh` recreate
 * `Dreamer4_Deep_Dive_speaker_notes.md` — the notes as plain text (written by `build_deck.py`).
 * `versions/` — every earlier PDF render of the deck (v1 39 slides, v2 39, v3 41, v4 43 with its pptx and notes, v5 49) plus a table of what changed in each version; see `versions/README.md`.
 * `build_deck.py` — regenerates the deep-dive deck (python-pptx); `build_final.py` the final talk. `make_assets.py` recreates the `assets/` folder both need
-  (figures rendered from the paper PDF / arXiv HTML, frames from the archived official clips, matplotlib charts); `make_charts.py`, `make_diagrams.py`, `make_stack_diagram.py`, `make_tech_tree.py`, `make_wm_stack_comparison.py --deck`, `make_genie3_stack_diagram.py` and `make_landscape.py` are called by it.
+  (figures rendered from the paper PDF / arXiv HTML, frames from the archived official clips, matplotlib charts); `make_charts.py`, `make_diagrams.py`, `make_stack_diagram.py`, `make_tech_tree.py`, `make_wm_stack_comparison.py --deck`, `make_genie3_stack_diagram.py`, `make_landscape.py` and `make_equations.py` (the Algorithm 1 objectives as mathtext PNGs) are called by it.
   The assets folder was removed after building to save workspace space — run `python3 make_assets.py && python3 build_deck.py` to rebuild (`NO_MOVIE=1 OUT=/tmp/x.pptx python3 build_deck.py` writes the poster-only variant used for the PDF render; `assets/video/` holds the thumbnail, QR codes and teaser poster).
+
+## Text pass (23 Sep 2026)
+
+All slide text and speaker notes of both decks were revised with the [blader/humanizer](https://github.com/blader/humanizer) skill (v3, the
+25 patterns from Wikipedia's "Signs of AI writing"): em dashes replaced by punctuation or rewritten sentences, bold-label bullets turned
+into sentences where the label carried no information (short field labels such as *Data:* or *Loss:* were kept), rhetorical "not X but Y"
+contrasts reduced to the ones that correct a real assumption, run-ups and stock closers removed, and the words on its list ("key",
+"robust" in the figurative sense, "actually", "landscape" as a noun) replaced. No number, name, quote or citation was changed; every claim
+still traces to the table or figure named on the slide. Equation ranges (2024–25, 16–64 steps) keep their en dashes. The renders from
+before this pass are `versions/v6_…` (deep dive) and `versions/final_v1_…` (final talk).
+
+Two slides were added at the same time, "Algorithm 1 in full (1/2) and (2/2)" (deep dive 13–14, final-talk appendix 35–36): the
+three phases of the paper's Algorithm 1 with every objective written out, eqs. (5) tokenizer loss, (6)–(8) shortcut forcing with
+x-prediction and the ramp weight, (9) multi-token behaviour cloning and reward loss, (10) λ-return value loss and (11) PMPO.
 
 Sources: arXiv 2509.24527, the project page danijar.com/project/dreamer4, and the research report / resource archive in `../dreamer4_resources`
 (mirrored at https://github.com/HarmannBitte/Dreamer-4, where this folder lives under `presentation/`). Figures © the authors, reproduced for discussion.
