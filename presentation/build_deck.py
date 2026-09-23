@@ -12,6 +12,7 @@ from PIL import Image, ImageEnhance
 import os
 
 A = "assets/"
+MEDIA = "/home/user/dreamer4_resources/media/"   # archived official clips (teaser embedded on slide 4)
 # ---- visual system: one dark ink, one accent, greys and hairlines; no fills, shadows or rounded shapes
 NAVY = RGBColor(0x14, 0x21, 0x3D); BLUE = RGBColor(0x2A, 0x56, 0xD6); DARK = RGBColor(0x1F, 0x29, 0x37)
 GREY = RGBColor(0x6B, 0x72, 0x80); MUTED = RGBColor(0x9A, 0xA3, 0xB2); RULE = RGBColor(0xD3, 0xD8, 0xE2)
@@ -220,6 +221,20 @@ def numbered(slide, left, top, width, items, size=16, gap=0.22, num_w=0.55, head
 def arrow(slide, left, top, width=Inches(0.45), height=Inches(0.5), color=GREY):
     return add_text(slide, left, top, width, height, "→", size=18, color=MUTED, align=PP_ALIGN.CENTER)
 
+
+def caption_links(slide, left, top, width, parts, size=10.5, color=GREY, link_color=BLUE):
+    """Italic caption made of (text, url-or-None) parts; URL parts become blue hyperlinks."""
+    tb = slide.shapes.add_textbox(left, top, width, Inches(0.5)); tf = tb.text_frame; tf.word_wrap = True
+    tf.margin_left = tf.margin_right = Inches(0.05); tf.margin_top = tf.margin_bottom = Inches(0.02)
+    p = tf.paragraphs[0]
+    for text, url in parts:
+        r = p.add_run(); r.text = text; _font(r, size, bool(url), link_color if url else color, italic=not url)
+        if url: r.hyperlink.address = url
+    return tb
+
+def click_through(shape, url):
+    shape.click_action.hyperlink.address = url; return shape
+
 def jpeg(path, max_w=1600, q=85):
     """Downscale/convert an asset to JPEG to keep the deck small; returns new path."""
     out = path.rsplit(".", 1)[0] + "_s.jpg"
@@ -279,6 +294,36 @@ rows = [["Claim", "Evidence in the paper"],
         ["~100× less data than VPT, no environment interaction", "2,541 h contractor video vs VPT's 270 K h web video + online RL — Table 3"]]
 add_table(s, Inches(0.5), Inches(1.55), Inches(12.3), rows, col_widths=[4.6, 7.7], font=12.5, row_h=0.8)
 notes(s, "If you remember one slide, it's this one. Five claims, each tied to a table or figure. Note the honesty in the numbers: diamonds are rare (0.7 %), but every earlier milestone is reached far more reliably and faster than by the baselines, all without a single environment step.")
+
+
+# 4 The official video ---------------------------------------------------------------
+YT = "https://www.youtube.com/watch?v=oDlBtTcX0g0"; PROJECT = "https://danijar.com/project/dreamer4"
+s = new_slide("The paper in three minutes: the official video",
+              "'Dreamer 4 | Diamonds from Offline Experience' — Danijar Hafner's channel, 1 Oct 2025, 2:55. In effect Figure 1 in motion")
+V = A + "video/"
+pic = s.shapes.add_picture(V + "yt_thumb_16x9.jpg", Inches(0.5), Inches(1.5), width=Inches(7.9), height=Inches(4.444)); click_through(pic, YT)
+pic.line.color.rgb = RULE; pic.line.width = Pt(0.75)
+cx, cy = Inches(0.5 + 7.9 / 2), Inches(1.5 + 4.444 / 2)
+ring = s.shapes.add_shape(MSO_SHAPE.OVAL, cx - Inches(0.55), cy - Inches(0.55), Inches(1.1), Inches(1.1)); ring.fill.solid(); ring.fill.fore_color.rgb = WHITE; ring.line.fill.background(); click_through(ring, YT)
+tri = s.shapes.add_shape(MSO_SHAPE.ISOSCELES_TRIANGLE, cx - Inches(0.19), cy - Inches(0.25), Inches(0.44), Inches(0.5)); tri.rotation = 90; tri.fill.solid(); tri.fill.fore_color.rgb = NAVY; tri.line.fill.background(); click_through(tri, YT)
+caption_links(s, Inches(0.5), Inches(6.0), Inches(7.9), [("\u25b6 Click the picture to open the video on YouTube (internet required): ", None), ("youtube.com/watch?v=oDlBtTcX0g0", YT)], size=11)
+caption_links(s, Inches(0.5), Inches(6.35), Inches(7.9), [("Project page: 60 more clips (imagination rollouts, 17 interaction tasks \u00d7 3 models, robot arm) \u2014 ", None), ("danijar.com/project/dreamer4", PROJECT)], size=10)
+# right column: QR + facts, what to watch for, embedded offline fallback
+s.shapes.add_picture(V + "qr_video.png", Inches(8.7), Inches(1.5), width=Inches(1.35), height=Inches(1.35))
+add_text(s, Inches(10.15), Inches(1.5), Inches(2.7), Inches(1.4), ["**Scan to watch on your own device**", "2:55 \u00b7 uploaded 1 Oct 2025", "YouTube channel @danijar (Danijar Hafner)", "Description: 'the first agent to mine diamonds learning entirely offline'"], size=10.5, color=GREY, bold_color=NAVY, line_spacing=1.15)
+note(s, Inches(8.7), Inches(3.0), Inches(4.13), Inches(1.5), "What to watch for", [
+    "The imagined training rollouts of Figure 1 in motion \u2014 chopping, crafting menus, mining, cave lighting, diamond ore \u2014 decoded from latents for viewing",
+    "The headline it builds up to: diamonds from 2,541 h of offline video, no environment interaction"], size=11)
+kicker(s, Inches(8.7), Inches(4.6), Inches(4.2), "No internet? Embedded 10-s teaser \u2014 click to play", color=MUTED, size=8)
+if os.environ.get("NO_MOVIE"):   # PDF render: poster frame only (LibreOffice would otherwise embed the clip as a Screen annotation)
+    s.shapes.add_picture(V + "teaser_poster.jpg", Inches(8.7), Inches(4.85), Inches(3.64), Inches(2.05))
+else:
+    mov = s.shapes.add_movie(MEDIA + "official_danijar_com/teaser.mp4", Inches(8.7), Inches(4.85), Inches(3.64), Inches(2.05), poster_frame_image=V + "teaser_poster.jpg", mime_type="video/mp4")
+notes(s, "Play the official video here (2:55) \u2014 or, if the room has no internet, the embedded ten-second teaser on the right. The video is essentially Figure 1 in motion: imagined rollouts decoded for visualisation, "
+         "building up to the headline claim. Say it explicitly: what you see there is generated by the world model, not recorded gameplay. "
+         "The four uncut 60-minute evaluation episodes on the same channel show the trained agent in the real game (linked on the results slide). "
+         "YouTube does not allow downloading, so the deck only links to the video; the teaser and the 60 project-page clips are archived in dreamer4_resources/media/. "
+         "If you prefer to show the video later, the natural spot is the Figure 1 slide in Part 3.")
 
 # ---- Part 1 -------------------------------------------------------------
 section("Background & motivation", "World models, learning in imagination, and why Minecraft from offline data is a hard test", 1)
@@ -575,7 +620,7 @@ for i, (key, name) in enumerate(tasks):
     add_text(s, Inches(0.3), y0 + i * (ch + Inches(0.1)) + Inches(0.5), Inches(1.35), Inches(0.8), name, size=12, bold=True, color=DARK)
     for j, m in enumerate(["dreamer", "lucid", "oasis"]):
         fit_picture(s, A + f"frame_{key}_{m}.jpg", x0 + j * (cw + Inches(0.1)), y0 + i * (ch + Inches(0.1)), cw, ch)
-caption(s, Inches(0.5), Inches(6.55), Inches(12.3), "Single frames sampled from the project-page clips (danijar.com/asset/dreamer4/human/…). Dreamer 4 renders the boat ride, the Nether-portal swirl and a working crafting-table menu; the baselines lose the scene or the menu.")
+caption_links(s, Inches(0.5), Inches(6.55), Inches(12.3), [("Single frames sampled from the project-page clips. Dreamer 4 renders the boat ride, the Nether-portal swirl and a working crafting-table menu; the baselines lose the scene or the menu.  \u25b6 All 51 clips (17 tasks \u00d7 3 models): ", None), ("danijar.com/project/dreamer4", PROJECT)])
 notes(s, "Three of the sixteen tasks. In the boat task Lucid shows only blue; in the portal task the baselines never enter; in the crafting task Dreamer 4 opens a functional crafting menu. "
          "The clips themselves are in the resource archive if you want to play them during the talk.")
 
@@ -586,7 +631,7 @@ add_bullets(s, Inches(0.6), Inches(5.2), Inches(12.2), Inches(1.9), [
     "**Dreamer 4:** stone pickaxe 90.1 % · iron ore 66.7 % · furnace 58.1 % · iron ingot 39.5 % · iron pickaxe 29.0 % · **diamond 0.7 %** (≈ 7 of 1,000 episodes)",
     "**VLA on Gemma 3 (same data):** iron pickaxe 11.2 %, no diamonds · **BC:** 0.6 % · **VPT fine-tuned** (pretrained on 270 K h of web video): only reliably reaches sticks",
     "Gap widens along the tech tree: imitation is enough for early items, imagination RL matters where data is thin and horizons are long"], size=14)
-caption(s, Inches(0.5), Inches(4.95), Inches(12), "Official figure from danijar.com/project/dreamer4 (benchmark.png).", size=9.5)
+caption_links(s, Inches(0.5), Inches(4.95), Inches(12.3), [("Official figure from danijar.com/project/dreamer4 (benchmark.png).   \u25b6 Watch the trained agent in the real game \u2014 four uncut 60-minute evaluation episodes on YouTube: ", None), ("Uncut #1", "https://www.youtube.com/watch?v=n4SwlSrkhvU"), (" \u00b7 ", None), ("#2", "https://www.youtube.com/watch?v=5CnpLRM8iXA"), (" \u00b7 ", None), ("#3", "https://www.youtube.com/watch?v=oZyliSpRMSw"), (" \u00b7 ", None), ("#4", "https://www.youtube.com/watch?v=VSKpvb1bnbU")], size=9.5)
 notes(s, "The official results figure. Every method nails the first items; the interesting region is the right half. Dreamer 4 roughly doubles or triples the VLA on iron-age items and is the only one reaching diamonds — rarely, but from zero interaction. "
          "Remember this is a 60-minute budget per episode; humans need about 20 minutes on average.")
 
@@ -621,6 +666,7 @@ add_bullets(s, Inches(9.3), Inches(1.6), Inches(3.7), Inches(5.3), [
     "RL never sees pixels: it operates on latents; decoding is for us",
     "Each rollout starts from real context frames and follows the *current* policy → training data stays on-policy without touching the game",
     "Stochastic sampling gives diverse futures — useful for exploring rare outcomes such as finding ore"], size=14)
+caption_links(s, Inches(0.5), Inches(6.62), Inches(8.6), [("\u25b6 The official video (slide 4, 2:55) shows these rollouts in motion: ", None), ("youtube.com/watch?v=oDlBtTcX0g0", YT)], size=10)
 notes(s, "Figure 1 from the paper. All of these frames are generated by the model while the policy is being trained. Worth stressing to a mixed audience: the agent learns in latent space; decoding is purely for visualisation.")
 
 # 26 Beyond Minecraft ---------------------------------------------------------------
@@ -808,7 +854,7 @@ rows = [["Term", "Meaning in this paper"],
 add_table(s, Inches(0.5), Inches(1.45), Inches(12.3), rows, col_widths=[2.4, 9.9], font=11.5, row_h=0.45)
 notes(s, "Glossary for the mixed audience.")
 
-out = "Dreamer4_Deep_Dive.pptx"; prs.save(out)
+out = os.environ.get("OUT", "Dreamer4_Deep_Dive.pptx"); prs.save(out)
 print("saved", out, os.path.getsize(out) // 1024, "KB,", len(prs.slides), "slides")
 with open("Dreamer4_Deep_Dive_speaker_notes.md", "w") as f:       # speaker notes as Markdown, regenerated with the deck
     f.write("# Dreamer 4 — deep dive: speaker notes\n\n")

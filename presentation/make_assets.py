@@ -31,3 +31,15 @@ from PIL import Image
 g = Image.open("/home/user/genie3_stack_diagram.png"); ppu = g.height / 56.0          # figure spans y = 60 … 4 units
 g.crop((0, int((60 - 56.6) * ppu), g.width, int((60 - 30.0) * ppu))).save(A + "genie3_top.png"); g.crop((0, int((60 - 25.6) * ppu), g.width, g.height)).save(A + "genie3_bottom.png")   # rows 01-04 without the figure title; rows 05-07
 print("assets ready:", len(os.listdir(A)))
+
+# ---- slide 4: official video material (thumbnail, QR codes, teaser poster frame)
+import subprocess, requests, segno, imageio_ffmpeg
+V = A + "video/"; os.makedirs(V, exist_ok=True)
+r = requests.get("https://i.ytimg.com/vi/oDlBtTcX0g0/sddefault.jpg", timeout=30); r.raise_for_status()
+open(V + "sddefault.jpg", "wb").write(r.content)
+Image.open(V + "sddefault.jpg").crop((0, 60, 640, 420)).save(V + "yt_thumb_16x9.jpg", quality=92)      # 640x480 letterboxed -> 16:9 centre
+segno.make("https://www.youtube.com/watch?v=oDlBtTcX0g0", error="m").save(V + "qr_video.png", scale=12, border=2, dark="#14213D", light="#FFFFFF")
+segno.make("https://danijar.com/project/dreamer4", error="m").save(V + "qr_project.png", scale=12, border=2, dark="#14213D", light="#FFFFFF")
+subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-loglevel", "error", "-ss", "1.0", "-i", "/home/user/dreamer4_resources/media/official_danijar_com/teaser.mp4",
+                "-frames:v", "1", "-q:v", "2", V + "teaser_poster.jpg"], check=True)
+print("video assets ready:", sorted(os.listdir(V)))

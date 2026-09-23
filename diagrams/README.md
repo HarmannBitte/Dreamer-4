@@ -1,6 +1,6 @@
 # Companion stack diagrams
 
-Three standalone graphics drawn in the same style as the Dreamer 4 system diagram (`presentation/stack_diagram.png`, slides 12–13 of the deck): numbered boxes, explicit data-flow arrows, one page each, 2666 px wide PNG plus an SVG. The comparison matrix (split in two) and the Genie 3 diagram (its two rows) also appear on slides 27–28 and 40–41 of the deck; the VPT diagram is standalone. The scripts that regenerate them live in `presentation/` (matplotlib + Carlito; they write to `/home/user/…`, adjust the output paths at the bottom of each script).
+Three standalone graphics drawn in the same style as the Dreamer 4 system diagram (`presentation/stack_diagram.png`, slides 13–14 of the deck): numbered boxes, explicit data-flow arrows, one page each, 2666 px wide PNG plus an SVG. The comparison matrix (split in two) and the Genie 3 diagram (its two rows) also appear on slides 28–29 and 41–42 of the deck; the VPT diagram is standalone. The scripts that regenerate them live in `presentation/` (matplotlib + Carlito; they write to `/home/user/…`, adjust the output paths at the bottom of each script).
 
 | File | Script | What it shows | Sources |
 |---|---|---|---|
