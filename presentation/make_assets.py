@@ -24,4 +24,10 @@ frame(M + "imag__cobble1.mp4", 0.6, A + "frame_imag_cobble.jpg"); frame(M + "rea
 shutil.copy(M + "benchmark.png", A + "benchmark.png")
 # 4. charts
 subprocess.run(["python3", "make_charts.py"], check=True); subprocess.run(["python3", "make_diagrams.py"], check=True); subprocess.run(["python3", "make_stack_diagram.py"], check=True)
+subprocess.run(["python3", "make_tech_tree.py"], check=True); subprocess.run(["python3", "make_wm_stack_comparison.py", "--deck"], check=True)
+# 5. Genie 3 system diagram (standalone at /home/user/genie3_stack_diagram.png), split into its two rows for two slides
+subprocess.run(["python3", "make_genie3_stack_diagram.py"], check=True)
+from PIL import Image
+g = Image.open("/home/user/genie3_stack_diagram.png"); ppu = g.height / 56.0          # figure spans y = 60 … 4 units
+g.crop((0, int((60 - 56.6) * ppu), g.width, int((60 - 30.0) * ppu))).save(A + "genie3_top.png"); g.crop((0, int((60 - 25.6) * ppu), g.width, g.height)).save(A + "genie3_bottom.png")   # rows 01-04 without the figure title; rows 05-07
 print("assets ready:", len(os.listdir(A)))

@@ -3,7 +3,7 @@ One column per model, one row per layer of the stack. Numbers in the context / F
 (one H100; large-Oasis FPS translated from public information). Architecture facts: MineWorld arXiv 2504.08388; Lucid-v1 write-up
 (ramimo.substack.com) + github.com/SonicCodes/lucid-v1; Oasis oasis-model.github.io + github.com/etched-ai/open-oasis; Dreamer 4 paper.
 Writes /home/user/minecraft_world_models_stack.{png,svg}. Not part of the deck build."""
-import glob, os
+import glob, os, sys
 import matplotlib; matplotlib.use("Agg")
 from matplotlib import font_manager
 import matplotlib.pyplot as plt
@@ -69,9 +69,10 @@ ROWS = [  # (row label, height, cells...)
      "simulator only\n(demo / product)",
      "agent tokens + policy / reward /\nvalue heads; RL in imagination →\ndiamonds from offline data only")]
 
-def draw(out, title=None):
+def draw(out, title=None, rows=None, footnote=True):
+    rows = rows or ROWS
     top = 60 if title else 56.25
-    HH = 4.2; total = HH + 0.5 + sum(r[1] + 0.35 for r in ROWS) + 4.2          # header + rows + footnote
+    HH = 4.2; total = HH + 0.5 + sum(r[1] + 0.35 for r in rows) + (4.2 if footnote else 0.4)          # header + rows + footnote
     bottom = 55.0 - total
     fig = plt.figure(figsize=(13.333, 13.333 * (top - bottom) / 100), dpi=200)
     ax = fig.add_axes([0, 0, 1, 1]); ax.set_xlim(0, 100); ax.set_ylim(bottom, top); ax.axis("off")
@@ -93,7 +94,7 @@ def draw(out, title=None):
     text(1.2, y - 1.0, "layer of the stack", size=7.2, color=GREY)
     text(1.2, y - 2.4, "Minecraft world\nmodels, 2024–25", size=8.6, color=NAVY, bold=True, ls=1.2)
     y -= HH + 0.5
-    for label, h, *cells in ROWS:
+    for label, h, *cells in rows:
         ax.add_patch(Rectangle((1, y - h), 12.5, h, fc=PANEL, ec=PANEL, zorder=1))
         text(1.2, y - 0.6, label, size=7.8, color=NAVY, bold=True)
         for i, c in enumerate(cells):
@@ -123,10 +124,15 @@ def draw(out, title=None):
             else:
                 text(cx(i) + 0.8, y - 0.6, c, size=7.3, color=(NAVY if hero else INK))
         y -= h + 0.35
-    text(1.2, y - 0.3, "Sources — MineWorld: Guo et al., arXiv 2504.08388 (their own measurement is 3–6 FPS with parallel decoding; the Dreamer 4 paper measures 2 FPS on one H100). Lucid-v1: ramimo.substack.com and\n"
+    if footnote: text(1.2, y - 0.3, "Sources — MineWorld: Guo et al., arXiv 2504.08388 (their own measurement is 3–6 FPS with parallel decoding; the Dreamer 4 paper measures 2 FPS on one H100). Lucid-v1: ramimo.substack.com and\n"
                        "github.com/SonicCodes/lucid-v1 (1.1 B and 44 FPS per Table 1). Oasis: oasis-model.github.io, the decart.ai blog and github.com/etched-ai/open-oasis. Dreamer 4: Hafner, Yan, Lillicrap, arXiv 2509.24527.\n"
                        "Play-test = a human trying the Dreamer 4 paper's 16 interaction tasks inside each model (Table 1 / Figures 12–14).", size=6.6, color=GREY, ls=1.3)
     fig.savefig(out, facecolor="white"); plt.close(fig); print("wrote", out)
 
-draw("/home/user/minecraft_world_models_stack.png", title="Minecraft world models, stack by stack")
-draw("/home/user/minecraft_world_models_stack.svg", title="Minecraft world models, stack by stack")
+if "--deck" in sys.argv:      # two halves for slides, no title / footnote (called by make_assets.py)
+    os.makedirs("assets", exist_ok=True)
+    draw("assets/diag_wm_stack_a.png", rows=ROWS[:5], footnote=False)
+    draw("assets/diag_wm_stack_b.png", rows=ROWS[5:], footnote=False)
+else:
+    draw("/home/user/minecraft_world_models_stack.png", title="Minecraft world models, stack by stack")
+    draw("/home/user/minecraft_world_models_stack.svg", title="Minecraft world models, stack by stack")

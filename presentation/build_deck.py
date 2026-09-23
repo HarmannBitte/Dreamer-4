@@ -24,7 +24,7 @@ W, H = Inches(13.333), Inches(7.5)
 prs = Presentation(); prs.slide_width = W; prs.slide_height = H
 BLANK = prs.slide_layouts[6]
 FOOTER = "Dreamer 4  ·  Hafner, Yan, Lillicrap (Google DeepMind)  ·  arXiv 2509.24527"
-state = {"n": 0, "part": None}
+state = {"n": 0, "part": None, "titles": []}
 
 # ---------------------------------------------------------------- helpers
 def _font(run_or_p, size, bold=False, color=DARK, italic=False, name=FONT):
@@ -104,7 +104,7 @@ def kicker(slide, left, top, width, text, color=GREY, size=10, align=PP_ALIGN.LE
     return add_text(slide, left, top, width, Inches(0.3), text.upper(), size=size, bold=True, color=color, spc=1.2, align=align)
 
 def chrome(slide, title, subtitle=None, dark=False):
-    state["n"] += 1
+    state["n"] += 1; state["titles"].append(title)
     if not dark:
         add_text(slide, Inches(0.5), Inches(0.38), Inches(12.3), Inches(0.75), title, size=26, bold=True, color=NAVY)
         if subtitle: add_text(slide, Inches(0.52), Inches(1.0), Inches(12.3), Inches(0.45), subtitle, size=14, color=GREY)
@@ -128,7 +128,7 @@ def section(title, sub, n):
     add_text(s, Inches(0.9), Inches(3.15), Inches(9), Inches(1.3), title, size=44, bold=True, color=WHITE)
     add_text(s, Inches(0.9), Inches(4.35), Inches(8.5), Inches(1.4), sub, size=18, color=RGBColor(0xC9, 0xD3, 0xE6), line_spacing=1.15)
     state["part"] = f"Part {n} · {title}"
-    chrome(s, title, dark=True); return s
+    chrome(s, title, dark=True); state["titles"][-1] = f"Part {n} — {title}"; return s
 
 def _borders(cell, top=None, bottom=None):
     """Booktabs-style borders: (color, pt) for top/bottom, no vertical rules. Elements are inserted in schema order."""
@@ -230,7 +230,7 @@ def jpeg(path, max_w=1600, q=85):
 
 # ================================================================ SLIDES
 # 1 Title -----------------------------------------------------------------
-s = prs.slides.add_slide(BLANK); state["n"] += 1
+s = prs.slides.add_slide(BLANK); state["n"] += 1; state["titles"].append("Dreamer 4 — Training Agents Inside of Scalable World Models (title)")
 bg = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, W, H); bg.fill.solid(); bg.fill.fore_color.rgb = NAVY; bg.line.fill.background()
 # right-hand strips: imagined rollout, human play inside the model, robot world model (all model-generated frames)
 strip_w, strip_h = Inches(5.433), Inches(2.5); sx = W - strip_w
@@ -325,6 +325,22 @@ tree = "log → planks → crafting table → stick → wooden pickaxe → cobbl
 box(s, Inches(7.5), Inches(5.1), Inches(5.3), Inches(1.6), "The 12 milestones (Table 5)", [tree], fill=PALE_BLUE, size=12)
 notes(s, "Offline means offline: the agent never touches Minecraft during training. The only signal is human gameplay video with logged inputs. "
          "Diamonds need a long chain of subgoals, each executed with raw mouse and keyboard at 20 Hz. That is why success rates fall off steeply along the tech tree for every method.")
+
+# 8 Tech tree ---------------------------------------------------------------
+s = new_slide("The tech tree: twelve milestones, three tool gates", "Why diamonds are a long-horizon problem — and where each agent falls off (Tables 7 and 8)")
+fit_picture(s, jpeg(A + "diag_tech_tree.png", max_w=2400, q=90), Inches(0.4), Inches(1.45), Inches(12.5), Inches(5.4))
+notes(s, "The whole challenge on one picture. Top row: the twelve milestone items in the order the evaluation prompts them, grouped into wood, stone and iron ages and the diamond. The amber gates are game rules, not choices: stone only drops if you hold a wooden pickaxe, iron ore needs a stone pickaxe, diamonds need an iron pickaxe — mining with a weaker tool destroys the block. "
+         "So there is no shortcut; every item depends on the previous tool, and each step is a different skill: punching, menu navigation with the mouse, placing blocks, digging, smelting. The minutes under the boxes are Dreamer 4's mean time to each item over successful episodes, Table 8: about 13 minutes to the iron pickaxe, 21 to a diamond — humans take about 20. "
+         "Bottom: success rates from Table 7. Every agent nails the wood age; VPT's offline policy already dies at the wooden pickaxe; the Gemma-3 VLA and Dreamer 4 separate from the stone pickaxe on, and the gap grows with the horizon: 29 versus 11 percent at the iron pickaxe, and only Dreamer 4 ever reaches a diamond. Keep this curve in mind — Part 3 asks where the gap comes from.")
+
+# 9 Predecessors ---------------------------------------------------------------
+s = new_slide("Who reached diamonds before, and what it cost", "Table 3: same goal, very different regimes — hours of data and interaction behind each agent")
+fit_picture(s, jpeg(A + "chart_agent_cost.png", max_w=1800, q=90), Inches(0.4), Inches(1.5), Inches(7.9), Inches(5.35))
+box(s, Inches(8.7), Inches(1.6), Inches(4.2), Inches(1.75), "VPT (OpenAI, 2022)", ["Showed that web video plus an inverse-dynamics model can bootstrap a mouse-and-keyboard policy — but diamonds still took 194K hours of trial and error in the live game, and the pure behavioural-cloning variant never crafts a wooden pickaxe offline."], size=12)
+box(s, Inches(8.7), Inches(3.45), Inches(4.2), Inches(1.55), "Dreamer 3 (2023)", ["Reached diamonds from scratch by online RL inside a small recurrent world model — at 64×64 pixels, with inventory state as input and abstract crafting actions instead of mouse clicks in menus."], size=12)
+box(s, Inches(8.7), Inches(5.1), Inches(4.2), Inches(1.75), "Dreamer 4's bet", ["Keep the human interface (360×640 pixels, raw mouse & keyboard), drop environment interaction entirely, and get the missing experience from imagination instead of the game — 100× less data than the keyboard-and-mouse agents before it (Table 3 caption)."], size=12, accent=NAVY)
+notes(s, "Historical context, with the hours on a log scale because they span three orders of magnitude. VPT is the closest relative: same contractor data, same action space. It got to diamonds, but only after pseudo-labelling 270 thousand hours of YouTube and then playing the real game for 194 thousand hours of RL; its offline-only version is the grey line that collapsed on the previous slide. "
+         "Dreamer 3 got there with far less experience, but it changed the problem: tiny images, privileged inventory state, and crafting as an abstract action rather than a sequence of mouse movements in a menu. Dreamer 4 keeps the hard interface and removes the interaction. That is the claim in the title of the paper, and it is why the number to remember is not 0.7 percent diamonds but zero hours in the game.")
 
 # ---- Part 2 -------------------------------------------------------------
 section("Method", "One transformer, three phases: world-model pretraining → agent fine-tuning → imagination training", 2)
@@ -533,6 +549,23 @@ box(s, Inches(8.7), Inches(4.6), Inches(4.2), Inches(2.1), "Why this evaluation"
 notes(s, "This is the paper's most convincing evidence about the world model. Real people sit down with a mouse and keyboard and try to do things. Dreamer 4 is the only model in which crafting, riding a boat or entering a portal work. "
          "The caveat is on the right: this is a small, human-judged protocol; I'd like to see automated long-horizon metrics in follow-ups.")
 
+# World-model comparison, two slides ---------------------------------------------------------------
+s = new_slide("Minecraft world models, stack by stack (1/2): how they are built", "The Table 1 models compared layer by layer — provenance, data, tokenizer, backbone and objective, action interface")
+fit_picture(s, jpeg(A + "diag_wm_stack_a.png", max_w=2400, q=90), Inches(0.4), Inches(1.5), Inches(12.5), Inches(4.5))
+add_bullets(s, Inches(0.6), Inches(6.05), Inches(12.2), Inches(0.9), [
+    "**Two families:** MineWorld predicts discrete codes with a LLaMA-style decoder that doubles as the policy; Lucid-v1, Oasis and Dreamer 4 denoise continuous latents with a transformer — Dreamer 4 with shortcut forcing so that four passes per frame suffice, and with the agent heads living in the same network"], size=13)
+notes(s, "Before the play-test numbers, a look at what the competitors actually are, layer by layer. The two extremes are MineWorld — a language-model recipe over discrete image codes, elegant because model and policy are one network, but slow — and the diffusion family, which Dreamer 4 belongs to. "
+         "Within that family the differences that matter are the tokenizer capacity (Lucid squeezes a frame into about 15 tokens, Dreamer 4 keeps 256) and the training objective: rolling diffusion or plain diffusion forcing versus shortcut forcing with x-prediction. The action interface is similar across all four — that is what makes them comparable at all, and what excludes Genie 3.")
+
+s = new_slide("Minecraft world models, stack by stack (2/2): how they run", "Sampling, context, speed on one H100, the 16-task human play-test, and what each model is used for")
+fit_picture(s, jpeg(A + "diag_wm_stack_b.png", max_w=2400, q=90), Inches(0.4), Inches(1.5), Inches(12.5), Inches(3.9))
+add_bullets(s, Inches(0.6), Inches(5.5), Inches(12.2), Inches(1.45), [
+    "**Speed alone is not the story:** Lucid-v1 is the fastest model in the table and solves none of the tasks; MineWorld cannot be played at all because its parallel decoding needs the actions in advance",
+    "**Context is:** 9.6 s versus 0.8–1.6 s is what lets the player look away and back — and the two tasks Dreamer 4 still fails are exactly the ones that exceed that window",
+    "**Only Dreamer 4 is used as a training ground:** the others are simulators or demos; here the same network also hosts the policy that is trained inside it"], size=13)
+notes(s, "Second half: how they behave at run time. Two things to point at. First, frame rate is necessary but not sufficient — Lucid is twice as fast as Dreamer 4 and fails every task, and Oasis large is the one that autocompletes buildings you never built. Second, context length is the quiet hero: six times more than the others, and the failures that remain are memory failures. "
+         "The last row is the conceptual difference: for the other projects the simulator is the product; for Dreamer 4 it is the means, and the policy trained inside it is the result.")
+
 # 21 Human interaction frames ---------------------------------------------------------------
 s = new_slide("What 'accurate object interactions' looks like", "Frames from the project page's side-by-side human sessions (same start frame, same human inputs)")
 labels = ["Dreamer 4", "Lucid-v1", "Oasis"]; tasks = [("boat", "Place and ride boat"), ("portal", "Enter portal"), ("pickaxe", "Craft wooden pickaxe")]
@@ -666,6 +699,24 @@ columns(s, Inches(1.6), Inches(5.2), [("Well supported", ["Shortcut forcing + x-
 notes(s, "Balance sheet. The methodological contribution — how to make a fast, accurate autoregressive video world model — is robust and has been independently reproduced. The headline agent result is real but statistically thin and has not been reproduced outside DeepMind. "
          "For a reading group, this split is where the discussion usually starts.")
 
+# Genie 3 context, two slides ---------------------------------------------------------------
+s = new_slide("Context: Genie 3 (1/2) — what is actually public", "Google DeepMind, Aug 2025 — blog post and model page only. Plain boxes = stated; amber = inferred from the Genie 2 recipe; grey = undisclosed")
+fit_picture(s, jpeg(A + "genie3_top.png", max_w=2400, q=90), Inches(0.4), Inches(1.55), Inches(12.5), Inches(3.4))
+add_bullets(s, Inches(0.6), Inches(5.2), Inches(12.2), Inches(1.7), [
+    "**A different problem:** any text-prompted world, 24 FPS at 720p, about a minute of visual memory, navigation-level actions — versus one game, full mouse & keyboard, 9.6 s of context at 21 FPS and 360p",
+    "**Why the paper cannot compare (§4.2):** Genie 3 exposes only camera actions and one generic 'interact' button, so the 16 Minecraft tasks are not expressible; nothing about its size, data or objective is published — the '11 B / 200k hours' figures that circulate are Genie 1's"], size=13)
+notes(s, "People will ask about Genie 3, so here is what is actually known. Everything in the plain boxes is stated by DeepMind: auto-regressive frame-by-frame generation conditioned on the prompt, the latest actions and the whole trajectory so far, with an emergent — not explicit — 3D consistency. The amber pipeline is the recipe DeepMind published for Genie 2, which is a reasonable guess for Genie 3 but not confirmed. "
+         "Parameter count, tokenizer, data and objective are undisclosed; there is no paper. The Dreamer 4 authors say why they do not compare: Genie 3's action space is navigation plus one interact button, and the Minecraft tasks need menus and precise mouse input.")
+
+s = new_slide("Context: Genie 3 (2/2) — in use, and where Dreamer 4 differs", "Human play in the research preview and Project Genie, the SIMA 2 agent loop, stated limitations")
+fit_picture(s, jpeg(A + "genie3_bottom.png", max_w=2400, q=90), Inches(0.4), Inches(1.55), Inches(12.5), Inches(2.75))
+add_bullets(s, Inches(0.6), Inches(4.5), Inches(12.2), Inches(2.45), [
+    "**Agent outside vs. agent inside:** SIMA 2 acts in Genie 3 worlds with Gemini-written tasks and a learned reward model, and Genie 3 only renders the consequences; Dreamer 4's policy is a head on the same transformer, trained by RL on imagined latents with the reward head it learned from the data",
+    "**Same limits, different scale:** both are closed. Genie 3 stays consistent for minutes but with a limited action space; Dreamer 4 forgets beyond 9.6 s but simulates crafting menus, furnaces, boats and portals from raw mouse and keyboard",
+    "**Convergent direction:** both bet on world models as training grounds — Genie 3 via generated worlds for embodied agents and robots, Dreamer 4 via imagination training on offline video; neither has yet shown a policy that transfers to a physical robot"], size=13)
+notes(s, "Bottom half of the Genie 3 picture. The interesting contrast is architectural: in DeepMind's own SIMA 2 work the agent, its rewards and its learning all live outside the world model, which is just an environment. In Dreamer 4 the policy is part of the world-model transformer and is trained on the model's latents, never on pixels. "
+         "Both approaches are closed and both point the same way — world models as the place where agents get their experience — but they trade off breadth against precision: Genie 3 generalises across worlds with a coarse action space, Dreamer 4 masters one world with the full human interface.")
+
 # 32 Future directions ---------------------------------------------------------------
 s = new_slide("Where the authors want to take it", "Future work listed in the paper and expanded in the TalkRL interview (Nov 2025)")
 items = [("Internet-video pretraining", "Learn dynamics from unlabeled web video; label only a small slice with actions (Fig. 7 is the proof of concept)."),
@@ -759,3 +810,9 @@ notes(s, "Glossary for the mixed audience.")
 
 out = "Dreamer4_Deep_Dive.pptx"; prs.save(out)
 print("saved", out, os.path.getsize(out) // 1024, "KB,", len(prs.slides), "slides")
+with open("Dreamer4_Deep_Dive_speaker_notes.md", "w") as f:       # speaker notes as Markdown, regenerated with the deck
+    f.write("# Dreamer 4 — deep dive: speaker notes\n\n")
+    for i, (sl, t) in enumerate(zip(prs.slides, state["titles"]), 1):
+        txt = sl.notes_slide.notes_text_frame.text.strip() if sl.has_notes_slide else ""
+        f.write(f"## {i}. {t}\n\n{txt or '_(no notes)_'}\n\n")
+print("notes written for", len(state["titles"]), "slides")
