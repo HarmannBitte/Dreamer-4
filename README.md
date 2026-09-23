@@ -25,7 +25,7 @@ dreamer4_resources/
 ├── videos/        oEmbed metadata + thumbnails for 7 YouTube videos               (0.1 MB) → videos/README.md
 ├── huggingface/   model/dataset cards + API file listings for 4 models, 4 datasets (0.7 MB) → huggingface/README.md
 ├── paper_figures/ all 11 figures + 8 tables of the paper as images, raw embedded images, caption index (6.3 MB) → paper_figures/README.md
-├── presentation/  49-slide deep-dive deck (.pptx with speaker notes, .pdf, notes .md, build scripts, stack diagram) (7.9 MB) → presentation/README.md
+├── presentation/  49-slide deep-dive deck (.pptx with speaker notes, .pdf, notes .md, build scripts, stack diagram) (7.9 MB) → presentation/README.md (versions/ keeps every earlier PDF render, v1–v4)
 └── diagrams/      companion stack graphics: VPT, Minecraft world-model comparison, Genie 3 (PNG + SVG) → diagrams/README.md
 ```
 

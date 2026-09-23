@@ -19,7 +19,7 @@
 * `make_genie3_stack_diagram.py` → `../genie3_stack_diagram.png` / `.svg` (GitHub mirror: `diagrams/`) — the same kind of system diagram for Google DeepMind's Genie 3 (no paper exists: stated facts vs. amber-marked inferences from the Genie 2 recipe vs. undisclosed items; SIMA 2 agent loop; Project Genie); its two rows are cropped onto slides 40–41.
 * `stack_diagram.svg` (+ `stack_diagram.png` in the GitHub mirror, `../dreamer4_stack_diagram.png` here) — the one-page "how the parts of Dreamer 4 fit together" system diagram (standalone version of slides 12–13).
 * `Dreamer4_Deep_Dive_speaker_notes.md` — the notes as plain text (written by `build_deck.py`).
-* `previous_43_slides/` — the unchanged v4 deck (43 slides: pptx, PDF, notes) from before the Sep 2026 extension, kept for reference.
+* `versions/` — every earlier PDF render of the deck (v1 39 slides, v2 39, v3 41, v4 43 with its pptx and notes) plus a table of what changed in each version; see `versions/README.md`.
 * `build_deck.py` — regenerates the deck (python-pptx). `make_assets.py` recreates the `assets/` folder it needs
   (figures rendered from the paper PDF / arXiv HTML, frames from the archived official clips, matplotlib charts); `make_charts.py`, `make_diagrams.py`, `make_stack_diagram.py`, `make_tech_tree.py`, `make_wm_stack_comparison.py --deck` and `make_genie3_stack_diagram.py` are called by it.
   The assets folder was removed after building to save workspace space — run `python3 make_assets.py && python3 build_deck.py` to rebuild.
