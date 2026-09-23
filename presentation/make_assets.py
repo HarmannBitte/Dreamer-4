@@ -32,6 +32,8 @@ g = Image.open("/home/user/genie3_stack_diagram.png"); ppu = g.height / 56.0    
 g.crop((0, int((60 - 56.6) * ppu), g.width, int((60 - 30.0) * ppu))).save(A + "genie3_top.png"); g.crop((0, int((60 - 25.6) * ppu), g.width, g.height)).save(A + "genie3_bottom.png")   # rows 01-04 without the figure title; rows 05-07
 print("assets ready:", len(os.listdir(A)))
 
+subprocess.run(["python3", "make_landscape.py"], check=True)      # final deck: world-model landscape
+
 # ---- slide 4: official video material (thumbnail, QR codes, teaser poster frame)
 import subprocess, requests, segno, imageio_ffmpeg
 V = A + "video/"; os.makedirs(V, exist_ok=True)

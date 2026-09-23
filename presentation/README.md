@@ -1,4 +1,22 @@
-# Dreamer 4 — deep-dive presentation
+# Dreamer 4 — presentations
+
+Two decks built from the same slide library:
+
+* **`Dreamer4_Final.pptx` / `.pdf` — the final talk (~30 min + discussion), framed around world models.** 31 talk slides + 12 appendix slides.
+  Arc: hook (official video, the thesis in one slide) → Part 1 *World models* (what they are, the 2019–2025 landscape of "models an agent trains inside"
+  vs. "models a human plays inside" with Dreamer 4 in both — `make_landscape.py`, what an agent needs from a world model, the diamond test) →
+  Part 2 *What makes Dreamer 4 special* (six design decisions: latents not pixels · shortcut forcing with the three primers and x-prediction ·
+  a 21-FPS architecture · the agent inside the transformer · offline imagination training with PMPO · action semantics from few labels) →
+  Part 3 *Does it hold up?* (humans inside the model, the diamond results, where the gains come from) → Part 4 *Where it stands*
+  (Genie 3 vs Dreamer 4, a critical reading, "what makes Dreamer 4 special" in one slide, discussion questions). Appendix: protocol, predecessors,
+  the three-phase recipe, the system diagram, the stack-by-stack comparison, Genie 3 details, Dreamer 3 vs 4, limitations, configuration, Table 7, glossary.
+  Speaker notes on every slide (`Dreamer4_Final_speaker_notes.md`). Built by `build_final.py`.
+* **`Dreamer4_Deep_Dive.pptx` / `.pdf` — the 50-slide reference deck** that follows the paper's structure (details below). Built by `build_deck.py`.
+
+Both scripts import `deck_common.py` (visual system, helpers) and `deck_slides.py` (one function per slide; the final deck reuses them under new titles
+via `titled()` and adds its own framing slides). `setup_libreoffice.sh` recreates the user-space LibreOffice used to render the PDFs.
+
+## The deep-dive deck
 
 * `Dreamer4_Deep_Dive.pptx` — 50 slides (16:9), speaker notes on every slide. Mixed technical audience, 50–65 min.
   v6 (Sep 2026) added slide 4, "The paper in three minutes: the official video": the YouTube video *Dreamer 4 | Diamonds from Offline Experience* (2:55, essentially Figure 1 in motion) as a
@@ -23,8 +41,8 @@
 * `stack_diagram.svg` (+ `stack_diagram.png` in the GitHub mirror, `../dreamer4_stack_diagram.png` here) — the one-page "how the parts of Dreamer 4 fit together" system diagram (standalone version of slides 13–14).
 * `Dreamer4_Deep_Dive_speaker_notes.md` — the notes as plain text (written by `build_deck.py`).
 * `versions/` — every earlier PDF render of the deck (v1 39 slides, v2 39, v3 41, v4 43 with its pptx and notes, v5 49) plus a table of what changed in each version; see `versions/README.md`.
-* `build_deck.py` — regenerates the deck (python-pptx). `make_assets.py` recreates the `assets/` folder it needs
-  (figures rendered from the paper PDF / arXiv HTML, frames from the archived official clips, matplotlib charts); `make_charts.py`, `make_diagrams.py`, `make_stack_diagram.py`, `make_tech_tree.py`, `make_wm_stack_comparison.py --deck` and `make_genie3_stack_diagram.py` are called by it.
+* `build_deck.py` — regenerates the deep-dive deck (python-pptx); `build_final.py` the final talk. `make_assets.py` recreates the `assets/` folder both need
+  (figures rendered from the paper PDF / arXiv HTML, frames from the archived official clips, matplotlib charts); `make_charts.py`, `make_diagrams.py`, `make_stack_diagram.py`, `make_tech_tree.py`, `make_wm_stack_comparison.py --deck`, `make_genie3_stack_diagram.py` and `make_landscape.py` are called by it.
   The assets folder was removed after building to save workspace space — run `python3 make_assets.py && python3 build_deck.py` to rebuild (`NO_MOVIE=1 OUT=/tmp/x.pptx python3 build_deck.py` writes the poster-only variant used for the PDF render; `assets/video/` holds the thumbnail, QR codes and teaser poster).
 
 Sources: arXiv 2509.24527, the project page danijar.com/project/dreamer4, and the research report / resource archive in `../dreamer4_resources`

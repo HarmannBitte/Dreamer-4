@@ -3,7 +3,7 @@
 Local archive of (almost) every source cited in `dreamer4_research_report.md` (copy included here; original at `/home/user/dreamer4_research_report.md`).
 Everything was fetched on **2026-09-20** from the sandbox in Frankfurt. Total size ≈ 112 MB / ~1,370 files.
 
-**Presentation.** `presentation/` holds a 50-slide deep dive on the paper for a mixed technical audience (45–60 min): [`Dreamer4_Deep_Dive.pptx`](presentation/Dreamer4_Deep_Dive.pptx) (with speaker notes), [`Dreamer4_Deep_Dive.pdf`](presentation/Dreamer4_Deep_Dive.pdf), the [speaker notes](presentation/Dreamer4_Deep_Dive_speaker_notes.md) as Markdown, the python-pptx scripts that regenerate it, and a one-page system diagram of the whole stack (`presentation/stack_diagram.png`). `diagrams/` holds three companion graphics in the same style: the OpenAI VPT stack, a stack-by-stack comparison of the five Minecraft world models of Table 1, and Google DeepMind's Genie 3 (stated vs. inferred vs. undisclosed); the latter two also appear in the deck (slides 28–29 and 41–42). `paper_figures/` holds every figure and table of the paper cropped from the PDF (plus the 449 raw embedded images) with a caption index.
+**Presentation.** `presentation/` holds the final ~30-minute talk (world-models framing, `Dreamer4_Final.pptx`) and a 50-slide deep dive on the paper for a mixed technical audience (45–60 min): [`Dreamer4_Deep_Dive.pptx`](presentation/Dreamer4_Deep_Dive.pptx) (with speaker notes), [`Dreamer4_Deep_Dive.pdf`](presentation/Dreamer4_Deep_Dive.pdf), the [speaker notes](presentation/Dreamer4_Deep_Dive_speaker_notes.md) as Markdown, the python-pptx scripts that regenerate it, and a one-page system diagram of the whole stack (`presentation/stack_diagram.png`). `diagrams/` holds three companion graphics in the same style: the OpenAI VPT stack, a stack-by-stack comparison of the five Minecraft world models of Table 1, and Google DeepMind's Genie 3 (stated vs. inferred vs. undisclosed); the latter two also appear in the deck (slides 28–29 and 41–42). `paper_figures/` holds every figure and table of the paper cropped from the PDF (plus the 449 raw embedded images) with a caption index.
 
 **Media?** See **`MEDIA_INDEX.md`** — a complete list of every video, audio file, image and large artefact (archived or listed-only, with sizes and URLs).
 
@@ -25,7 +25,7 @@ dreamer4_resources/
 ├── videos/        oEmbed metadata + thumbnails for 7 YouTube videos               (0.1 MB) → videos/README.md
 ├── huggingface/   model/dataset cards + API file listings for 4 models, 4 datasets (0.7 MB) → huggingface/README.md
 ├── paper_figures/ all 11 figures + 8 tables of the paper as images, raw embedded images, caption index (6.3 MB) → paper_figures/README.md
-├── presentation/  50-slide deep-dive deck (.pptx with speaker notes, .pdf, notes .md, build scripts, stack diagram) (7.9 MB) → presentation/README.md (versions/ keeps every earlier PDF render, v1–v5)
+├── presentation/  final 30-min talk + 50-slide deep-dive deck (.pptx with speaker notes, .pdf, notes .md, build scripts, stack diagram) (7.9 MB) → presentation/README.md (versions/ keeps every earlier PDF render, v1–v5)
 └── diagrams/      companion stack graphics: VPT, Minecraft world-model comparison, Genie 3 (PNG + SVG) → diagrams/README.md
 ```
 
